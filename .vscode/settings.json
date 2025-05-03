@@ -1,0 +1,13 @@
+{
+    "java.project.referencedLibraries": [
+        "c:\\Users\\rugge\\Desktop\\UNI\\IngeSW\\Gestore_visite_ver1-1\\lib\\mysql-connector-j-9.2.0.jar",
+        "c:\\Users\\rugge\\Desktop\\UNI\\IngeSW\\Gestore_visite_ver1-1\\lib\\mylib.jar",
+        "src/it/unibs/lib/mylib.jar",
+        "src/it/unibs/lib/mysql-connector-j-9.2.0.jar"
+    ],
+    "java.project.sourcePaths": [
+        "."
+    ],
+    "java.dependency.packagePresentation": "hierarchical",
+    "java.jdt.ls.java.home": "C:/Program Files/Java/jdk-24"
+}

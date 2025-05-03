@@ -1,0 +1,91 @@
+
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "MainVisite",
+            "request": "launch",
+            "mainClass": "src.it.unibs.ingsw.gestvisit.MainVisite",
+            "projectName": "MVC-GestoreVisite_d2925500"
+        },
+        {
+            "type": "java",
+            "name": "MainVisite",
+            "request": "launch",
+            "mainClass": "src.it.unibs.ingsw.gestvisit.gestvisit.MainVisite",
+            "projectName": "Gestore_visite_ver1_ffc6c246"
+        },
+        {
+            "type": "java",
+            "name": "MainVisite",
+            "request": "launch",
+            "mainClass": "src.it.unibs.ingsw.gestvisit.MainVisite",
+            "projectName": "Gestore_visite_ver1-1_9fb13b1"
+        },
+        {
+            "type": "java",
+            "name": "MainVisite",
+            "request": "launch",
+            "mainClass": "src.it.unibs.ingsw.gestvisit.MainVisite",
+            "projectName": "Gestore_visite_ver1_ffc6c246"
+        },
+        {
+            "type": "java",
+            "name": "MainVisite",
+            "request": "launch",
+            "mainClass": "src.it.unibs.ingsw.gestvisit.MainVisite",
+            "projectName": "Gestore_visite_ver1_29912d4d"
+        },
+        {
+            "type": "java",
+            "name": "MainVisite",
+            "request": "launch",
+            "mainClass": "src.it.unibs.ingsw.gestvisit.MainVisite",
+            "projectName": "IngeSoftware-A-_67f0af65"
+        },
+        {
+            "type": "java",
+            "name": "MainVisite",
+            "request": "launch",
+            "mainClass": "src.it.unibs.ingsw.gestvisit.MainVisite",
+            "projectName": "IngeSoftware-A-_677be5eb"
+        },
+        {
+            "type": "java",
+            "name": "MainVisite",
+            "request": "launch",
+            "mainClass": "src.it.unibs.ingsw.gestvisit.MainVisite",
+            "projectName": "IngeSoftware-A-_5aa1a8de"
+        },
+        {
+            "type": "java",
+            "name": "SalvaCredenziali",
+            "request": "launch",
+            "mainClass": "src.it.unibs.ingsw.gestvisit.SalvaCredenziali",
+            "projectName": "IngeSoftware-A-_677be5eb"
+        },
+        {
+            "type": "java",
+            "name": "GestoreMain",
+            "request": "launch",
+            "mainClass": "src.it.unibs.ingsw.gestvisit.GestoreMain",
+            "projectName": "IngeSoftware-A-_677be5eb"
+        },
+        {
+            "type": "java",
+            "name": "GestoreMain",
+            "request": "launch",
+            "mainClass": "src.it.unibs.ingsw.gestvisit.GestoreMain",
+            "projectName": "IngeSoftware-A-_5aa1a8de"
+        },
+        {
+            "type": "java",
+            "name": "Run GestoreMain",
+            "request": "launch",
+            "mainClass": "it.unibs.ingsw.gestvisit.GestoreMain",
+            "projectName": "IngeSoftware-A-",
+            "args": ""
+        }
+    ]
+}
