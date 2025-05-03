@@ -1,5 +1,7 @@
 package src.it.unibs.ingsw.gestvisit.model;
 
+import src.it.unibs.ingsw.gestvisit.controller.ThreadPoolManager;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -22,23 +24,27 @@ public class DatabaseUpdater {
     private Thread aggiornamentoThread;
     private volatile boolean eseguiAggiornamento = true; // Variabile per controllare il ciclo
 
-    public DatabaseUpdater(ExecutorService executorService) {
-        this.executorService = executorService;
+    public DatabaseUpdater(ThreadPoolManager threadPoolManager) {
+        this.executorService = threadPoolManager.createThreadPool(4); // Inizializza il thread pool
     }
 
     //Logiche Thread------------------------------------------------------------------
     // Metodo per sincronizzare i dati dal database in un thread separato
     public void sincronizzaDalDatabase() {
         executorService.submit(() -> {
-            try {
-                // Logica per sincronizzare i dati dal database
-                caricaVolontari();
-                caricaConfiguratori();
-                caricaLuoghi();
-                caricaVisite();
-            } catch (Exception e) {
-                System.err.println("Errore durante la sincronizzazione dal database: " + e.getMessage());
-            }
+            if (eseguiAggiornamento) {
+                try {
+                    // Logica per sincronizzare i dati dal database
+                    caricaVolontari();
+                    caricaConfiguratori();
+                    caricaLuoghi();
+                    caricaVisite();
+                } catch (Exception e) {
+                    System.err.println("Errore durante la sincronizzazione dal database: " + e.getMessage());
+                }
+            } else {
+                return;
+            }            
         });
     }
 
@@ -77,8 +83,8 @@ public class DatabaseUpdater {
                     sincronizzaDalDatabase();
                     Thread.sleep(5000); // Pausa di 5 secondi
                 } catch (InterruptedException e) {
-                    System.out.println("Thread di aggiornamento interrotto.");
                     Thread.currentThread().interrupt(); // Ripristina lo stato di interruzione
+                    break; // Esci dal ciclo se il thread è interrotto
                 }
             }
         });

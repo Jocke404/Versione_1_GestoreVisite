@@ -1,14 +1,12 @@
 package src.it.unibs.ingsw.gestvisit.controller;
 
+import java.util.Set;
+
 //import it.unibs.mylib.*;
 import it.unibs.mylib.InputDati;
 // Ensure this import matches the actual package of AggiuntaUtilita
 import src.it.unibs.ingsw.gestvisit.model.*;
 import src.it.unibs.ingsw.gestvisit.view.*;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 
 public class VisitManager {
@@ -19,7 +17,6 @@ public class VisitManager {
 
     // Attributi------------------------------------------------------------------------------  
     private final ThreadPoolManager threadPoolManager = new ThreadPoolManager(); // Inizializza il gestore del thread pool
-    private final ExecutorService executorService /* = Executors.newFixedThreadPool(4)*/; // Pool con thread caching
     private final DatabaseUpdater databaseUpdater /*= new DatabaseUpdater(executorService)*/;
     private final CredentialManager credentialManager /*= new CredentialManager(databaseUpdater)*/;
     private final ModificaUtilita modificaUtilita /*= new ModificaUtilita(databaseUpdater)*/; // Inizializza ModificaUtilita con databaseUpdater
@@ -29,8 +26,7 @@ public class VisitManager {
     //Gestione Thread-------------------------------------------------------------------------
     public VisitManager() {
 
-        executorService = threadPoolManager.createThreadPool(4);
-        databaseUpdater = new DatabaseUpdater(executorService); // Inizializza DatabaseUpdater con executorService
+        databaseUpdater = new DatabaseUpdater(threadPoolManager); // Inizializza DatabaseUpdater con executorService
         credentialManager = new CredentialManager(databaseUpdater); // Inizializza CredentialManager con databaseUpdater
         modificaUtilita = new ModificaUtilita(databaseUpdater); // Inizializza ModificaUtilita con databaseUpdater
         viewUtilita = new ViewUtilita(databaseUpdater); // Inizializza ViewUtilita con databaseUpdater
@@ -40,12 +36,13 @@ public class VisitManager {
         databaseUpdater.sincronizzaDalDatabase();
         // Avvia il thread di aggiornamento periodico
         databaseUpdater.avviaSincronizzazioneConSleep(); // Esegui ogni 5 secondi
-        System.out.println("Thread di aggiornamento avviato.");
     }
 
     public void stopExecutorService() {
 
+        databaseUpdater.arrestaSincronizzazioneConSleep(); // Arresta il thread di aggiornamento periodico
         threadPoolManager.shutdownAll();
+        com.mysql.cj.jdbc.AbandonedConnectionCleanupThread.checkedShutdown();
 
         // executorService.shutdown();
         // try {
@@ -56,8 +53,6 @@ public class VisitManager {
         //     executorService.shutdownNow();
         //     Thread.currentThread().interrupt();
         // }
-        // databaseUpdater.arrestaSincronizzazioneConSleep();
-        // System.out.println("ExecutorService arrestato.");
         
     }
 

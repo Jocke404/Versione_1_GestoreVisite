@@ -29,6 +29,7 @@ public class ThreadPoolManager {
         for (ExecutorService executorService : threadPools) {
             executorService.shutdown();
             try {
+                com.mysql.cj.jdbc.AbandonedConnectionCleanupThread.checkedShutdown();
                 if (!executorService.awaitTermination(5, TimeUnit.SECONDS)) {
                     System.out.println("Forzando la chiusura di un thread pool...");
                     executorService.shutdownNow();
