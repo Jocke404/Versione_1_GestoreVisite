@@ -3,7 +3,7 @@ package src.view;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import it.unibs.mylib.InputDati;
+import lib.InputDati;
 
 import src.controller.VisitManager;
 import src.model.*;

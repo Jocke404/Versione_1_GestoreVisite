@@ -1,8 +1,7 @@
 {
     "java.project.referencedLibraries": {
         "include": [
-            "c:\\Users\\Ruggero Lombardi\\Desktop\\UNI\\Ingegneria del software\\Parte A\\MVC-GestoreVisite\\src\\lib\\MyLib_V1.jar",
-            "lib/**/*.jar"
+            "utility\\mysql-connector-j-9.2.0.jar"
         ],
         "exclude": [
             "src/lib/mylib.jar"

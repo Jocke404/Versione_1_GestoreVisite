@@ -4,12 +4,15 @@ import java.time.LocalDate;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import it.unibs.mylib.InputDati;
+
+import lib.InputDati;
 import src.model.Visite;
+import src.view.ConsoleView;
 
 public class ModificaUtilita {
 
     private final DatabaseUpdater databaseUpdater;
+    private final ConsoleView consoleView = new ConsoleView();
 
     public ModificaUtilita(DatabaseUpdater databaseUpdater) {
         this.databaseUpdater = databaseUpdater;
@@ -20,11 +23,11 @@ public class ModificaUtilita {
         ConcurrentHashMap<Integer, Visite> visiteMap = databaseUpdater.getVisiteMap();
 
         if (visiteMap.isEmpty()) {
-            System.out.println("Non ci sono visite disponibili da modificare.");
+            consoleView.mostraMessaggio("Non ci sono visite disponibili da modificare.");
             return;
         }
 
-        System.out.println("Visite disponibili:");
+        consoleView.mostraMessaggio("Visite disponibili:");
         for (Map.Entry<Integer, Visite> entry : visiteMap.entrySet()) {
             Visite visita = entry.getValue();
             System.out.printf("%d. Luogo: %s, Tipo Visita: %s, Volontario: %s, Data: %s%n",
@@ -34,7 +37,7 @@ public class ModificaUtilita {
 
         int visitaId = InputDati.leggiIntero("Seleziona l'ID della visita da modificare: ");
         if (!visiteMap.containsKey(visitaId)) {
-            System.out.println("ID visita non valido.");
+            consoleView.mostraMessaggio("ID visita non valido.");
             return;
         }
 
@@ -47,13 +50,13 @@ public class ModificaUtilita {
         visitaAggiornata.setData(nuovaData);
 
         databaseUpdater.aggiornaVisita(visitaId, visitaAggiornata);
-        System.out.println("Data della visita aggiornata con successo.");
+        consoleView.mostraMessaggio("Data della visita aggiornata con successo.");
     }
 
     // Metodo per impostare il numero massimo di persone per visita
     public void modificaMaxPersone(int maxPersonePerVisita) {
         databaseUpdater.aggiornaMaxPersonePerVisita(maxPersonePerVisita);
-        System.out.println("Numero massimo di persone per visita aggiornato a: " + maxPersonePerVisita);
+        consoleView.mostraMessaggio("Numero massimo di persone per visita aggiornato a: " + maxPersonePerVisita);
     }
 
     // Metodo per visualizzare le visite in base allo stato
@@ -61,11 +64,11 @@ public class ModificaUtilita {
         ConcurrentHashMap<Integer, Visite> visiteMap = databaseUpdater.getVisiteMap();
     
         if (visiteMap.isEmpty()) {
-            System.out.println("Non ci sono visite disponibili da modificare.");
+            consoleView.mostraMessaggio("Non ci sono visite disponibili da modificare.");
             return;
         }
     
-        System.out.println("Visite disponibili:");
+        consoleView.mostraMessaggio("Visite disponibili:");
         for (Map.Entry<Integer, Visite> entry : visiteMap.entrySet()) {
             Visite visita = entry.getValue();
             System.out.printf("%d. Luogo: %s, Tipo Visita: %s, Stato: %s%n",
@@ -74,12 +77,12 @@ public class ModificaUtilita {
     
         int visitaId = InputDati.leggiIntero("Seleziona la visita da modificare: ");
         if (!visiteMap.containsKey(visitaId)) {
-            System.out.println("Visita non valida.");
+            consoleView.mostraMessaggio("Visita non valida.");
             return;
         }
     
         String[] stati = {"Proposta", "Completa", "Confermata", "Cancellata", "Effettuata"};
-        System.out.println("Stati disponibili:");
+        consoleView.mostraMessaggio("Stati disponibili:");
         for (int i = 0; i < stati.length; i++) {
             System.out.printf("%d. %s%n", i + 1, stati[i]);
         }
@@ -92,7 +95,7 @@ public class ModificaUtilita {
     
         // Aggiorna la visita nel database
         databaseUpdater.aggiornaVisita(visitaId, visitaAggiornata);
-        System.out.println("Stato della visita aggiornato con successo.");
+        consoleView.mostraMessaggio("Stato della visita aggiornato con successo.");
     }
 
 }

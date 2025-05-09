@@ -7,13 +7,14 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.DayOfWeek;
 
-import it.unibs.mylib.InputDati;
-
+import lib.InputDati;
+import src.view.ConsoleView;
 
 
 public class AggiuntaUtilita {
 
     private final DatabaseUpdater databaseUpdater;
+    private final ConsoleView consoleView = new ConsoleView();
 
     public AggiuntaUtilita(DatabaseUpdater databaseUpdater) {
         this.databaseUpdater = databaseUpdater;
@@ -25,11 +26,11 @@ public class AggiuntaUtilita {
         ConcurrentHashMap<Integer, Visite> visiteMap = databaseUpdater.getVisiteMap();
     
         if (luoghiMap.isEmpty()) {
-            System.out.println("Nessun luogo disponibile.");
+            consoleView.mostraMessaggio("aggiungi_visita.nessun_luogo_disponibile");
             return;
         }
     
-        System.out.println("Elenco dei luoghi disponibili:");
+        consoleView.mostraMessaggio("Elenco dei luoghi disponibili:");
         List<String> luoghiNomi = new ArrayList<>(luoghiMap.keySet());
         for (int i = 0; i < luoghiNomi.size(); i++) {
             System.out.printf("%d. %s%n", i + 1, luoghiNomi.get(i));
@@ -41,11 +42,11 @@ public class AggiuntaUtilita {
         String tipoVisitaScelto = InputDati.leggiStringaNonVuota("Inserisci il tipo di visita: ");
     
         if (volontariMap.isEmpty()) {
-            System.out.println("Nessun volontario disponibile.");
+            consoleView.mostraMessaggio("Nessun volontario disponibile.");
             return;
         }
     
-        System.out.println("\nElenco dei volontari disponibili:");
+        consoleView.mostraMessaggio("\nElenco dei volontari disponibili:");
         List<Volontario> volontariNomi = new ArrayList<>(volontariMap.values());//TODO: controllare se è giusto
         for (int i = 0; i < volontariNomi.size(); i++) {
             System.out.printf("%d. %s %s%n", i + 1, volontariNomi.get(i).getNome(), volontariNomi.get(i).getCognome());
@@ -73,7 +74,7 @@ public class AggiuntaUtilita {
                 }
             }
     
-            System.out.println("\nDate disponibili per la visita:");
+            consoleView.mostraMessaggio("\nDate disponibili per la visita:");
             for (int i = 0; i < dateValide.size(); i++) {
                 System.out.printf("%d. %s%n", i + 1, dateValide.get(i));
             }
@@ -94,7 +95,7 @@ public class AggiuntaUtilita {
 
         databaseUpdater.aggiungiNuovaVisita(nuovaVisita);
     
-        System.out.println("Visita assegnata con successo per la data " + dataVisita + "!");
+        consoleView.mostraMessaggio("Visita assegnata con successo per la data " + dataVisita + "!");
     }
 
     // Metodo per aggiungere un volontario
@@ -121,6 +122,6 @@ public class AggiuntaUtilita {
         Luogo nuovoLuogo = new Luogo(nome, descrizione);
         databaseUpdater.getLuoghiMap().putIfAbsent(nome, nuovoLuogo);
         databaseUpdater.aggiungiNuovoLuogo(nuovoLuogo);  
-        System.out.println("Luogo aggiunto: " + nuovoLuogo);
+        consoleView.mostraMessaggio("Luogo aggiunto: " + nuovoLuogo);
     }
 }

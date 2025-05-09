@@ -1,6 +1,7 @@
 package src.model;
 
 import src.controller.ThreadPoolManager;
+import src.view.ConsoleView;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,6 +19,7 @@ public class DatabaseUpdater {
     private ConcurrentHashMap<String, Luogo> luoghiMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Integer, Visite> visiteMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String, TemporaryCredential> temporaryCredentials = new ConcurrentHashMap<>();
+    private ConsoleView consoleView = new ConsoleView();
     
 
     private final ExecutorService executorService;
@@ -54,7 +56,7 @@ public class DatabaseUpdater {
             aggiungiVolontario(volontario);
             aggiornaPswVolontario(volontario.getEmail(), volontario.getPassword());
         }
-        System.out.println("Sincronizzazione dei volontari completata.");
+        consoleView.mostraMessaggio("Sincronizzazione dei volontari completata.");
     }
 
     // Metodo per sincronizzare i configuratori
@@ -62,7 +64,7 @@ public class DatabaseUpdater {
         for (Configuratore configuratore : configuratoriMap.values()) {
             aggiornaConfiguratore(configuratore.getEmail(), configuratore);
         }
-        System.out.println("Sincronizzazione dei configuratori completata.");
+        consoleView.mostraMessaggio("Sincronizzazione dei configuratori completata.");
     }
 
     // Metodo per sincronizzare i luoghi
@@ -71,7 +73,7 @@ public class DatabaseUpdater {
             aggiungiLuogo(luogo);
             aggiornaLuogo(luogo.getNome(), luogo);
         }
-        System.out.println("Sincronizzazione dei luoghi completata.");
+        consoleView.mostraMessaggio("Sincronizzazione dei luoghi completata.");
     }
 
     // Metodo per avviare la sincronizzazione periodica con un ciclo e sleep
@@ -141,7 +143,7 @@ public class DatabaseUpdater {
             pstmt.setString(4, password);
             pstmt.setString(5, tipoUtente);
             pstmt.executeUpdate();
-            System.out.println("Utente aggiunto con successo nella tabella 'utenti_unificati'.");
+            consoleView.mostraMessaggio("Utente aggiunto con successo nella tabella 'utenti_unificati'.");
         } catch (SQLException e) {
             System.err.println("Errore durante l'aggiunta dell'utente nella tabella 'utenti_unificati': " + e.getMessage());
         }
@@ -161,9 +163,9 @@ public class DatabaseUpdater {
                 temporaryCredentials.put(username, new TemporaryCredential(username, password));
             }
     
-            System.out.println("Credenziali temporanee caricate con successo.");
+            consoleView.mostraMessaggio("Credenziali temporanee caricate con successo.");
         } catch (SQLException e) {
-            System.out.println("Errore durante il caricamento delle credenziali temporanee: " + e.getMessage());
+            consoleView.mostraMessaggio("Errore durante il caricamento delle credenziali temporanee: " + e.getMessage());
         }
     }
 
@@ -207,7 +209,7 @@ public class DatabaseUpdater {
             pstmt.setString(5, volontario.getTipiDiVisite());
             pstmt.setBoolean(6, false);
             pstmt.executeUpdate();
-            System.out.println("Volontario aggiunto con successo nella tabella 'volontari'.");
+            consoleView.mostraMessaggio("Volontario aggiunto con successo nella tabella 'volontari'.");
     
             // Aggiungi anche nella tabella 'utenti_unificati'
             aggiungiUtenteUnificato(volontario);
@@ -278,7 +280,7 @@ public class DatabaseUpdater {
                 }
             }
         } catch (SQLException e) {
-            System.out.println("Errore durante il caricamento dei configuratori: " + e.getMessage());
+            consoleView.mostraMessaggio("Errore durante il caricamento dei configuratori: " + e.getMessage());
         }
     }
 
@@ -293,7 +295,7 @@ public class DatabaseUpdater {
             pstmt.setString(3, configuratore.getEmail());
             pstmt.setString(4, configuratore.getPassword());
             pstmt.executeUpdate();
-            System.out.println("Configuratore aggiunto con successo nella tabella 'configuratori'.");
+            consoleView.mostraMessaggio("Configuratore aggiunto con successo nella tabella 'configuratori'.");
     
             // Aggiungi anche nella tabella 'utenti_unificati'
             aggiungiUtenteUnificato(configuratore);
@@ -403,7 +405,7 @@ public class DatabaseUpdater {
                 pstmt.setString(2, luogo.getDescrizione());
                 pstmt.executeUpdate();
     
-                System.out.println("Luogo aggiunto con successo.");
+                consoleView.mostraMessaggio("Luogo aggiunto con successo.");
             } catch (SQLException e) {
                 System.err.println("Errore durante l'aggiunta del luogo: " + e.getMessage());
             }
@@ -453,7 +455,7 @@ public class DatabaseUpdater {
                 pstmt.setInt(6, visita.getMaxPersone());
                 pstmt.executeUpdate();
     
-                System.out.println("Visita aggiunta con successo.");
+                consoleView.mostraMessaggio("Visita aggiunta con successo.");
             } catch (SQLException e) {
                 System.err.println("Errore durante l'aggiunta della visita: " + e.getMessage());
             }
@@ -509,11 +511,11 @@ public class DatabaseUpdater {
     public void aggiungiNuovaVisita(Visite nuovaVisita) {
         String verificaSql = "SELECT 1 FROM visite WHERE luogo = ? AND data = ? AND volontario = ?";
         if(!recordEsiste(verificaSql, nuovaVisita.getLuogo(), nuovaVisita.getData(), nuovaVisita.getVolontario())){
-            System.out.println("La visita non esiste già. Procedo con l'aggiunta.");
+            consoleView.mostraMessaggio("La visita non esiste già. Procedo con l'aggiunta.");
             aggiungiVisita(nuovaVisita);
         }
         else{
-            System.out.println("La visita esiste già. Non posso aggiungerla.");
+            consoleView.mostraMessaggio("La visita esiste già. Non posso aggiungerla.");
             return;
         }
     }
@@ -522,21 +524,21 @@ public class DatabaseUpdater {
         String verificaSql = "SELECT 1 FROM volontari WHERE email = ?";
         if(!recordEsiste(verificaSql, nuovoVolontario.getEmail())){
             aggiungiVolontario(nuovoVolontario);
-            System.out.println("Volontario aggiunto con successo.");
+            consoleView.mostraMessaggio("Volontario aggiunto con successo.");
         }
         else{
-            System.out.println("Il volontario con email " + nuovoVolontario.getEmail() + " esiste già.");
+            consoleView.mostraMessaggio("Il volontario con email " + nuovoVolontario.getEmail() + " esiste già.");
         }
     }
 
     public void aggiungiNuovoLuogo(Luogo nuovoLuogo) {
         String verificaSql = "SELECT 1 FROM luoghi WHERE nome = ?";
         if(!recordEsiste(verificaSql, nuovoLuogo.getNome())){
-            System.out.println("Il luogo non esiste già. Procedo con l'aggiunta.");
+            consoleView.mostraMessaggio("Il luogo non esiste già. Procedo con l'aggiunta.");
             aggiungiLuogo(nuovoLuogo);
         }
         else{
-            System.out.println("Il luogo esiste già.");
+            consoleView.mostraMessaggio("Il luogo esiste già.");
             return;
         }
     }
@@ -544,11 +546,11 @@ public class DatabaseUpdater {
     public void aggiungiNuovoConf(Configuratore nuovoConfiguratore) {
         String verificaSql = "SELECT 1 FROM configuratori WHERE email = ?";
         if(!recordEsiste(verificaSql, nuovoConfiguratore.getEmail())){
-            System.out.println("Il configuratore non esiste già. Procedo con l'aggiunta.");
+            consoleView.mostraMessaggio("Il configuratore non esiste già. Procedo con l'aggiunta.");
             aggiungiConfiguratore(nuovoConfiguratore);
         }
         else{
-            System.out.println("Il configuratore esiste già.");
+            consoleView.mostraMessaggio("Il configuratore esiste già.");
             return;
         }
     }
@@ -574,7 +576,7 @@ public class DatabaseUpdater {
                 }
             }
         } catch (SQLException e) {
-            System.out.println("Errore durante la verifica delle credenziali: " + e.getMessage());
+            consoleView.mostraMessaggio("Errore durante la verifica delle credenziali: " + e.getMessage());
         }
         return tipo_utente; // Restituisce il tipo_utente o null se non trovato
     }
@@ -593,11 +595,11 @@ public class DatabaseUpdater {
                 if (rs.next()) {
                     passwordModificata = rs.getBoolean("password_modificata"); // Recupera il valore del campo password_modificata
                 } else {
-                    System.out.println("Nessun record trovato per l'email: " + email);
+                    consoleView.mostraMessaggio("Nessun record trovato per l'email: " + email);
                 }
             }
         } catch (SQLException e) {
-            System.out.println("Errore durante la verifica del campo password_modificata: " + e.getMessage());
+            consoleView.mostraMessaggio("Errore durante la verifica del campo password_modificata: " + e.getMessage());
         }
     
         return passwordModificata;

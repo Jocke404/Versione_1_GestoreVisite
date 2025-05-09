@@ -1,6 +1,6 @@
 package src.model;
 // import it.unibs.mylib.*;
-import it.unibs.mylib.InputDati;
+import lib.InputDati;
 
 import java.util.*;
 

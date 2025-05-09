@@ -1,6 +1,6 @@
 package src.view;
 
-import it.unibs.mylib.MyMenu;
+import lib.MyMenu;
 import src.controller.VisitManager;
 
 import java.time.LocalDate;

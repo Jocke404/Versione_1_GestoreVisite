@@ -3,6 +3,7 @@ package src.model;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import src.view.ConsoleView;
 
 public class DatabaseConnection {
 
@@ -10,11 +11,13 @@ public class DatabaseConnection {
     private static final String USER = "root"; // Cambia se hai impostato un altro utente
     private static final String PASSWORD = ""; // Cambia se hai impostato una password
 
+    private static ConsoleView consoleView = new ConsoleView();
+
     public static Connection connect() {
         try {
             return DriverManager.getConnection(URL, USER, PASSWORD);
         } catch (SQLException e) {
-            System.out.println("Errore di connessione al database: " + e.getMessage());
+            consoleView.mostraMessaggio("Errore di connessione al database: " + e.getMessage());
             return null;
         }
     }

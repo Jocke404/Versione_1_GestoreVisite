@@ -2,7 +2,7 @@ package src.view;
 
 import java.time.LocalDate;
 
-import it.unibs.mylib.MyMenu;
+import lib.MyMenu;
 import src.controller.VisitManager;
 
 public class MenuConfiguratore implements Menu {

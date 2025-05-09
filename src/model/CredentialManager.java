@@ -1,12 +1,14 @@
 package src.model;
 
-import it.unibs.mylib.InputDati;
+import lib.InputDati;
+import src.view.ConsoleView;
 
 public class CredentialManager {
 
     private DatabaseUpdater databaseUpdater ;
     private Volontario volontarioCorrente = null;
     private Configuratore configuratoreCorrente = null;
+    private ConsoleView consoleView = new ConsoleView();
     
     public CredentialManager(DatabaseUpdater databaseUpdater) {
         this.databaseUpdater = databaseUpdater;
@@ -20,36 +22,36 @@ public class CredentialManager {
         boolean credenzialiModificate = isPasswordModificata(email);
     
         if (tipoUtente == null) {
-            System.out.println("Credenziali non valide.");
+            consoleView.mostraMessaggio("Credenziali non valide.");
             return null;
         }
     
         switch (tipoUtente) {
             case "Volontario":
-                System.out.println("Accesso come Volontario.");
+                consoleView.mostraMessaggio("Accesso come Volontario.");
                 Volontario volontario = databaseUpdater.getVolontariMap().get(email);
                 if (volontario == null) {
-                    System.out.println("Errore: volontario non trovato.");
+                    consoleView.mostraMessaggio("Errore: volontario non trovato.");
                     return null;
                 }
     
                 if (!credenzialiModificate) {
-                    System.out.println("Hai credenziali temporanee. Ti preghiamo di modificarle.");
+                    consoleView.mostraMessaggio("Hai credenziali temporanee. Ti preghiamo di modificarle.");
                     salvaNuovaPasswordVol(volontario);
                 }
                 return volontario;
     
             case "Configuratore":
-                System.out.println("Accesso come Configuratore.");
+                consoleView.mostraMessaggio("Accesso come Configuratore.");
                 Configuratore configuratore = databaseUpdater.getConfiguratoriMap().get(email);
                 if (configuratore == null) {
-                    System.out.println("Errore: configuratore non trovato.");
+                    consoleView.mostraMessaggio("Errore: configuratore non trovato.");
                     return null;
                 }
                 return configuratore;
     
             default:
-                System.out.println("Ruolo non riconosciuto: " + tipoUtente);
+                consoleView.mostraMessaggio("Ruolo non riconosciuto: " + tipoUtente);
                 return null;
         }
     }
