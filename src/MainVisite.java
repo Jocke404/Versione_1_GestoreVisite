@@ -6,7 +6,6 @@ public class MainVisite {
     public static void main(String[] args) {
         VisitManager manager = new VisitManager();
 
-        //manager.leggiCredenziali();
         try {
             manager.autentica();
         } finally {
@@ -14,6 +13,5 @@ public class MainVisite {
             manager.stopExecutorService();
             
         }
-        //System.exit(0); // Forza la terminazione del programma   
     }
 }

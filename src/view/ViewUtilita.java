@@ -137,7 +137,7 @@ public class ViewUtilita {
     
         for (Map.Entry<Integer, Visite> entry : visiteMap.entrySet()) {
             Visite visita = entry.getValue();
-            if (visita.getVolontario().equals(volontario.getEmail())) {
+            if (visita.getVolontario().equals(volontario.getNome() + " " + volontario.getCognome())) {
                 System.out.println("ID: " + entry.getKey());
                 System.out.println("Luogo: " + visita.getLuogo());
                 System.out.println("Tipo Visita: " + visita.getTipoVisita());

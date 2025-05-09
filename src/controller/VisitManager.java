@@ -1,5 +1,7 @@
 package src.controller;
 
+import java.util.Locale;
+
 import lib.InputDati;
 // Ensure this import matches the actual package of AggiuntaUtilita
 import src.model.*;
@@ -12,13 +14,15 @@ public class VisitManager {
     public Configuratore configuratoreCorrente; // Configuratore corrente
     public Utente utenteCorrente; // Utente corrente (Volontario o Configuratore)
 
+
     // Attributi------------------------------------------------------------------------------  
     private final ThreadPoolManager threadPoolManager = new ThreadPoolManager(); // Inizializza il gestore del thread pool
-    private final DatabaseUpdater databaseUpdater /*= new DatabaseUpdater(executorService)*/;
-    private final CredentialManager credentialManager /*= new CredentialManager(databaseUpdater)*/;
-    private final ModificaUtilita modificaUtilita /*= new ModificaUtilita(databaseUpdater)*/; // Inizializza ModificaUtilita con databaseUpdater
-    private final ViewUtilita viewUtilita /*= new ViewUtilita(databaseUpdater)*/; // Inizializza ViewUtilita con databaseUpdater
-    private final AggiuntaUtilita addUtilita /*= new AggiuntaUtilita(databaseUpdater)*/; // Inizializza AggiuntaUtilita con databaseUpdater
+    private final DatabaseUpdater databaseUpdater;
+    private final CredentialManager credentialManager;
+    private final ModificaUtilita modificaUtilita; // Inizializza ModificaUtilita con databaseUpdater
+    private final ViewUtilita viewUtilita; // Inizializza ViewUtilita con databaseUpdater
+    private final AggiuntaUtilita addUtilita; // Inizializza AggiuntaUtilita con databaseUpdater
+    private final ConsoleView consoleView = new ConsoleView(); // Inizializza ConsoleView
 
     //Gestione Thread-------------------------------------------------------------------------
     public VisitManager() {
@@ -39,17 +43,13 @@ public class VisitManager {
 
         databaseUpdater.arrestaSincronizzazioneConSleep(); // Arresta il thread di aggiornamento periodico
         threadPoolManager.shutdownAll();
-
-        // executorService.shutdown();
-        // try {
-        //     if (!executorService.awaitTermination(5, TimeUnit.SECONDS)) {
-        //         executorService.shutdownNow();
-        //     }
-        // } catch (InterruptedException e) {
-        //     executorService.shutdownNow();
-        //     Thread.currentThread().interrupt();
-        // }
         
+    }
+
+    // Metodo per cambiare il Locale
+    public void cambiaLingua() {
+        Locale systemLocale = Locale.getDefault();
+        MessageProvider.setLocale(systemLocale);
     }
 
 
@@ -60,12 +60,14 @@ public class VisitManager {
 
         if (utente instanceof Volontario) {
             volontarioCorrente = (Volontario) utente;
+            utenteCorrente = volontarioCorrente; // Assegna il volontario corrente all'utente corrente
             menu = new MenuVolontario();
         } else if (utente instanceof Configuratore) {
             configuratoreCorrente = (Configuratore) utente;
+            utenteCorrente = configuratoreCorrente; // Assegna il configuratore corrente all'utente corrente
             menu = new MenuConfiguratore();
         } else {
-            System.out.println("Autenticazione fallita.");
+            consoleView.mostraMessaggio("Autenticazione fallita.");
         }
         menu.mostraMenu(); // Mostra il menu corrispondente
     }
@@ -101,8 +103,8 @@ public class VisitManager {
     public void modificaNumeroMaxPersonePerVisita() {
         int numeroMax = InputDati.leggiInteroConMinimo("Inserisci il numero massimo di persone per visita: ", 2);
         modificaUtilita.modificaMaxPersone(numeroMax);
-        System.out.println("Numero massimo di persone per visita modificato a: " + numeroMax);
-            
+        consoleView.mostraMessaggio("Numero massimo di persone per visita modificato a: " + numeroMax);
+
     }
 
     public void modificaDataVisita() {        
