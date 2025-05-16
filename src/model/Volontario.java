@@ -1,14 +1,16 @@
 package src.model;
 
+import java.util.List;
+
 public class Volontario implements Utente {
     private String nome;
     private String cognome;
     private String email;
     private String password;
-    private String tipiDiVisite; // Tipi di visite a cui il volontario è assegnato
+    private List<String> tipiDiVisite; // Tipi di visite a cui il volontario è assegnato
 
     // Costruttore, getter e setter
-    public Volontario(String nome, String cognome, String email, String password, String tipiDiVisite) {
+    public Volontario(String nome, String cognome, String email, String password, List<String> tipiDiVisite) {
         this.nome = nome;
         this.cognome = cognome;
         this.email = email;
@@ -31,7 +33,7 @@ public class Volontario implements Utente {
         return cognome;
     }
     
-    public String getTipiDiVisite() {
+    public List<String> getTipiDiVisite() {
         return tipiDiVisite;
     }
     

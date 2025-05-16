@@ -133,6 +133,10 @@ public class VisitManager {
         addUtilita.aggiungiVolontario();
     }
 
+    public void inserisciDisponibilitaVolontario() {
+        addUtilita.inserisciDisponibilitaVolontario(volontarioCorrente);
+    }
+
     public void mostraVolontari() {
         viewUtilita.stampaVolontari();
     }

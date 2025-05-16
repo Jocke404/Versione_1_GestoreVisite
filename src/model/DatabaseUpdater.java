@@ -8,6 +8,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
@@ -181,12 +184,17 @@ public class DatabaseUpdater {
                 volontariMap.clear();
                 while (rs.next()) {
                     String email = rs.getString("email");
+                    String tipiDiVisite = rs.getString("tipi_di_visite");
+                    List<String> listaTipiVisite = new ArrayList<>();
+                                    if (tipiDiVisite != null && !tipiDiVisite.isEmpty()) {
+                    listaTipiVisite = Arrays.asList(tipiDiVisite.split(","));
+                }
                     Volontario volontario = new Volontario(
                             rs.getString("nome"),
                             rs.getString("cognome"),
                             email,
                             rs.getString("password"),
-                            rs.getString("tipi_di_visite")
+                            listaTipiVisite
                     );
                     volontariMap.putIfAbsent(email, volontario);
                 }
@@ -206,7 +214,7 @@ public class DatabaseUpdater {
             pstmt.setString(2, volontario.getCognome());
             pstmt.setString(3, volontario.getEmail());
             pstmt.setString(4, volontario.getPassword());
-            pstmt.setString(5, volontario.getTipiDiVisite());
+            pstmt.setString(5, String.join(",", volontario.getTipiDiVisite()));
             pstmt.setBoolean(6, false);
             pstmt.executeUpdate();
             consoleView.mostraMessaggio("Volontario aggiunto con successo nella tabella 'volontari'.");
@@ -254,6 +262,25 @@ public class DatabaseUpdater {
                 }
             } catch (SQLException e) {
                 System.err.println("Errore durante l'aggiornamento della password: " + e.getMessage());
+            }
+        });
+    }
+
+        public void aggiornaDisponibilitaVolontario(String email, String disponibilita) {
+        String sql = "UPDATE volontari SET disponibilita = ? WHERE email = ?";
+        executorService.submit(() -> {
+            try (Connection conn = DatabaseConnection.connect();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setString(1, disponibilita);
+                pstmt.setString(2, email);
+                int rowsUpdated = pstmt.executeUpdate();
+                if (rowsUpdated > 0) {
+                    System.out.println("Disponibilità aggiornata con successo per il volontario " + email);
+                } else {
+                    System.out.println("Nessun volontario trovato con l'email " + email);
+                }
+            } catch (SQLException e) {
+                System.err.println("Errore durante l'aggiornamento della disponibilità: " + e.getMessage());
             }
         });
     }
