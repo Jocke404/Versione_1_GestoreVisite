@@ -8,10 +8,14 @@ import src.controller.VisitManager;
 public class MenuConfiguratore implements Menu {
     private static final String[] SELECT = {"Aggiungi Luogo", "Aggiungi Volontario", "Aggiungi Visita", 
     "Visualizza Luoghi", "Visualizza Volontari", "Visualizza Visite", 
-    "Modifica numero massimo di persone per visita", 
+    "Modifica numero massimo di persone per visita",
     "Modifica stato della visita", "Visualizza visite per stato", "Visualizza archivio storico"};
-    private VisitManager visitManager = new VisitManager();
+    private final VisitManager visitManager; // Riferimento all'istanza di VisitManager che ha creato questo menu
 
+    public MenuConfiguratore(VisitManager visitManager) {
+        this.visitManager = visitManager;
+    }
+    
     @Override
     public void mostraMenu() {
         // Inizializza il menu con le opzioni disponibili

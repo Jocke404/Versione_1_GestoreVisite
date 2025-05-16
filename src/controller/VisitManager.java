@@ -1,9 +1,6 @@
 package src.controller;
 
 import java.util.Locale;
-
-import lib.InputDati;
-// Ensure this import matches the actual package of AggiuntaUtilita
 import src.model.*;
 import src.view.*;
 
@@ -54,22 +51,71 @@ public class VisitManager {
 
 
     //Autenticazione-------------------------------------------------------------------------
-    public void autentica() {
-        Utente utente = credentialManager.autentica();
-        Menu menu = null; // Inizializza il menu a null
-
-        if (utente instanceof Volontario) {
-            volontarioCorrente = (Volontario) utente;
-            utenteCorrente = volontarioCorrente; // Assegna il volontario corrente all'utente corrente
-            menu = new MenuVolontario();
-        } else if (utente instanceof Configuratore) {
-            configuratoreCorrente = (Configuratore) utente;
-            utenteCorrente = configuratoreCorrente; // Assegna il configuratore corrente all'utente corrente
-            menu = new MenuConfiguratore();
-        } else {
-            consoleView.mostraMessaggio("Autenticazione fallita.");
+    public Utente autentica() {
+        Utente utenteBase = credentialManager.autentica();
+        
+        if (!validaAutenticazioneBase(utenteBase)) {
+            return null;
         }
-        menu.mostraMenu(); // Mostra il menu corrispondente
+
+        Menu menu = creaMenuPerUtente(utenteBase);
+        if (menu != null) {
+            menu.mostraMenu();
+            return utenteCorrente;
+        }
+        
+        return null;
+    }
+
+    private boolean validaAutenticazioneBase(Utente utenteBase) {
+        if (utenteBase == null) {
+            consoleView.mostraMessaggio("Autenticazione fallita.");
+            resetUtenti();
+            return false;
+        }
+        return true;
+    }
+
+    private void resetUtenti() {
+        this.utenteCorrente = null;
+        this.volontarioCorrente = null;
+        this.configuratoreCorrente = null;
+    }
+
+    private Menu creaMenuPerUtente(Utente utenteBase) {
+        String email = utenteBase.getEmail();
+        
+        if (utenteBase instanceof Volontario) {
+            return creaMenuVolontario(email);
+        } else if (utenteBase instanceof Configuratore) {
+            return creaMenuConfiguratore(email);
+        } else {
+            consoleView.mostraMessaggio("Tipo utente non riconosciuto.");
+            resetUtenti();
+            return null;
+        }
+    }
+
+    private Menu creaMenuVolontario(String email) {
+        this.volontarioCorrente = databaseUpdater.getVolontariMap().get(email);
+        if (this.volontarioCorrente == null) {
+            consoleView.mostraMessaggio("Errore: dati volontario non trovati nel database.");
+            resetUtenti();
+            return null;
+        }
+        this.utenteCorrente = this.volontarioCorrente;
+        return new MenuVolontario(this);
+    }
+
+    private Menu creaMenuConfiguratore(String email) {
+        this.configuratoreCorrente = databaseUpdater.getConfiguratoriMap().get(email);
+        if (this.configuratoreCorrente == null) {
+            consoleView.mostraMessaggio("Errore: dati configuratore non trovati nel database.");
+            resetUtenti();
+            return null;
+        }
+        this.utenteCorrente = this.configuratoreCorrente;
+        return new MenuConfiguratore(this);
     }
 
     
@@ -90,6 +136,10 @@ public class VisitManager {
     public void mostraVolontari() {
         viewUtilita.stampaVolontari();
     }
+    
+    public void visualizzaVisiteVolontario(){
+        viewUtilita.stampaVisiteVolontario((Volontario)utenteCorrente);
+    }
 
     //Logiche per le visite-------------------------------------------------------------------------
     public void mostraVisite() {        
@@ -101,13 +151,10 @@ public class VisitManager {
     }
 
     public void modificaNumeroMaxPersonePerVisita() {
-        int numeroMax = InputDati.leggiInteroConMinimo("Inserisci il numero massimo di persone per visita: ", 2);
-        modificaUtilita.modificaMaxPersone(numeroMax);
-        consoleView.mostraMessaggio("Numero massimo di persone per visita modificato a: " + numeroMax);
-
+        modificaUtilita.modificaMaxPersone();
     }
 
-    public void modificaDataVisita() {        
+    public void modificaDataVisita() {
         modificaUtilita.modificaDataVisita();
     }
 
@@ -123,10 +170,6 @@ public class VisitManager {
     public void visualizzaArchivioStorico() {
         viewUtilita.stampaArchivioStorico();
     } 
-
-    public void visualizzaVisiteVolontario(){
-        viewUtilita.stampaVisiteVolontario();
-    }
 
     public Utente getTipoUtente(){
         return utenteCorrente;

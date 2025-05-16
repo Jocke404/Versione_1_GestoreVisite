@@ -20,7 +20,7 @@ public class CredentialManager {
         String password = InputDati.leggiStringaNonVuota("Inserisci la password: ");
         String tipoUtente = verificaCredenziali(email, password);
         boolean credenzialiModificate = isPasswordModificata(email);
-    
+
         if (tipoUtente == null) {
             consoleView.mostraMessaggio("Credenziali non valide.");
             return null;
@@ -30,6 +30,7 @@ public class CredentialManager {
             case "Volontario":
                 consoleView.mostraMessaggio("Accesso come Volontario.");
                 Volontario volontario = databaseUpdater.getVolontariMap().get(email);
+                
                 if (volontario == null) {
                     consoleView.mostraMessaggio("Errore: volontario non trovato.");
                     return null;
@@ -40,6 +41,8 @@ public class CredentialManager {
                     salvaNuovaPasswordVol(volontario);
                 }
                 return volontario;
+                
+                
     
             case "Configuratore":
                 consoleView.mostraMessaggio("Accesso come Configuratore.");

@@ -6,7 +6,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 import lib.InputDati;
-import src.model.Visite;
 import src.view.ConsoleView;
 
 public class ModificaUtilita {
@@ -54,9 +53,10 @@ public class ModificaUtilita {
     }
 
     // Metodo per impostare il numero massimo di persone per visita
-    public void modificaMaxPersone(int maxPersonePerVisita) {
-        databaseUpdater.aggiornaMaxPersonePerVisita(maxPersonePerVisita);
-        consoleView.mostraMessaggio("Numero massimo di persone per visita aggiornato a: " + maxPersonePerVisita);
+    public void modificaMaxPersone() {
+        int numeroMax = InputDati.leggiInteroConMinimo("Inserisci il numero massimo di persone per visita: ", 2);
+        databaseUpdater.aggiornaMaxPersonePerVisita(numeroMax);
+        consoleView.mostraMessaggio("Numero massimo di persone per visita aggiornato a: " + numeroMax);
     }
 
     // Metodo per visualizzare le visite in base allo stato

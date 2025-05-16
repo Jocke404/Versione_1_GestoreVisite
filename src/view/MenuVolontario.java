@@ -6,7 +6,7 @@ import src.controller.VisitManager;
 import java.time.LocalDate;
 
 public class MenuVolontario implements Menu {
-    private VisitManager visitManager = new VisitManager(); // Inizializza il VisitManager
+    private final VisitManager visitManager; // Riferimento all'istanza di VisitManager che ha creato questo menu
     private static final String[] OPZIONI_VOLONTARIO = {
         "Visualizza visite assegnate",
         "Inserisci disponibilità"
@@ -14,6 +14,10 @@ public class MenuVolontario implements Menu {
 
     @Override
     public void mostraMenu() {
+    }
+
+    public MenuVolontario(VisitManager visitManager) {
+        this.visitManager = visitManager;
         // Inizializza il menu con le opzioni disponibili
         boolean goOn = true;
         System.out.printf("oggi è il: %d/%d/%d\n", LocalDate.now().getDayOfMonth(), LocalDate.now().getMonthValue(), LocalDate.now().getYear());

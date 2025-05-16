@@ -120,16 +120,12 @@ public class ViewUtilita {
 
 
     // Metodo per visualizzare le visite assegnate a un volontario
-    public void stampaVisiteVolontario() {
-        VisitManager visitManager = new VisitManager();
-        Utente utenteCorrente = visitManager.getTipoUtente();
-    
-        if (!(utenteCorrente instanceof Volontario)) {
-            System.out.println("Nessun volontario trovato o utente non autenticato.");
+    public void stampaVisiteVolontario(Volontario volontario) {
+        
+        if (volontario == null) {
+            System.out.println("Errore: nessun volontario fornito");
             return;
         }
-    
-        Volontario volontario = (Volontario) utenteCorrente;
         System.out.println("Visite assegnate a " + volontario.getNome() + " " + volontario.getCognome() + ":");
     
         ConcurrentHashMap<Integer, Visite> visiteMap = databaseUpdater.getVisiteMap();
