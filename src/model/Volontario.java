@@ -49,8 +49,8 @@ public class Volontario implements Utente {
         this.password = password;
     }
 
-    @Override
-    public String toString() {
-        return "Volontario [nome=" + nome + ", cognome=" + cognome + ", email=" + email + ", tipiDiVisite=" + tipiDiVisite + "]";
-    }
+    // @Override
+    // public String toString() {
+    //     return "Volontario [nome=" + nome + ", cognome=" + cognome + ", email=" + email + ", tipiDiVisite=" + tipiDiVisite + "]";
+    // }
 }

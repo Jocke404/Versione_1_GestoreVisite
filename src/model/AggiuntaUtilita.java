@@ -107,13 +107,12 @@ public class AggiuntaUtilita {
         String nome = InputDati.leggiStringaNonVuota("inserire il nome del volontario: ");
         String cognome = InputDati.leggiStringaNonVuota("inserire il cognome del volontario: ");
         String email = InputDati.leggiStringaNonVuota("inserire l'email del volontario: ");
-        String nomeUtente = email;
         String password = InputDati.leggiStringaNonVuota("inserire la password: ");
         List<String> tipiDiVisite = new ArrayList<>();
         // Chiedi all'utente di inserire i tipi di visita
 
         
-        Volontario nuovoVolontario = new Volontario(nome, cognome, email, nomeUtente, tipiDiVisite);
+        Volontario nuovoVolontario = new Volontario(nome, cognome, email, password, tipiDiVisite);
         // Aggiungi il volontario alla HashMap
         databaseUpdater.getVolontariMap().putIfAbsent(email, nuovoVolontario);
 
@@ -133,75 +132,88 @@ public class AggiuntaUtilita {
     }
 
     public void inserisciDisponibilitaVolontario(Volontario volontario) {
+        if (volontario == null) {
+            consoleView.mostraMessaggio("Errore: volontario non valido");
+            return;
+        }
+
         LocalDate oggi = LocalDate.now();
-        int giornoCorrente = oggi.getDayOfMonth();
-
-        // Permetti solo tra il 1 e il 15 del mese
-        //if (giornoCorrente < 1 || giornoCorrente > 15) {
-        // System.out.println("Puoi inserire la disponibilità solo tra il 1 e il 15 del mese precedente a quello di interesse.");
-            //return;
-        //}
-
         LocalDate meseProssimo = oggi.plusMonths(1);
         YearMonth ym = YearMonth.of(meseProssimo.getYear(), meseProssimo.getMonthValue());
-        ConcurrentHashMap<Integer, Visite> visiteMap = databaseUpdater.getVisiteMap();
+        
+        List<Integer> giorniDisponibili = trovaGiorniDisponibili(volontario, meseProssimo, ym);
+        
+        if (giorniDisponibili.isEmpty()) {
+            consoleView.mostraMessaggio("Non ci sono giorni disponibili per dichiarare la disponibilità.");
+            return;
+        }
 
-        // Ottieni i tipi di visita associati al volontario
+        List<String> dateDisponibili = raccogliDateDisponibili(giorniDisponibili);
+        salvaDisponibilita(volontario, dateDisponibili);
+    }
+
+    private List<Integer> trovaGiorniDisponibili(Volontario volontario, LocalDate meseProssimo, YearMonth ym) {
+        List<Integer> giorniDisponibili = new ArrayList<>();
+        ConcurrentHashMap<Integer, Visite> visiteMap = databaseUpdater.getVisiteMap();
         List<String> tipiVisitaVolontario = volontario.getTipiDiVisite();
 
-        System.out.println("Calendario del mese di " + meseProssimo.getMonth() + " " + meseProssimo.getYear() + ":");
-        System.out.println("Giorno\tGiorno della settimana");
+        consoleView.mostraMessaggio("Calendario del mese di " + meseProssimo.getMonth() + " " + meseProssimo.getYear() + ":");
+        consoleView.mostraMessaggio("Giorno\tGiorno della settimana");
 
-        List<Integer> giorniDisponibili = new ArrayList<>();
         for (int giorno = 1; giorno <= ym.lengthOfMonth(); giorno++) {
             LocalDate data = ym.atDay(giorno);
-            // Giorno della settimana in italiano
             String giornoSettimana = data.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ITALIAN);
 
-            boolean visitaProgrammato = visiteMap.values().stream()
-                .anyMatch(v -> v.getData() != null && v.getData().equals(data));
-
-            boolean tipoVisitaConsentito = tipiVisitaVolontario.stream()
-                .anyMatch(tipo -> isTipoVisitaProgrammabileInGiorno(tipo, data.getDayOfWeek().toString()));
-
-            boolean disponibile = !visitaProgrammato && tipoVisitaConsentito;
-
-            if (disponibile) {
+            if (isGiornoDisponibile(data, visiteMap, tipiVisitaVolontario)) {
                 System.out.printf("%02d\t%s%n", giorno, giornoSettimana);
                 giorniDisponibili.add(giorno);
             }
         }
+        
+        return giorniDisponibili;
+    }
 
-        if (giorniDisponibili.isEmpty()) {
-            System.out.println("Non ci sono giorni disponibili per dichiarare la disponibilità.");
-            return;
-        }
+    private boolean isGiornoDisponibile(LocalDate data, ConcurrentHashMap<Integer, Visite> visiteMap, 
+                                    List<String> tipiVisitaVolontario) {
+        boolean visitaProgrammata = visiteMap.values().stream()
+            .anyMatch(v -> v.getData() != null && v.getData().equals(data));
 
-        System.out.println("Inserisci le date (formato: DD) separate da virgola tra quelle disponibili:");
+        boolean tipoVisitaConsentito = tipiVisitaVolontario.stream()
+            .anyMatch(tipo -> isTipoVisitaProgrammabileInGiorno(tipo, data.getDayOfWeek().toString()));
+
+        return !visitaProgrammata && tipoVisitaConsentito;
+    }
+
+    private List<String> raccogliDateDisponibili(List<Integer> giorniDisponibili) {
+        consoleView.mostraMessaggio("Inserisci le date (formato: DD) separate da virgola tra quelle disponibili:");
         String input = InputDati.leggiStringaNonVuota("Date: ");
         String[] dateArray = input.split(",");
         List<String> dateDisponibili = new ArrayList<>();
+
         for (String data : dateArray) {
             String trimmed = data.trim();
             try {
                 int giorno = Integer.parseInt(trimmed);
                 if (!giorniDisponibili.contains(giorno)) {
-                    System.out.println("Il giorno " + trimmed + " non è disponibile.");
+                    consoleView.mostraMessaggio("Il giorno " + trimmed + " non è disponibile.");
                     continue;
                 }
                 dateDisponibili.add(trimmed);
             } catch (NumberFormatException e) {
-                System.out.println("Formato data non valido: " + trimmed);
+                consoleView.mostraMessaggio("Formato data non valido: " + trimmed);
             }
         }
-        disponibilitaVolontari.put(volontario.getEmail(), dateDisponibili);
-        System.out.println("Disponibilità salvata solo in memoria!");
-        System.out.println("Date salvate per " + volontario.getEmail() + ": " + dateDisponibili);
+        
+        return dateDisponibili;
     }
 
-        // Funzione di esempio: da personalizzare in base alla tua logica di associazione tipo-visita/giorno
+    private void salvaDisponibilita(Volontario volontario, List<String> dateDisponibili) {
+        disponibilitaVolontari.put(volontario.getEmail(), dateDisponibili);
+        consoleView.mostraMessaggio("Disponibilità salvata solo in memoria!");
+        consoleView.mostraMessaggio("Date salvate per " + volontario.getEmail() + ": " + dateDisponibili);
+    }
+
     private boolean isTipoVisitaProgrammabileInGiorno(String tipoVisita, String giornoSettimana) {
-        // Esempio: tutte le visite sono programmabili tutti i giorni tranne DOMENICA
         return !giornoSettimana.equals("SUNDAY");
     }
 }
