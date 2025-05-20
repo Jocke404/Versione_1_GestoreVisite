@@ -6,8 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.concurrent.ConcurrentHashMap;
 import src.controller.ThreadPoolManager;
-
-import src.model.DatabaseConnection;
 import src.model.Luogo;
 
 public class LuoghiManager extends DatabaseManager {

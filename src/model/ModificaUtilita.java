@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 import lib.InputDati;
+import src.model.db.DatabaseUpdater;
 import src.view.ConsoleView;
 
 public class ModificaUtilita {

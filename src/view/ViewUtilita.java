@@ -7,6 +7,7 @@ import lib.InputDati;
 
 import src.controller.VisitManager;
 import src.model.*;
+import src.model.db.DatabaseUpdater;
 
 public class ViewUtilita {
     private final DatabaseUpdater databaseUpdater;

@@ -7,7 +7,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import src.controller.ThreadPoolManager;
 import src.model.Configuratore;
-import src.model.DatabaseConnection;
 
 public class ConfiguratoriManager extends DatabaseManager {
     private ConcurrentHashMap<String, Configuratore> configuratoriMap = new ConcurrentHashMap<>();
@@ -26,7 +25,7 @@ public class ConfiguratoriManager extends DatabaseManager {
     
     //Logiche dei configuratori--------------------------------------------------
     // Metodo per caricare i configuratori dal database e memorizzarli nella HashMap
-    private void caricaConfiguratori() {
+    protected void caricaConfiguratori() {
         String sql = "SELECT nome, cognome, email, password FROM configuratori";
         try (Connection conn = DatabaseConnection.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -51,7 +50,7 @@ public class ConfiguratoriManager extends DatabaseManager {
     }
 
     // Metodo per aggiungere un configuratore al database
-    private void aggiungiConfiguratore(Configuratore configuratore) {
+    protected void aggiungiConfiguratore(Configuratore configuratore) {
         String inserisciSqlConfiguratori = "INSERT INTO configuratori (nome, cognome, email, password) VALUES (?, ?, ?, ?)";
     
         try (Connection conn = DatabaseConnection.connect();
@@ -114,7 +113,7 @@ public class ConfiguratoriManager extends DatabaseManager {
         });
     }
 
-        public void aggiungiNuovoConf(Configuratore nuovoConfiguratore) {
+    public void aggiungiNuovoConf(Configuratore nuovoConfiguratore) {
         String verificaSql = "SELECT 1 FROM configuratori WHERE email = ?";
         if(!recordEsiste(verificaSql, nuovoConfiguratore.getEmail())){
             consoleView.mostraMessaggio("Il configuratore non esiste già. Procedo con l'aggiunta.");

@@ -1,10 +1,11 @@
-package src.model;
+package src.model.db;
 
 import src.controller.ThreadPoolManager;
-import src.model.db.ConfiguratoriManager;
-import src.model.db.LuoghiManager;
-import src.model.db.VisiteManager;
-import src.model.db.VolontariManager;
+import src.model.Configuratore;
+import src.model.Luogo;
+import src.model.TemporaryCredential;
+import src.model.Visite;
+import src.model.Volontario;
 import src.view.ConsoleView;
 
 import java.sql.Connection;
@@ -54,7 +55,7 @@ public class DatabaseUpdater {
                     volontariManager.caricaVolontari();
                     configuratoriManager.caricaConfiguratori();
                     luoghiManager.caricaLuoghi();
-                    visiteManager.caricaVisite();
+                    visiteManagerDB.caricaVisite();
                 } catch (Exception e) {
                     System.err.println("Errore durante la sincronizzazione dal database: " + e.getMessage());
                 }

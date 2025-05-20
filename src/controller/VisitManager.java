@@ -2,6 +2,7 @@ package src.controller;
 
 import java.util.Locale;
 import src.model.*;
+import src.model.db.DatabaseUpdater;
 import src.view.*;
 
 

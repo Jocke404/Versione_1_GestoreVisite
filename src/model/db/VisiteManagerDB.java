@@ -7,11 +7,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.concurrent.ConcurrentHashMap;
 import src.controller.ThreadPoolManager;
-
-import src.model.DatabaseConnection;
-import src.model.Luogo;
 import src.model.Visite;
-import src.model.Volontario;
 
 public class VisiteManagerDB extends DatabaseManager {
     private ConcurrentHashMap<Integer, Visite> visiteMap = new ConcurrentHashMap<>();
@@ -23,7 +19,7 @@ public class VisiteManagerDB extends DatabaseManager {
 
     //Logiche delle visite--------------------------------------------------
     // Metodo per caricare un luogo nel database e memorizzarlo nella HashMap
-    private void caricaVisite() {
+    protected void caricaVisite() {
         String sql = "SELECT id, luogo, tipo_visita, volontario, data, stato, max_persone FROM visite";
         try (Connection conn = DatabaseConnection.connect();
             PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -51,7 +47,7 @@ public class VisiteManagerDB extends DatabaseManager {
     }
 
     // Metodo per aggiungere una visita al database
-    private void aggiungiVisita(Visite visita) {
+    protected void aggiungiVisita(Visite visita) {
         String inserisciSql = "INSERT INTO visite (luogo, tipo_visita, volontario, data, stato, max_persone) VALUES (?, ?, ?, ?, ?, ?)";
 
             try (Connection conn = DatabaseConnection.connect();

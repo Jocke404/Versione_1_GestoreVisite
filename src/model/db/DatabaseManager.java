@@ -1,6 +1,5 @@
 package src.model.db;
 
-import src.model.DatabaseConnection;
 import src.model.Utente;
 import src.view.ConsoleView;
 import src.controller.ThreadPoolManager;

@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import src.controller.ThreadPoolManager;
-import src.model.DatabaseConnection;
 import src.model.Volontario;
 
 public class VolontariManager extends DatabaseManager {
@@ -34,7 +33,7 @@ public class VolontariManager extends DatabaseManager {
 
     //Logiche dei volontari--------------------------------------------------
     // Metodo per caricare i volontari dal database e memorizzarli nella HashMap
-    private void caricaVolontari() {
+    protected void caricaVolontari() {
         String sql = "SELECT nome, cognome, email, password, tipi_di_visite FROM volontari";
         try (Connection conn = DatabaseConnection.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -65,7 +64,7 @@ public class VolontariManager extends DatabaseManager {
     }
 
     // Metodo per aggiungere un volontario al database
-    private void aggiungiVolontario(Volontario volontario) {
+    protected void aggiungiVolontario(Volontario volontario) {
         String inserisciSqlVolontari = "INSERT INTO volontari (nome, cognome, email, password, tipi_di_visite, password_modificata) VALUES (?, ?, ?, ?, ?, ?)";
     
         try (Connection conn = DatabaseConnection.connect();
@@ -126,7 +125,7 @@ public class VolontariManager extends DatabaseManager {
         });
     }
 
-        public void aggiornaDisponibilitaVolontario(String email, String disponibilita) {
+    public void aggiornaDisponibilitaVolontario(String email, String disponibilita) {
         String sql = "UPDATE volontari SET disponibilita = ? WHERE email = ?";
         executorService.submit(() -> {
             try (Connection conn = DatabaseConnection.connect();
