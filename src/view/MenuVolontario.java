@@ -31,7 +31,7 @@ public class MenuVolontario implements Menu {
                     visitManager.visualizzaVisiteVolontario();
                 } else if (chosed == 2) {
                     //Logica per inserire le disponibilità del volontario
-                    //VisitManager.inserisciDisponibilita();
+                    visitManager.inserisciDisponibilitaVolontario();
                 } else if (chosed == 4) {
                     //TODO
                 } else if (chosed == 0) {

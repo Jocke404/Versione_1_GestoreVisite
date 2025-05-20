@@ -2,7 +2,7 @@ package src.view;
 
 import java.util.List;
 
-public class ConsoleView {
+public class ConsoleView implements View{
 
     public void mostraMessaggio(String messaggio) {
         System.out.println(messaggio);
