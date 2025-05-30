@@ -9,20 +9,18 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-import src.controller.ThreadPoolManager;
+import src.controller.ThreadPoolController;
 import src.model.Volontario;
 
 public class VolontariManager extends DatabaseManager {
 
     private ConcurrentHashMap<String, Volontario> volontariMap = new ConcurrentHashMap<>();
 
-    public VolontariManager(ThreadPoolManager threadPoolManager) {
+    public VolontariManager(ThreadPoolController threadPoolManager) {
         super(threadPoolManager);
     }
 
-
-
-        // Metodo per sincronizzare i volontari
+    // Metodo per sincronizzare i volontari
     public void sincronizzaVolontari() {
         for (Volontario volontario : volontariMap.values()) {
             aggiungiVolontario(volontario);
@@ -152,6 +150,18 @@ public class VolontariManager extends DatabaseManager {
         } else {
             consoleView.mostraMessaggio("Il volontario con email " + nuovoVolontario.getEmail() + " esiste già.");
         }
+    }
+
+    public ConcurrentHashMap<String, Volontario> getVolontariMap() {
+        return volontariMap;
+    }
+    
+    public void setVolontariMap(ConcurrentHashMap<String, Volontario> volontariMap) {
+        this.volontariMap = volontariMap;
+    }
+
+    public static VolontariManager getInstance() {
+        return new VolontariManager(ThreadPoolController.getInstance());
     }
 
 }

@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
-public class ThreadPoolManager {
+import src.model.db.DatabaseUpdater;
 
+public class ThreadPoolController {
+
+    private final ThreadPoolController threadPoolManager = new ThreadPoolController(); // Inizializza il gestore del thread pool
+    private final DatabaseUpdater databaseUpdater = new DatabaseUpdater(); // Inizializza il database updater con il gestore del thread pool
     private final List<ExecutorService> threadPools = new ArrayList<>();
 
     // Metodo per creare un nuovo thread pool e registrarlo
@@ -24,20 +27,18 @@ public class ThreadPoolManager {
         return executorService;
     }
 
+    public void startDatabaseSync() {
+        databaseUpdater.sincronizzaDalDatabase();
+        databaseUpdater.avviaSincronizzazioneConSleep();
+    }
+
     // Metodo per arrestare tutti i thread pool registrati
     public void shutdownAll() {
-        for (ExecutorService executorService : threadPools) {
-            executorService.shutdown();
-            try {
-                if (!executorService.awaitTermination(5, TimeUnit.SECONDS)) {
-                    System.out.println("Forzando la chiusura di un thread pool...");
-                    executorService.shutdownNow();
-                }
-            } catch (InterruptedException e) {
-                executorService.shutdownNow();
-                Thread.currentThread().interrupt();
-            }
-        }
-        System.out.println("Tutti i thread pool sono stati arrestati.");
+        databaseUpdater.arrestaSincronizzazioneConSleep();
+        threadPoolManager.shutdownAll();
+    }
+
+    public static ThreadPoolController getInstance() {
+        return new ThreadPoolController();
     }
 }

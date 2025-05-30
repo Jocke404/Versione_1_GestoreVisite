@@ -3,24 +3,22 @@ package src.model;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import src.model.db.VisiteManagerDB;
 
 
 import lib.InputDati;
-import src.model.db.DatabaseUpdater;
 import src.view.ConsoleView;
 
 public class ModificaUtilita {
 
-    private final DatabaseUpdater databaseUpdater;
+    private static final VisiteManagerDB visiteManagerDB = VisiteManagerDB.getInstance();
     private final ConsoleView consoleView = new ConsoleView();
 
-    public ModificaUtilita(DatabaseUpdater databaseUpdater) {
-        this.databaseUpdater = databaseUpdater;
-    }
+    public ModificaUtilita() {}
 
     // Metodo per modificare la data di una visita
     public void modificaDataVisita() {
-        ConcurrentHashMap<Integer, Visite> visiteMap = databaseUpdater.getVisiteMap();
+        ConcurrentHashMap<Integer, Visite> visiteMap = visiteManagerDB.getVisiteMap();
 
         if (visiteMap.isEmpty()) {
             consoleView.mostraMessaggio("Non ci sono visite disponibili da modificare.");
@@ -49,20 +47,20 @@ public class ModificaUtilita {
         Visite visitaAggiornata = visiteMap.get(visitaId);
         visitaAggiornata.setData(nuovaData);
 
-        databaseUpdater.aggiornaVisita(visitaId, visitaAggiornata);
+        visiteManagerDB.aggiornaVisita(visitaId, visitaAggiornata);
         consoleView.mostraMessaggio("Data della visita aggiornata con successo.");
     }
 
     // Metodo per impostare il numero massimo di persone per visita
     public void modificaMaxPersone() {
         int numeroMax = InputDati.leggiInteroConMinimo("Inserisci il numero massimo di persone per visita: ", 2);
-        databaseUpdater.aggiornaMaxPersonePerVisita(numeroMax);
+        visiteManagerDB.aggiornaMaxPersonePerVisita(numeroMax);
         consoleView.mostraMessaggio("Numero massimo di persone per visita aggiornato a: " + numeroMax);
     }
 
     // Metodo per visualizzare le visite in base allo stato
     public void modificaStatoVisita() {
-        ConcurrentHashMap<Integer, Visite> visiteMap = databaseUpdater.getVisiteMap();
+        ConcurrentHashMap<Integer, Visite> visiteMap = visiteManagerDB.getVisiteMap();
     
         if (visiteMap.isEmpty()) {
             consoleView.mostraMessaggio("Non ci sono visite disponibili da modificare.");
@@ -95,8 +93,12 @@ public class ModificaUtilita {
         visitaAggiornata.setStato(nuovoStato);
     
         // Aggiorna la visita nel database
-        databaseUpdater.aggiornaVisita(visitaId, visitaAggiornata);
+        visiteManagerDB.aggiornaVisita(visitaId, visitaAggiornata);
         consoleView.mostraMessaggio("Stato della visita aggiornato con successo.");
+    }
+
+    public static ModificaUtilita getInstance() {
+        return new ModificaUtilita();
     }
 
 }

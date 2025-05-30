@@ -1,16 +1,18 @@
 package src;
 
-import src.controller.VisitManager;
+import src.controller.AuthenticationController;
+import src.controller.MasterController;
 
 public class MainVisite {
     public static void main(String[] args) {
-        VisitManager manager = new VisitManager();
+        AuthenticationController auth = AuthenticationController.getInstance();
+        MasterController master = MasterController.getInstance();
 
         try {
-            manager.autentica();
+            auth.autentica();
         } finally {
             // Arresta il thread di aggiornamento prima di uscire
-            manager.stopExecutorService();
+            master.stopExecutorService();
             
         }
     }

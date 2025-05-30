@@ -5,13 +5,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.concurrent.ConcurrentHashMap;
 
-import src.controller.ThreadPoolManager;
+import src.controller.ThreadPoolController;
 import src.model.Configuratore;
 
 public class ConfiguratoriManager extends DatabaseManager {
     private ConcurrentHashMap<String, Configuratore> configuratoriMap = new ConcurrentHashMap<>();
 
-    public ConfiguratoriManager(ThreadPoolManager threadPoolManager) {
+    public ConfiguratoriManager(ThreadPoolController threadPoolManager) {
         super(threadPoolManager);
         caricaConfiguratori();
     }
@@ -123,6 +123,17 @@ public class ConfiguratoriManager extends DatabaseManager {
             consoleView.mostraMessaggio("Il configuratore esiste già.");
             return;
         }
+    }
+
+    public ConcurrentHashMap<String, Configuratore> getConfiguratoriMap() {
+        return configuratoriMap;
+    }
+    
+    public void setConfiguratoriMap(ConcurrentHashMap<String, Configuratore> configuratoriMap) {
+        this.configuratoriMap = configuratoriMap;
+    }
+    public static ConfiguratoriManager getInstance() {
+        return new ConfiguratoriManager(ThreadPoolController.getInstance());
     }
 
 }

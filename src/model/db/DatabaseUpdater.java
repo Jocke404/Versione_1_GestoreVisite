@@ -1,6 +1,6 @@
 package src.model.db;
 
-import src.controller.ThreadPoolManager;
+import src.controller.ThreadPoolController;
 import src.model.Configuratore;
 import src.model.Luogo;
 import src.model.TemporaryCredential;
@@ -12,38 +12,28 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
 
 public class DatabaseUpdater {
     // HashMap per memorizzare i dati sincronizzati
-    private ConcurrentHashMap<String, Volontario> volontariMap = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<String, Configuratore> configuratoriMap = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<String, Luogo> luoghiMap = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<Integer, Visite> visiteMap = new ConcurrentHashMap<>();
+    // private ConcurrentHashMap<String, Volontario> volontariMap = VolontariManager.getInstance().getVolontariMap();
+    // private ConcurrentHashMap<String, Configuratore> configuratoriMap = ConfiguratoriManager.getInstance().getConfiguratoriMap();
+    // private ConcurrentHashMap<String, Luogo> luoghiMap = LuoghiManager.getInstance().getLuoghiMap();
+    // private ConcurrentHashMap<Integer, Visite> visiteMap = VisiteManagerDB.getInstance().getVisiteMap();
     private ConcurrentHashMap<String, TemporaryCredential> temporaryCredentials = new ConcurrentHashMap<>();
     private ConsoleView consoleView = new ConsoleView();
     
-    private final VolontariManager volontariManager;
-    private final ConfiguratoriManager configuratoriManager;
-    private final LuoghiManager luoghiManager;
-    private final VisiteManagerDB visiteManagerDB;
-    private final ExecutorService executorService;
+    private final VolontariManager volontariManager = VolontariManager.getInstance();
+    private final ConfiguratoriManager configuratoriManager = ConfiguratoriManager.getInstance();
+    private final LuoghiManager luoghiManager = LuoghiManager.getInstance();
+    private final VisiteManagerDB visiteManagerDB = VisiteManagerDB.getInstance();
+    private final ExecutorService executorService = ThreadPoolController.getInstance().createThreadPool(4); // Inizializza il thread pool
     private Thread aggiornamentoThread;
     private volatile boolean eseguiAggiornamento = true; // Variabile per controllare il ciclo
 
-    public DatabaseUpdater(ThreadPoolManager threadPoolManager) {
-        this.executorService = threadPoolManager.createThreadPool(4); // Inizializza il thread pool
-        this.volontariManager = new VolontariManager(threadPoolManager);
-        this.configuratoriManager = new ConfiguratoriManager(threadPoolManager);
-        this.luoghiManager = new LuoghiManager(threadPoolManager);
-        this.visiteManagerDB = new VisiteManagerDB(threadPoolManager);
-    }
+    public DatabaseUpdater() {}
 
     //Logiche Thread------------------------------------------------------------------
     // Metodo per sincronizzare i dati dal database in un thread separato
@@ -188,43 +178,12 @@ public class DatabaseUpdater {
     
         return passwordModificata;
     }
-    
-
-
-
-    public ConcurrentHashMap<String, Volontario> getVolontariMap() {
-        return volontariMap;
-    }
-    
-    public void setVolontariMap(ConcurrentHashMap<String, Volontario> volontariMap) {
-        this.volontariMap = volontariMap;
-    }
-    
-    public ConcurrentHashMap<String, Configuratore> getConfiguratoriMap() {
-        return configuratoriMap;
-    }
-    
-    public void setConfiguratoriMap(ConcurrentHashMap<String, Configuratore> configuratoriMap) {
-        this.configuratoriMap = configuratoriMap;
-    }
-    
-    public ConcurrentHashMap<String, Luogo> getLuoghiMap() {
-        return luoghiMap;
-    }
-    
-    public void setLuoghiMap(ConcurrentHashMap<String, Luogo> luoghiMap) {
-        this.luoghiMap = luoghiMap;
-    }
-    
-    public ConcurrentHashMap<Integer, Visite> getVisiteMap() {
-        return visiteMap;
-    }
-    
-    public void setVisiteMap(ConcurrentHashMap<Integer, Visite> visiteMap) {
-        this.visiteMap = visiteMap;
-    }
 
     public ConcurrentHashMap<String, TemporaryCredential> getTemporaryCredentials() {
         return temporaryCredentials;
+    }
+
+    public static DatabaseUpdater getInstance() {
+        return new DatabaseUpdater();
     }
 }

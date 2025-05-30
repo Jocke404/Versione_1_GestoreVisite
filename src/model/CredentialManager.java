@@ -3,17 +3,20 @@ package src.model;
 import lib.InputDati;
 import src.model.db.DatabaseUpdater;
 import src.view.ConsoleView;
+import src.model.db.*;
 
 public class CredentialManager {
 
-    private DatabaseUpdater databaseUpdater ;
+    private static DatabaseUpdater databaseUpdater = DatabaseUpdater.getInstance(); ;
+    private static VolontariManager volontariManager = VolontariManager.getInstance();
+    private static ConfiguratoriManager configuratoriManager = ConfiguratoriManager.getInstance();
+
+
     private Volontario volontarioCorrente = null;
     private Configuratore configuratoreCorrente = null;
     private ConsoleView consoleView = new ConsoleView();
     
-    public CredentialManager(DatabaseUpdater databaseUpdater) {
-        this.databaseUpdater = databaseUpdater;
-    }
+    public CredentialManager() {}
 
     //Autenticazione-------------------------------------------------------------------------
     public Utente autentica() {
@@ -30,7 +33,7 @@ public class CredentialManager {
         switch (tipoUtente) {
             case "Volontario":
                 consoleView.mostraMessaggio("Accesso come Volontario.");
-                Volontario volontario = databaseUpdater.getVolontariMap().get(email);
+                Volontario volontario = volontariManager.getVolontariMap().get(email);
                 
                 if (volontario == null) {
                     consoleView.mostraMessaggio("Errore: volontario non trovato.");
@@ -43,11 +46,9 @@ public class CredentialManager {
                 }
                 return volontario;
                 
-                
-    
             case "Configuratore":
                 consoleView.mostraMessaggio("Accesso come Configuratore.");
-                Configuratore configuratore = databaseUpdater.getConfiguratoriMap().get(email);
+                Configuratore configuratore = configuratoriManager.getConfiguratoriMap().get(email);
                 if (configuratore == null) {
                     consoleView.mostraMessaggio("Errore: configuratore non trovato.");
                     return null;
@@ -70,10 +71,10 @@ public class CredentialManager {
         
         // Aggiorna la password nella HashMap
         volontario.setPassword(nuovaPassword);
-        databaseUpdater.getVolontariMap().put(volontario.getEmail(), volontario);
+        volontariManager.getVolontariMap().put(volontario.getEmail(), volontario);
 
         // Sincronizza con il database
-        databaseUpdater.aggiornaPswVolontario(volontario.getEmail(), nuovaPassword);
+        volontariManager.aggiornaPswVolontario(volontario.getEmail(), nuovaPassword);
     }
 
     public void salvaNuoveCredenzialiConf() {
@@ -87,10 +88,10 @@ public class CredentialManager {
         Configuratore updatedConfiguratore = new Configuratore(name, surname, newEmail, newPassword);
         
         // Aggiorna la HashMap
-        databaseUpdater.getConfiguratoriMap().put(newEmail, updatedConfiguratore);
+        configuratoriManager.getConfiguratoriMap().put(newEmail, updatedConfiguratore);
     
         // Sincronizza con il database
-        databaseUpdater.aggiungiNuovoConf(updatedConfiguratore);
+        configuratoriManager.aggiungiNuovoConf(updatedConfiguratore);
     }
 
     // Restituisci il tipo_utente dell'utente o null se non autenticato
@@ -103,5 +104,9 @@ public class CredentialManager {
     public boolean isPasswordModificata(String email) {
         Boolean passwordModificata = databaseUpdater.isPasswordModificata(email);
         return passwordModificata;
+    }
+
+    public static CredentialManager getInstance() {
+        return new CredentialManager();
     }
 }

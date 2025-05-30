@@ -9,26 +9,37 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.TextStyle;
 import java.time.DayOfWeek;
+import src.model.db.*;
 
 import lib.InputDati;
-import src.model.db.DatabaseUpdater;
 import src.view.ConsoleView;
 
 
 public class AggiuntaUtilita {
 
-    private final DatabaseUpdater databaseUpdater;
+    // private final DatabaseUpdater databaseUpdater;
+    private final VolontariManager volontariManager = VolontariManager.getInstance();
+    private final LuoghiManager luoghiManager = LuoghiManager.getInstance();
+    private final VisiteManagerDB visiteManagerDB = VisiteManagerDB.getInstance();
+    ConcurrentHashMap<String, Luogo> luoghiMap = luoghiManager.getLuoghiMap();
+    ConcurrentHashMap<String, Volontario> volontariMap = volontariManager.getVolontariMap();
+    ConcurrentHashMap<Integer, Visite> visiteMap = visiteManagerDB.getVisiteMap();
+
     private final ConsoleView consoleView = new ConsoleView();
     private final Map<String, List<String>> disponibilitaVolontari = new ConcurrentHashMap<>();
 
-    public AggiuntaUtilita(DatabaseUpdater databaseUpdater) {
-        this.databaseUpdater = databaseUpdater;
+    private static AggiuntaUtilita instance;
+
+    private AggiuntaUtilita() {}
+
+    public static AggiuntaUtilita getInstance() {
+        if (instance == null) {
+            instance = new AggiuntaUtilita();
+        }
+        return instance;
     }
     // Metodo per aggiungere una nuova visita
     public void aggiungiVisita() {
-        ConcurrentHashMap<String, Luogo> luoghiMap = databaseUpdater.getLuoghiMap();
-        ConcurrentHashMap<String, Volontario> volontariMap = databaseUpdater.getVolontariMap();
-        ConcurrentHashMap<Integer, Visite> visiteMap = databaseUpdater.getVisiteMap();
     
         if (luoghiMap.isEmpty()) {
             consoleView.mostraMessaggio("aggiungi_visita.nessun_luogo_disponibile");
@@ -88,7 +99,7 @@ public class AggiuntaUtilita {
             dataVisita = dateValide.get(dataIndex);
         }
     
-        int maxPersone = databaseUpdater.getMaxPersoneDefault();
+        int maxPersone = visiteManagerDB.getMaxPersoneDefault();
         String stato = "Proposta"; // Stato iniziale della visita
     
         // Genera un ID univoco per la visita
@@ -98,7 +109,7 @@ public class AggiuntaUtilita {
         Visite nuovaVisita = new Visite(id, luogoNomeScelto, tipoVisitaScelto, volontarioNomeScelto, dataVisita, maxPersone, stato);
         visiteMap.put(id, nuovaVisita);
 
-        databaseUpdater.aggiungiNuovaVisita(nuovaVisita);
+        visiteManagerDB.aggiungiNuovaVisita(nuovaVisita);
     
         consoleView.mostraMessaggio("Visita assegnata con successo per la data " + dataVisita + "!");
     }
@@ -115,10 +126,10 @@ public class AggiuntaUtilita {
         
         Volontario nuovoVolontario = new Volontario(nome, cognome, email, password, tipiDiVisite);
         // Aggiungi il volontario alla HashMap
-        databaseUpdater.getVolontariMap().putIfAbsent(email, nuovoVolontario);
+        volontariMap.putIfAbsent(email, nuovoVolontario);
 
         // Sincronizza con il database
-        databaseUpdater.aggiungiNuovoVolontario(nuovoVolontario);
+        volontariManager.aggiungiNuovoVolontario(nuovoVolontario);
     }
 
     // Metodo per aggiungere un luogo
@@ -127,8 +138,8 @@ public class AggiuntaUtilita {
         String descrizione = InputDati.leggiStringaNonVuota("inserire la descrizione del luogo: ");
 
         Luogo nuovoLuogo = new Luogo(nome, descrizione);
-        databaseUpdater.getLuoghiMap().putIfAbsent(nome, nuovoLuogo);
-        databaseUpdater.aggiungiNuovoLuogo(nuovoLuogo);  
+        luoghiMap.putIfAbsent(nome, nuovoLuogo);
+        luoghiManager.aggiungiNuovoLuogo(nuovoLuogo);  
         consoleView.mostraMessaggio("Luogo aggiunto: " + nuovoLuogo);
     }
 
@@ -155,7 +166,6 @@ public class AggiuntaUtilita {
 
     private List<Integer> trovaGiorniDisponibili(Volontario volontario, LocalDate meseProssimo, YearMonth ym) {
         List<Integer> giorniDisponibili = new ArrayList<>();
-        ConcurrentHashMap<Integer, Visite> visiteMap = databaseUpdater.getVisiteMap();
         List<String> tipiVisitaVolontario = volontario.getTipiDiVisite();
 
         consoleView.mostraMessaggio("Calendario del mese di " + meseProssimo.getMonth() + " " + meseProssimo.getYear() + ":");

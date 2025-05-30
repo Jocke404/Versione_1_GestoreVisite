@@ -2,7 +2,7 @@ package src.model.db;
 
 import src.model.Utente;
 import src.view.ConsoleView;
-import src.controller.ThreadPoolManager;
+import src.controller.ThreadPoolController;
 import java.sql.*;
 import java.util.concurrent.ExecutorService;
 
@@ -10,7 +10,7 @@ public abstract class DatabaseManager {
     protected ConsoleView consoleView;
     protected ExecutorService executorService;
 
-    public DatabaseManager(ThreadPoolManager threadPoolManager) {
+    public DatabaseManager(ThreadPoolController threadPoolManager) {
         this.executorService = threadPoolManager.createThreadPool(4);
         this.consoleView = new ConsoleView();
     }

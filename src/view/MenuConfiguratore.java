@@ -3,17 +3,18 @@ package src.view;
 import java.time.LocalDate;
 
 import lib.MyMenu;
-import src.controller.VisitManager;
+import src.controller.ConfiguratoriController;
+import src.controller.MasterController;
 
 public class MenuConfiguratore implements Menu {
     private static final String[] SELECT = {"Aggiungi Luogo", "Aggiungi Volontario", "Aggiungi Visita", 
     "Visualizza Luoghi", "Visualizza Volontari", "Visualizza Visite", 
     "Modifica numero massimo di persone per visita",
     "Modifica stato della visita", "Visualizza visite per stato", "Visualizza archivio storico"};
-    private final VisitManager visitManager; // Riferimento all'istanza di VisitManager che ha creato questo menu
+    private final ConfiguratoriController configuratoriController; // Riferimento all'istanza di ConfiguratoriController che ha creato questo menu
 
-    public MenuConfiguratore(VisitManager visitManager) {
-        this.visitManager = visitManager;
+    public MenuConfiguratore(ConfiguratoriController configuratoriController) {
+        this.configuratoriController = configuratoriController;
     }
     
     @Override
@@ -25,34 +26,20 @@ public class MenuConfiguratore implements Menu {
             MyMenu menu = new MyMenu("Digitare l'opzione desiderata\n", SELECT);
             int chosed = menu.scegli();
 
-            if (chosed != 0) {
-                if (chosed == 1) {
-                    visitManager.aggiungiLuogo();
-                } else if (chosed == 2) {
-                    visitManager.aggiungiVolontario();
-                } else if (chosed == 3) {
-                    visitManager.aggiungiVisita();
-                } else if (chosed == 4) {
-                    visitManager.mostraLuoghi();
-                } else if (chosed == 5) {
-                    visitManager.mostraVolontari();
-                } else if (chosed == 6) {
-                    visitManager.mostraVisite();
-                } else if (chosed == 7) {
-                    visitManager.modificaNumeroMaxPersonePerVisita();
-                } else if (chosed == 8) {
-                    visitManager.modificaStatoVisita();
-                }else if (chosed == 9) {
-                    visitManager.visualizzaVisitePerStato();
-                }else if (chosed == 10) {
-                    visitManager.visualizzaArchivioStorico();
-                }else if(chosed == 11){
-                    
-                }else if (chosed == 0) {
-                    goOn = false;
-                }
-            } else
-                goOn = false;
+            switch (chosed) {
+                case 1 -> configuratoriController.aggiungiLuogo();
+                case 2 -> configuratoriController.aggiungiVolontario();
+                case 3 -> configuratoriController.aggiungiVisita();
+                case 4 -> configuratoriController.mostraLuoghi();
+                case 5 -> configuratoriController.mostraVolontari();
+                case 6 -> configuratoriController.mostraVisite();
+                case 7 -> configuratoriController.modificaNumeroMaxPersonePerVisita();
+                case 8 -> configuratoriController.modificaStatoVisita();
+                case 9 -> configuratoriController.visualizzaVisitePerStato();
+                case 10 -> configuratoriController.visualizzaArchivioStorico();
+                case 0 -> goOn = false; // Esce dal menu
+                default -> System.out.println("Opzione non valida.");
+            }
         } while (goOn);
     }
 

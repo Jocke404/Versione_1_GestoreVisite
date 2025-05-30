@@ -5,13 +5,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.concurrent.ConcurrentHashMap;
-import src.controller.ThreadPoolManager;
+import src.controller.ThreadPoolController;
 import src.model.Luogo;
 
 public class LuoghiManager extends DatabaseManager {
     private ConcurrentHashMap<String, Luogo> luoghiMap = new ConcurrentHashMap<>();
 
-    public LuoghiManager(ThreadPoolManager threadPoolManager) {
+    public LuoghiManager(ThreadPoolController threadPoolManager) {
         super(threadPoolManager);
         caricaLuoghi();
     }
@@ -98,4 +98,17 @@ public class LuoghiManager extends DatabaseManager {
             return;
         }
     }
+
+    public ConcurrentHashMap<String, Luogo> getLuoghiMap() {
+        return luoghiMap;
+    }
+    
+    public void setLuoghiMap(ConcurrentHashMap<String, Luogo> luoghiMap) {
+        this.luoghiMap = luoghiMap;
+    }
+
+    public static LuoghiManager getInstance() {
+        return new LuoghiManager(ThreadPoolController.getInstance());
+    }
+
 }

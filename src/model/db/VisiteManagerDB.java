@@ -6,13 +6,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.concurrent.ConcurrentHashMap;
-import src.controller.ThreadPoolManager;
+import src.controller.ThreadPoolController;
 import src.model.Visite;
 
 public class VisiteManagerDB extends DatabaseManager {
     private ConcurrentHashMap<Integer, Visite> visiteMap = new ConcurrentHashMap<>();
 
-    public VisiteManagerDB(ThreadPoolManager threadPoolManager) {
+    public VisiteManagerDB(ThreadPoolController threadPoolManager) {
         super(threadPoolManager);
         caricaVisite();
     }
@@ -140,6 +140,18 @@ public class VisiteManagerDB extends DatabaseManager {
             System.err.println("Errore durante il recupero del numero massimo di persone: " + e.getMessage());
         }
         return 10; // Valore di default se non trovato nel database
+    }
+
+    public ConcurrentHashMap<Integer, Visite> getVisiteMap() {
+        return visiteMap;
+    }
+    
+    public void setVisiteMap(ConcurrentHashMap<Integer, Visite> visiteMap) {
+        this.visiteMap = visiteMap;
+    }
+
+    public static VisiteManagerDB getInstance() {
+        return new VisiteManagerDB(ThreadPoolController.getInstance());
     }
 
 }
