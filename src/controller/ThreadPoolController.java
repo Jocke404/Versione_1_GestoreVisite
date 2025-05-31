@@ -9,9 +9,11 @@ import src.model.db.DatabaseUpdater;
 
 public class ThreadPoolController {
 
-    private final ThreadPoolController threadPoolManager = new ThreadPoolController(); // Inizializza il gestore del thread pool
+    private static ThreadPoolController instance; // Inizializza il gestore del thread pool
     private final DatabaseUpdater databaseUpdater = new DatabaseUpdater(); // Inizializza il database updater con il gestore del thread pool
-    private final List<ExecutorService> threadPools = new ArrayList<>();
+    private static final List<ExecutorService> threadPools = new ArrayList<>();
+
+    private ThreadPoolController() {}
 
     // Metodo per creare un nuovo thread pool e registrarlo
     public ExecutorService createThreadPool(int poolSize) {
@@ -34,11 +36,16 @@ public class ThreadPoolController {
 
     // Metodo per arrestare tutti i thread pool registrati
     public void shutdownAll() {
-        databaseUpdater.arrestaSincronizzazioneConSleep();
-        threadPoolManager.shutdownAll();
+        for (ExecutorService executorService : threadPools) {
+            executorService.shutdown();
+        }
+        threadPools.clear();
     }
-
-    public static ThreadPoolController getInstance() {
-        return new ThreadPoolController();
+    
+    public static synchronized ThreadPoolController getInstance() {
+        if (instance == null) {
+            instance = new ThreadPoolController();
+        }
+        return instance;
     }
 }
