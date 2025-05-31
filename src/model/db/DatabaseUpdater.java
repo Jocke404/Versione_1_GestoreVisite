@@ -1,11 +1,7 @@
 package src.model.db;
 
 import src.controller.ThreadPoolController;
-import src.model.Configuratore;
-import src.model.Luogo;
 import src.model.TemporaryCredential;
-import src.model.Visite;
-import src.model.Volontario;
 import src.view.ConsoleView;
 
 import java.sql.Connection;
@@ -54,9 +50,6 @@ public class DatabaseUpdater {
             }            
         });
     }
-
-
-
 
     // Metodo per avviare la sincronizzazione periodica con un ciclo e sleep
     public void avviaSincronizzazioneConSleep() {

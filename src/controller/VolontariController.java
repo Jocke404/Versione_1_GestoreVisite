@@ -4,8 +4,7 @@ import java.util.List;
 
 import src.model.AggiuntaUtilita;
 import src.model.Volontario;
-import src.model.db.VisiteManagerDB;
-import src.view.ConsoleView;
+import src.view.MenuVolontario;
 import src.view.ViewUtilita;
 import src.model.db.VolontariManager;
 
@@ -13,7 +12,7 @@ public class VolontariController {
     private static final VolontariManager volontariManager = VolontariManager.getInstance();
     private final AggiuntaUtilita addUtilita = AggiuntaUtilita.getInstance(); // Utilità per l'aggiunta di dati
     private final ViewUtilita viewUtilita = ViewUtilita.getInstance();
-    private final MasterController masterController = MasterController.getInstance();
+    private Volontario volontarioCorrente = (Volontario) MasterController.getInstance().utenteAutenticato();
 
     public VolontariController(){}
 
@@ -22,7 +21,7 @@ public class VolontariController {
     }
     
     public void visualizzaVisiteVolontario(){
-        viewUtilita.stampaVisiteVolontario((Volontario)utenteCorrente);
+        viewUtilita.stampaVisiteVolontario(volontarioCorrente);
     }
 
     public List<Volontario> getVolontari() {
@@ -31,5 +30,10 @@ public class VolontariController {
 
     public static VolontariController getInstance() {
         return new VolontariController();
+    }
+
+    public void menuVolontario() {
+        MenuVolontario menuVolontario = new MenuVolontario(this);
+        menuVolontario.mostraMenu();
     }
 }

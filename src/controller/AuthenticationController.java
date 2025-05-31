@@ -15,6 +15,7 @@ public class AuthenticationController {
     private Volontario volontarioCorrente;
     private Configuratore configuratoreCorrente;
     private Utente utenteCorrente;
+    private Utente utenteLoggato;
 
     private final VolontariController volontariController = VolontariController.getInstance();
     private final ConfiguratoriController configuratoriController = ConfiguratoriController.getInstance();
@@ -23,6 +24,8 @@ public class AuthenticationController {
 
     public boolean autentica() {
         Utente utenteBase = credentialManager.autentica();
+        utenteLoggato = utenteBase;
+
         if (!validaAutenticazioneBase(utenteBase)) {
             return false;
         }
@@ -85,6 +88,10 @@ public class AuthenticationController {
         }
         this.utenteCorrente = this.configuratoreCorrente;
         return new MenuConfiguratore(configuratoriController);
+    }
+
+    public Utente getUtenteCorrente() {
+        return utenteLoggato;
     }
 
     public static AuthenticationController getInstance() {

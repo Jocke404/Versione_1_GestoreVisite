@@ -29,17 +29,11 @@ public class MasterController {
         return isAuth = authenticationController.autentica();
     }
 
-    public void 
-
-    public void menu(){
+    public Utente utenteAutenticato(){
         if (isAuth) {
-            if (utenteCorrente instanceof Volontario) {
-                volontariController.menuVolontario();
-            } else if (utenteCorrente instanceof Configuratore) {
-                configuratoriController.menuConfiguratore();
-            }
+            return utenteCorrente = authenticationController.getUtenteCorrente();
         } else {
-            System.out.println("Autenticazione non riuscita. Riprova.");
+            throw new IllegalStateException("Nessun utente autenticato. Effettua prima l'autenticazione.");
         }
     }
 

@@ -25,8 +25,8 @@ public class MenuVolontario implements Menu {
             int chosed = menu.scegli();
 
             switch (chosed) {
-                case 1 -> volontariController.visualizzaVisiteVolontario(); // Delegato al controller
-                case 2 -> volontariController.inserisciDisponibilitaVolontario();   // Delegato al controller
+                case 1 -> volontariController.visualizzaVisiteVolontario();
+                case 2 -> volontariController.inserisciDisponibilitaVolontario();
                 case 0 -> goOn = false;
                 default -> System.out.println("Opzione non valida.");
             }
