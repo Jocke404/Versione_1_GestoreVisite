@@ -5,12 +5,9 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import src.model.db.DatabaseUpdater;
-
 public class ThreadPoolController {
 
     private static ThreadPoolController instance; // Inizializza il gestore del thread pool
-    private final DatabaseUpdater databaseUpdater = new DatabaseUpdater(); // Inizializza il database updater con il gestore del thread pool
     private static final List<ExecutorService> threadPools = new ArrayList<>();
 
     private ThreadPoolController() {}
@@ -27,11 +24,6 @@ public class ThreadPoolController {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         threadPools.add(executorService);
         return executorService;
-    }
-
-    public void startDatabaseSync() {
-        databaseUpdater.sincronizzaDalDatabase();
-        databaseUpdater.avviaSincronizzazioneConSleep();
     }
 
     // Metodo per arrestare tutti i thread pool registrati

@@ -26,6 +26,7 @@ public class DatabaseUpdater {
     private final LuoghiManager luoghiManager = LuoghiManager.getInstance();
     private final VisiteManagerDB visiteManagerDB = VisiteManagerDB.getInstance();
     private final ExecutorService executorService = ThreadPoolController.getInstance().createThreadPool(4); // Inizializza il thread pool
+    private static DatabaseUpdater instance; // Singleton per DatabaseUpdater
     private Thread aggiornamentoThread;
     private volatile boolean eseguiAggiornamento = true; // Variabile per controllare il ciclo
 
@@ -177,6 +178,14 @@ public class DatabaseUpdater {
     }
 
     public static DatabaseUpdater getInstance() {
-        return new DatabaseUpdater();
+        if( instance == null) {
+            instance = new DatabaseUpdater();
+        }
+        return instance;
+    }
+
+    public void startDatabaseSync() {
+        // Avvia la sincronizzazione periodica
+        avviaSincronizzazioneConSleep();
     }
 }
