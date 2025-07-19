@@ -100,7 +100,7 @@ public class CredentialManager {
                 // Controlla se la password è temporanea
                 if (!isPasswordModificata(email)) {
                     consoleView.mostraMessaggio("Hai credenziali temporanee. Ti preghiamo di modificarle.");
-                    salvaNuovaPasswordVol(volontario);
+                    salvaNuovaPassword(volontario);
                 }
                 break;
 
@@ -109,6 +109,10 @@ public class CredentialManager {
                 if (configuratore == null) {
                     consoleView.mostraMessaggio("Errore: configuratore non trovato.");
                     return null;
+                }
+                if (isPasswordModificata(email)) {
+                    consoleView.mostraMessaggio("Hai credenziali temporanee. Ti preghiamo di modificarle.");
+                    salvaNuovaPassword(configuratore);
                 }
                 nome = configuratore.getNome();
                 cognome = configuratore.getCognome();
@@ -127,16 +131,21 @@ public class CredentialManager {
         databaseUpdater.getTemporaryCredentials();
     }
 
-    public void salvaNuovaPasswordVol(Volontario volontario) {    
+    public void salvaNuovaPassword(Utente utente) {    
         // Inserisci la nuova password
         String nuovaPassword = InputDati.leggiStringaNonVuota("Inserisci la nuova password: ");
         
         // Aggiorna la password nella HashMap
-        volontario.setPassword(nuovaPassword);
-        volontariManager.getVolontariMap().put(volontario.getEmail(), volontario);
-
-        // Sincronizza con il database
-        volontariManager.aggiornaPswVolontario(volontario.getEmail(), nuovaPassword);
+        utente.setPassword(nuovaPassword);
+        if (utente instanceof Volontario) {
+            volontariManager.getVolontariMap().put(utente.getEmail(), (Volontario) utente);
+            // Sincronizza con il database
+            volontariManager.aggiornaPswVolontario(utente.getEmail(), nuovaPassword);
+        } else if (utente instanceof Configuratore) {
+            configuratoriManager.getConfiguratoriMap().put(utente.getEmail(), (Configuratore) utente);
+            // Sincronizza con il database
+            configuratoriManager.aggiornaPswConfiguratore(utente.getEmail(), nuovaPassword);
+        }
     }
 
     public void salvaNuoveCredenzialiConf() {

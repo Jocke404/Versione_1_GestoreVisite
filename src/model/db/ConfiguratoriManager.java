@@ -113,6 +113,59 @@ public class ConfiguratoriManager extends DatabaseManager {
         });
     }
 
+    // Metodo per aggiornare un volontario nel database
+    public void aggiornaPswConfiguratore(String email, String nuovaPassword) {
+        String sqlConfiguratori = "UPDATE configuratori SET password = ?, password_modificata = ? WHERE email = ?";
+        String sqlUtentiUnificati = "UPDATE utenti_unificati SET password = ?, password_modificata = ? WHERE email = ?";
+    
+        executorService.submit(() -> {
+            try (Connection conn = DatabaseConnection.connect()) {
+                // Aggiorna la tabella "configuratori"
+                try (PreparedStatement pstmtConfiguratori = conn.prepareStatement(sqlConfiguratori)) {
+                    pstmtConfiguratori.setString(1, nuovaPassword);
+                    pstmtConfiguratori.setBoolean(2, true); // Imposta password_modificata a true
+                    pstmtConfiguratori.setString(3, email);
+                    int rowsUpdatedConfiguratori = pstmtConfiguratori.executeUpdate();
+
+                    if (rowsUpdatedConfiguratori > 0) {
+                        System.err.println("Password aggiornata con successo nella tabella 'configuratori'.");
+                    } else {
+                        System.err.println("Errore: Nessun configuratore trovato con l'email specificata.");
+                    }
+                }
+
+                // Aggiorna la tabella "utenti_unificati"
+                try (PreparedStatement pstmtUtenti = conn.prepareStatement(sqlUtentiUnificati)) {
+                    pstmtUtenti.setString(1, nuovaPassword);
+                    pstmtUtenti.setBoolean(2, true); // Imposta password_modificata a true
+                    pstmtUtenti.setString(3, email);
+                    int rowsUpdatedUtenti = pstmtUtenti.executeUpdate();
+                    if (rowsUpdatedUtenti > 0) {
+                        System.err.println("Password aggiornata con successo nella tabella 'utenti_unificati'.");
+                    } else {
+                        System.err.println("Errore: Nessun utente trovato con l'email specificata.");
+                    }
+                }
+    
+                // Aggiorna la tabella "utenti_unificati"
+                try (PreparedStatement pstmtUtenti = conn.prepareStatement(sqlUtentiUnificati)) {
+                    pstmtUtenti.setString(1, nuovaPassword);
+                    pstmtUtenti.setBoolean(2, true); // Imposta password_modificata a true
+                    pstmtUtenti.setString(3, email);
+                    int rowsUpdatedUtenti = pstmtUtenti.executeUpdate();
+    
+                    if (rowsUpdatedUtenti > 0) {
+                        System.err.println("Password aggiornata con successo nella tabella 'utenti_unificati'.");
+                    } else {
+                        System.err.println("Errore: Nessun utente trovato con l'email specificata nella tabella 'utenti_unificati'.");
+                    }
+                }
+            } catch (SQLException e) {
+                System.err.println("Errore durante l'aggiornamento della password: " + e.getMessage());
+            }
+        });
+    }
+
     public void aggiungiNuovoConf(Configuratore nuovoConfiguratore) {
         String verificaSql = "SELECT 1 FROM configuratori WHERE email = ?";
         if(!recordEsiste(verificaSql, nuovoConfiguratore.getEmail())){
