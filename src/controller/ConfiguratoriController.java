@@ -6,19 +6,41 @@ import src.model.db.ConfiguratoriManager;
 import src.view.ViewUtilita;
 
 public class ConfiguratoriController {
-    private final AggiuntaUtilita addUtilita = AggiuntaUtilita.getInstance();
-    private final ModificaUtilita modificaUtilita = ModificaUtilita.getInstance();
-    private final ViewUtilita viewUtilita = ViewUtilita.getInstance();
-    private final ConfiguratoriManager configuratoriManager = ConfiguratoriManager.getInstance();
+    private final AggiuntaUtilita addUtilita;
+    private final ModificaUtilita modificaUtilita;
+    private final ViewUtilita viewUtilita;
 
-    public ConfiguratoriController() {}
+    private final VolontariController volontariController;
+    private final LuoghiController luoghiController;
+    private final VisiteController visiteController;
+    // private final AggiuntaUtilita addUtilita = AggiuntaUtilita.getInstance();
+    // private final ModificaUtilita modificaUtilita = ModificaUtilita.getInstance();
+    // private final ViewUtilita viewUtilita = ViewUtilita.getInstance();
+    // private final ConfiguratoriManager configuratoriManager = ConfiguratoriManager.getInstance();
+
+    // public ConfiguratoriController() {}
+    public ConfiguratoriController(
+        AggiuntaUtilita addUtilita, 
+        ModificaUtilita modificaUtilita, 
+        ViewUtilita viewUtilita, 
+        VolontariController volontariController,
+        LuoghiController luoghiController,
+        VisiteController visiteController
+    ) {
+        this.addUtilita = addUtilita;
+        this.modificaUtilita = modificaUtilita;
+        this.viewUtilita = viewUtilita;
+        this.volontariController = volontariController;
+        this.luoghiController = luoghiController;
+        this.visiteController = visiteController;
+    }
 
     public void aggiungiVolontario() {
         addUtilita.aggiungiVolontario();
     }
 
     public void mostraVolontari() {
-        viewUtilita.stampaVolontari(VolontariController.getInstance());
+        viewUtilita.stampaVolontari(volontariController);
     }
 
     public void aggiungiLuogo() {
@@ -26,15 +48,15 @@ public class ConfiguratoriController {
     }
 
     public void mostraLuoghi() {
-        viewUtilita.stampaLuoghi(LuoghiController.getInstance());
+        viewUtilita.stampaLuoghi(luoghiController);
     }
 
-    public void mostraVisite() {        
-        viewUtilita.stampaVisite(VisiteController.getInstance());
+    public void mostraVisite() {
+        viewUtilita.stampaVisite(visiteController);
     }
     
     public void visualizzaVisitePerStato(){
-        viewUtilita.stampaVisitePerStato(VisiteController.getInstance());
+        viewUtilita.stampaVisitePerStato(visiteController);
     }
 
     public void modificaNumeroMaxPersonePerVisita() {
@@ -54,10 +76,10 @@ public class ConfiguratoriController {
     }
 
     public void visualizzaArchivioStorico() {
-        viewUtilita.stampaArchivioStorico(VisiteController.getInstance());
-    } 
-
-    public static ConfiguratoriController getInstance() {
-        return new ConfiguratoriController();
+        viewUtilita.stampaArchivioStorico(visiteController);
     }
+
+    // public static ConfiguratoriController getInstance() {
+    //     return new ConfiguratoriController();
+    // }
 }

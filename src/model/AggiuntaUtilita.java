@@ -18,26 +18,25 @@ import src.view.ConsoleView;
 public class AggiuntaUtilita {
 
     // private final DatabaseUpdater databaseUpdater;
-    private final VolontariManager volontariManager = VolontariManager.getInstance();
-    private final LuoghiManager luoghiManager = LuoghiManager.getInstance();
-    private final VisiteManagerDB visiteManagerDB = VisiteManagerDB.getInstance();
-    ConcurrentHashMap<String, Luogo> luoghiMap = luoghiManager.getLuoghiMap();
-    ConcurrentHashMap<String, Volontario> volontariMap = volontariManager.getVolontariMap();
-    ConcurrentHashMap<Integer, Visite> visiteMap = visiteManagerDB.getVisiteMap();
+    private final VolontariManager volontariManager;
+    private final LuoghiManager luoghiManager;
+    private final VisiteManagerDB visiteManagerDB;
+    ConcurrentHashMap<String, Luogo> luoghiMap;
+    ConcurrentHashMap<String, Volontario> volontariMap;
+    ConcurrentHashMap<Integer, Visite> visiteMap;
 
     private final ConsoleView consoleView = new ConsoleView();
     private final Map<String, List<String>> disponibilitaVolontari = new ConcurrentHashMap<>();
 
-    private static AggiuntaUtilita instance;
-
-    private AggiuntaUtilita() {}
-
-    public static AggiuntaUtilita getInstance() {
-        if (instance == null) {
-            instance = new AggiuntaUtilita();
-        }
-        return instance;
+    private AggiuntaUtilita(VolontariManager volontariManager, LuoghiManager luoghiManager, VisiteManagerDB visiteManagerDB) {
+        this.volontariManager = volontariManager;
+        this.luoghiManager = luoghiManager;
+        this.visiteManagerDB = visiteManagerDB;
+        this.luoghiMap = luoghiManager.getLuoghiMap();
+        this.volontariMap = volontariManager.getVolontariMap();
+        this.visiteMap = visiteManagerDB.getVisiteMap();
     }
+
     // Metodo per aggiungere una nuova visita
     public void aggiungiVisita() {
     

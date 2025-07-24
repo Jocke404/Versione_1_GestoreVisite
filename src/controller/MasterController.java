@@ -1,27 +1,49 @@
 package src.controller;
 
 import src.model.*;
-import src.model.db.DatabaseUpdater;
+import src.model.db.*;
+import src.view.*;
 
 
 public class MasterController {
 
-    public Volontario volontarioCorrente; // Volontario corrente
-    public Configuratore configuratoreCorrente; // Configuratore corrente
-    public Utente utenteCorrente; // Utente corrente (Volontario o Configuratore)
-    private ConfiguratoriController configuratoriController = ConfiguratoriController.getInstance();
-    private VolontariController volontariController = VolontariController.getInstance();
-    private VisiteController visiteController = VisiteController.getInstance();
-    private LuoghiController luoghiController = LuoghiController.getInstance();
-    //Gestione Thread-------------------------------------------------------------------------
-    private final DatabaseUpdater databaseUpdater = new DatabaseUpdater(); // Inizializza il database updater con il gestore del thread pool
-    private final AuthenticationController authenticationController = AuthenticationController.getInstance();
-    private static final ThreadPoolController threadPoolController = ThreadPoolController.getInstance();
+    public Volontario volontarioCorrente;
+    public Configuratore configuratoreCorrente;
+    public Utente utenteCorrente;
+
+    private final DatabaseUpdater databaseUpdater;
+    private final AuthenticationController authenticationController;
+    private final ConfiguratoriController configuratoriController;
+    private final VolontariController volontariController;
+    private final VisiteController visiteController;
+    private final LuoghiController luoghiController;
+    private final ThreadPoolController threadPoolController = ThreadPoolController.getInstance();
     private Boolean isAuth = false;
 
-    public MasterController(){
-        // threadPoolController.startDatabaseSync();
+    public MasterController() {
+        // Istanzia manager e utility
+        VolontariManager volontariManager = new VolontariManager(threadPoolController);
+        ConfiguratoriManager configuratoriManager = new ConfiguratoriManager(threadPoolController);
+        LuoghiManager luoghiManager = new LuoghiManager(threadPoolController);
+        VisiteManager visiteManager = new VisiteManager(threadPoolController);
+        AggiuntaUtilita aggiuntaUtilita = new AggiuntaUtilita();
+        ModificaUtilita modificaUtilita = new ModificaUtilita();
+        ViewUtilita viewUtilita = new ViewUtilita();
+        ConsoleView consoleView = new ConsoleView();
+        CredentialManager credentialManager = new CredentialManager();
+
+        // Istanzia controller
+        volontariController = new VolontariController(volontariManager, aggiuntaUtilita, viewUtilita, null);
+        configuratoriController = new ConfiguratoriController(aggiuntaUtilita, modificaUtilita, viewUtilita, configuratoriManager);
+        visiteController = new VisiteController(visiteManager, viewUtilita);
+        luoghiController = new LuoghiController(luoghiManager, aggiuntaUtilita, viewUtilita);
+
+        authenticationController = new AuthenticationController(
+            credentialManager, consoleView, volontariManager, configuratoriManager, volontariController, configuratoriController
+        );
+        databaseUpdater = new DatabaseUpdater();
     }
+
 
     public void stopExecutorService() {
         threadPoolController.shutdownAll();
@@ -39,8 +61,8 @@ public class MasterController {
         }
     }
 
-    public static MasterController getInstance() {
-        return new MasterController();
-    }
+    // public static MasterController getInstance() {
+    //     return new MasterController();
+    // }
     
 }

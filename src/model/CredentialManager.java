@@ -10,18 +10,23 @@ import src.model.db.*;
 
 public class CredentialManager {
 
-    private static DatabaseUpdater databaseUpdater = DatabaseUpdater.getInstance(); ;
-    private static VolontariManager volontariManager = VolontariManager.getInstance();
-    private static ConfiguratoriManager configuratoriManager = ConfiguratoriManager.getInstance();
-    private static UserFactory userFactory;
-    private ConcurrentHashMap<String, Volontario> volontariMap = volontariManager.getVolontariMap();
+    private final DatabaseUpdater databaseUpdater;
+    private final VolontariManager volontariManager;
+    private final ConfiguratoriManager configuratoriManager;
+    private final UserFactory userFactory;
+    private final ConcurrentHashMap<String, Volontario> volontariMap  = ;
 
 
     private Volontario volontarioCorrente = null;
     private Configuratore configuratoreCorrente = null;
     private ConsoleView consoleView = new ConsoleView();
     
-    public CredentialManager() {}
+    public CredentialManager(DatabaseUpdater databaseUpdater, VolontariManager volontariManager, ConfiguratoriManager configuratoriManager, UserFactory userFactory) {
+        this.databaseUpdater = databaseUpdater;
+        this.volontariManager = volontariManager;
+        this.configuratoriManager = configuratoriManager;
+        this.userFactory = userFactory;
+    }
 
     //Autenticazione-------------------------------------------------------------------------
     
@@ -177,7 +182,4 @@ public class CredentialManager {
         return passwordModificata;
     }
 
-    public static CredentialManager getInstance() {
-        return new CredentialManager();
-    }
 }

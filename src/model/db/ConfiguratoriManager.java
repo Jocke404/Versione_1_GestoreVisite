@@ -185,8 +185,8 @@ public class ConfiguratoriManager extends DatabaseManager {
     public void setConfiguratoriMap(ConcurrentHashMap<String, Configuratore> configuratoriMap) {
         this.configuratoriMap = configuratoriMap;
     }
-    public static ConfiguratoriManager getInstance() {
-        return new ConfiguratoriManager(ThreadPoolController.getInstance());
-    }
+    // public static ConfiguratoriManager getInstance() {
+    //     return new ConfiguratoriManager(ThreadPoolController.getInstance());
+    // }
 
 }

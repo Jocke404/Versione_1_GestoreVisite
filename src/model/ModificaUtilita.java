@@ -11,10 +11,12 @@ import src.view.ConsoleView;
 
 public class ModificaUtilita {
 
-    private static final VisiteManagerDB visiteManagerDB = VisiteManagerDB.getInstance();
+    private final VisiteManagerDB visiteManagerDB;
     private final ConsoleView consoleView = new ConsoleView();
 
-    public ModificaUtilita() {}
+    public ModificaUtilita(VisiteManagerDB visiteManagerDB) {
+        this.visiteManagerDB = visiteManagerDB;
+    }   
 
     // Metodo per modificare la data di una visita
     public void modificaDataVisita() {
@@ -95,10 +97,6 @@ public class ModificaUtilita {
         // Aggiorna la visita nel database
         visiteManagerDB.aggiornaVisita(visitaId, visitaAggiornata);
         consoleView.mostraMessaggio("Stato della visita aggiornato con successo.");
-    }
-
-    public static ModificaUtilita getInstance() {
-        return new ModificaUtilita();
     }
 
 }

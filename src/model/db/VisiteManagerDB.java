@@ -150,8 +150,8 @@ public class VisiteManagerDB extends DatabaseManager {
         this.visiteMap = visiteMap;
     }
 
-    public static VisiteManagerDB getInstance() {
-        return new VisiteManagerDB(ThreadPoolController.getInstance());
-    }
+    // public static VisiteManagerDB getInstance() {
+    //     return new VisiteManagerDB(ThreadPoolController.getInstance());
+    // }
 
 }

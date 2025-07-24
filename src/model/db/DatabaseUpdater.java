@@ -21,16 +21,25 @@ public class DatabaseUpdater {
     private ConcurrentHashMap<String, TemporaryCredential> temporaryCredentials = new ConcurrentHashMap<>();
     private ConsoleView consoleView = new ConsoleView();
     
-    private final VolontariManager volontariManager = VolontariManager.getInstance();
-    private final ConfiguratoriManager configuratoriManager = ConfiguratoriManager.getInstance();
-    private final LuoghiManager luoghiManager = LuoghiManager.getInstance();
-    private final VisiteManagerDB visiteManagerDB = VisiteManagerDB.getInstance();
+    private final VolontariManager volontariManager;
+    private final ConfiguratoriManager configuratoriManager;
+    private final LuoghiManager luoghiManager;
+    private final VisiteManagerDB visiteManagerDB;
     private final ExecutorService executorService = ThreadPoolController.getInstance().createThreadPool(4); // Inizializza il thread pool
-    private static DatabaseUpdater instance; // Singleton per DatabaseUpdater
     private Thread aggiornamentoThread;
     private volatile boolean eseguiAggiornamento = true; // Variabile per controllare il ciclo
 
-    public DatabaseUpdater() {}
+    public DatabaseUpdater(
+        VolontariManager volontariManager, 
+        ConfiguratoriManager configuratoriManager, 
+        LuoghiManager luoghiManager, 
+        VisiteManagerDB visiteManagerDB
+    ) {
+        this.volontariManager = volontariManager;
+        this.configuratoriManager = configuratoriManager;
+        this.luoghiManager = luoghiManager;
+        this.visiteManagerDB = visiteManagerDB;
+    }
 
     //Logiche Thread------------------------------------------------------------------
     // Metodo per sincronizzare i dati dal database in un thread separato
@@ -175,13 +184,6 @@ public class DatabaseUpdater {
 
     public ConcurrentHashMap<String, TemporaryCredential> getTemporaryCredentials() {
         return temporaryCredentials;
-    }
-
-    public static DatabaseUpdater getInstance() {
-        if( instance == null) {
-            instance = new DatabaseUpdater();
-        }
-        return instance;
     }
 
     public void startDatabaseSync() {

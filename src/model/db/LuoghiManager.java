@@ -107,8 +107,8 @@ public class LuoghiManager extends DatabaseManager {
         this.luoghiMap = luoghiMap;
     }
 
-    public static LuoghiManager getInstance() {
-        return new LuoghiManager(ThreadPoolController.getInstance());
-    }
+    // public static LuoghiManager getInstance() {
+    //     return new LuoghiManager(ThreadPoolController.getInstance());
+    // }
 
 }

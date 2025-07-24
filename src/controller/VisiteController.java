@@ -22,7 +22,7 @@ public class VisiteController {
         return visiteManagerDB.getVisiteMap();
     }
 
-    public static VisiteController getInstance() {
-        return new VisiteController(VisiteManagerDB.getInstance());
-    }
+    // public static VisiteController getInstance() {
+    //     return new VisiteController(VisiteManagerDB.getInstance());
+    // }
 }

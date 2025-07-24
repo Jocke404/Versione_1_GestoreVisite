@@ -14,7 +14,7 @@ import src.controller.LuoghiController;
 
 public class ViewUtilita {
 
-    private ConcurrentHashMap<Integer, Visite> visiteMap = VisiteController.getInstance().getVisiteMap();
+    private ConcurrentHashMap<Integer, Visite> visiteMap = VisiteController.getVisiteMap();
 
     private static ViewUtilita instance;
 
