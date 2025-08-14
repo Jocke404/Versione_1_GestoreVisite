@@ -21,8 +21,4 @@ public class VisiteController {
     public ConcurrentHashMap<Integer, Visite> getVisiteMap() {
         return visiteManagerDB.getVisiteMap();
     }
-
-    // public static VisiteController getInstance() {
-    //     return new VisiteController(VisiteManagerDB.getInstance());
-    // }
 }

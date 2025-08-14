@@ -28,7 +28,7 @@ public class AggiuntaUtilita {
     private final ConsoleView consoleView = new ConsoleView();
     private final Map<String, List<String>> disponibilitaVolontari = new ConcurrentHashMap<>();
 
-    private AggiuntaUtilita(VolontariManager volontariManager, LuoghiManager luoghiManager, VisiteManagerDB visiteManagerDB) {
+    public AggiuntaUtilita(VolontariManager volontariManager, LuoghiManager luoghiManager, VisiteManagerDB visiteManagerDB) {
         this.volontariManager = volontariManager;
         this.luoghiManager = luoghiManager;
         this.visiteManagerDB = visiteManagerDB;

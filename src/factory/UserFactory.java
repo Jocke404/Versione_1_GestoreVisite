@@ -14,7 +14,6 @@ public class UserFactory {
     public static final String VISITATORE = "Visitatore";
 
     private UserFactory() {
-        // Prevent instantiation
     }
 
     public static Utente createUser(String userType, String email, String password,  String nome, String cognome, List<String> tipodiVisita) {

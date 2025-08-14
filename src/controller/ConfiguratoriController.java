@@ -2,7 +2,6 @@ package src.controller;
 
 import src.model.AggiuntaUtilita;
 import src.model.ModificaUtilita;
-import src.model.db.ConfiguratoriManager;
 import src.view.ViewUtilita;
 
 public class ConfiguratoriController {

@@ -50,13 +50,7 @@ public class AuthenticationController {
             return false;
         }
 
-        Menu menu = creaMenuPerUtente(utenteBase);
-        if (menu != null) {
-            menu.mostraMenu();
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
     private boolean validaAutenticazioneBase(Utente utenteBase) {
@@ -74,47 +68,9 @@ public class AuthenticationController {
         this.configuratoreCorrente = null;
     }
 
-    private Menu creaMenuPerUtente(Utente utenteBase) {
-        String email = utenteBase.getEmail();
 
-        if (utenteBase instanceof Volontario) {
-            return creaMenuVolontario(email);
-        } else if (utenteBase instanceof Configuratore) {
-            return creaMenuConfiguratore(email);
-        } else {
-            consoleView.mostraMessaggio("Tipo utente non riconosciuto.");
-            resetUtenti();
-            return null;
-        }
-    }
-
-    private Menu creaMenuVolontario(String email) {
-        this.volontarioCorrente = volontariManager.getVolontariMap().get(email);
-        if (this.volontarioCorrente == null) {
-            consoleView.mostraMessaggio("Errore: dati volontario non trovati nel database.");
-            resetUtenti();
-            return null;
-        }
-        this.utenteCorrente = this.volontarioCorrente;
-        return new MenuVolontario(volontariController);
-    }
-
-    private Menu creaMenuConfiguratore(String email) {
-        this.configuratoreCorrente = configuratoriManager.getConfiguratoriMap().get(email);
-        if (this.configuratoreCorrente == null) {
-            consoleView.mostraMessaggio("Errore: dati configuratore non trovati nel database.");
-            resetUtenti();
-            return null;
-        }
-        this.utenteCorrente = this.configuratoreCorrente;
-        return new MenuConfiguratore(configuratoriController);
-    }
 
     public Utente getUtenteCorrente() {
         return utenteLoggato;
     }
-
-    // public static AuthenticationController getInstance() {
-    //     return new AuthenticationController();
-    // }
 }

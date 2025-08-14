@@ -13,20 +13,18 @@ public class CredentialManager {
     private final DatabaseUpdater databaseUpdater;
     private final VolontariManager volontariManager;
     private final ConfiguratoriManager configuratoriManager;
-    private final UserFactory userFactory;
-    private final ConcurrentHashMap<String, Volontario> volontariMap  = ;
 
 
     private Volontario volontarioCorrente = null;
     private Configuratore configuratoreCorrente = null;
     private ConsoleView consoleView = new ConsoleView();
     
-    public CredentialManager(DatabaseUpdater databaseUpdater, VolontariManager volontariManager, ConfiguratoriManager configuratoriManager, UserFactory userFactory) {
+    public CredentialManager(DatabaseUpdater databaseUpdater, VolontariManager volontariManager, ConfiguratoriManager configuratoriManager) {
         this.databaseUpdater = databaseUpdater;
         this.volontariManager = volontariManager;
         this.configuratoriManager = configuratoriManager;
-        this.userFactory = userFactory;
     }
+
 
     //Autenticazione-------------------------------------------------------------------------
     
@@ -89,7 +87,7 @@ public class CredentialManager {
         // Recupera i dati necessari per creare l'utente
         String nome = null;
         String cognome = null;
-        List<String> tipidiVisite = null; // Inizializza a null per evitare NullPointerException
+        List<String> tipidiVisite = null; 
 
         switch (tipoUtente) {
             case UserFactory.VOLONTARIO:

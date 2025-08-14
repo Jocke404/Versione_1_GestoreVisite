@@ -9,12 +9,14 @@ import src.controller.VolontariController;
 import src.model.Luogo;
 import src.model.Visite;
 import src.model.Volontario;
+import src.model.db.VisiteManagerDB;
 import src.controller.VisiteController;
 import src.controller.LuoghiController;
+import src.controller.ThreadPoolController;
 
 public class ViewUtilita {
 
-    private ConcurrentHashMap<Integer, Visite> visiteMap = VisiteController.getVisiteMap();
+    private ConcurrentHashMap<Integer, Visite> visiteMap = new VisiteManagerDB(ThreadPoolController.getInstance()).getVisiteMap();
 
     private static ViewUtilita instance;
 

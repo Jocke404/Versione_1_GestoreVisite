@@ -33,9 +33,4 @@ public class LuoghiController {
     public List<Luogo> getLuoghi() {
         return List.copyOf(luoghiManager.getLuoghiMap().values());
     }
-
-    // public static LuoghiController getInstance() {
-    //     return new LuoghiController();
-    // }
-
 }
