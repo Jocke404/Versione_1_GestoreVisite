@@ -21,9 +21,9 @@ public class UserFactory {
             case VOLONTARIO:
                 return new Volontario(nome, cognome, email, password, tipodiVisita);
             case CONFIGURATORE:
-                return new Configuratore(email, password, nome, cognome);
+                return new Configuratore(nome, cognome, email, password);
             case VISITATORE:
-                return new Visitatore(email, password, nome, cognome);
+                return new Visitatore(nome, cognome, email, password);
             default:
                 throw new IllegalArgumentException("Tipo di utente sconosciuto: " + userType);
         }

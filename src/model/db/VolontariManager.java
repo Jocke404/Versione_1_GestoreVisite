@@ -18,6 +18,7 @@ public class VolontariManager extends DatabaseManager {
 
     public VolontariManager(ThreadPoolController threadPoolManager) {
         super(threadPoolManager);
+        caricaVolontari();
     }
 
     // Metodo per sincronizzare i volontari

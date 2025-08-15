@@ -1,5 +1,8 @@
 package src.controller;
 
+import java.util.concurrent.ExecutorService;
+
+import src.factory.MenuFactory;
 import src.factory.UserFactory;
 import src.model.*;
 import src.model.db.*;
@@ -11,14 +14,19 @@ public class MasterController {
     public Volontario volontarioCorrente;
     public Configuratore configuratoreCorrente;
     public Utente utenteCorrente;
-    private final ThreadPoolController threadPoolController = ThreadPoolController.getInstance();
+    private ThreadPoolController threadPoolController = ThreadPoolController.getInstance();
     private AuthenticationController authenticationController;
+    private VolontariController volontariController;
+    private ConfiguratoriController configuratoriController;
+    private MenuFactory menuFactory = new MenuFactory();
+    private DatabaseUpdater databaseUpdater;
+
     private Boolean isAuth = false;
 
 
     public MasterController(){}
 
-    public static MasterController createApp() {
+    public MasterController createApp() {
 
         ThreadPoolController threadPoolController = ThreadPoolController.getInstance();
         VolontariManager volontariManager = new VolontariManager(threadPoolController);
@@ -50,52 +58,56 @@ public class MasterController {
         MasterController masterController = new MasterController();
         masterController.authenticationController = authenticationController;
         masterController.volontariController = volontariController;
+        masterController.configuratoriController = configuratoriController;
         return masterController;
-    }
-
-   
-    public void stopExecutorService() {
-        threadPoolController.shutdownAll();
-    }
-
-    public boolean autentica() {
-        return isAuth = authenticationController.autentica();
-    }
-
-    public void showMenu() {
-        if (isAuth) {
-            utenteCorrente = authenticationController.getUtenteCorrente();
-            System.out.println("Benvenuto " + utenteCorrente.getNome() + "!");  
-        } else {
-            System.out.println("Accesso negato. Effettua prima l'autenticazione.");
-        }
-    }
-
-    private Menu creaMenuPerUtente(Utente utenteBase) {
-        String email = utenteBase.getEmail();
-
-        if (utenteBase instanceof Volontario) {
-            return new MenuVolontario(volontariController);
-        } else if (utenteBase instanceof Configuratore) {
-            return new MenuConfiguratore(configuratoriController);
-        } else {
-            consoleView.mostraMessaggio("Tipo utente non riconosciuto.");
-            resetUtenti();
-            return null;
-        }
     }
 
     public void startApp() {
         if (autentica()) {
             showMenu();
-            Menu menu = creaMenuPerUtente(utenteCorrente);
-            if (menu != null) {
-                menu.mostraMenu();
-            } else {
-                consoleView.mostraMessaggio("Errore nella creazione del menu per l'utente.");
-            }
-        } else {
-            consoleView.mostraMessaggio("Autenticazione fallita. Riprova.");
+            aggiornaDatabaseAsync();
         }
     }
+
+    private void aggiornaDatabaseAsync() {
+        ExecutorService executor = threadPoolController.createThreadPool(4);
+        executor.submit(()->{
+            databaseUpdater.sincronizzaDalDatabase();
+        });
+    
+    }
+
+    public void stopExecutorService() {
+        threadPoolController.shutdownAll();
+    }
+
+    private boolean autentica() {
+        isAuth = authenticationController.autentica();
+        if (isAuth)
+            utenteCorrente = authenticationController.getUtenteCorrente();
+        else
+            utenteCorrente = null;
+        return isAuth;
+    }
+
+    private void showMenu() {
+        Menu menu = null;
+        if (isAuth) {
+            utenteCorrente = authenticationController.getUtenteCorrente();
+            System.out.println("Benvenuto " + utenteCorrente.getNome() + "!");
+            if (utenteCorrente instanceof Volontario) 
+                menu = menuFactory.creaMenuVolontario(volontariController);
+            else if (utenteCorrente instanceof Configuratore) 
+                menu = menuFactory.creaMenuConfiguratore(configuratoriController);
+        } else {
+            System.out.println("Accesso negato. Effettua prima l'autenticazione.");
+        }
+        if (menu != null) {
+            menu.mostraMenu();
+        } else {
+            System.out.println("Errore nella creazione del menu.");
+        }
+    }
+
+
 }
