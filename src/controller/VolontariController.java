@@ -12,7 +12,7 @@ public class VolontariController {
     private final VolontariManager volontariManager;
     private final AggiuntaUtilita addUtilita;
     private final ViewUtilita viewUtilita;
-    private Volontario volontarioCorrente;
+    Volontario volontarioCorrente;
     // private static final VolontariManager volontariManager = VolontariManager.getInstance();
     // private final AggiuntaUtilita addUtilita = AggiuntaUtilita.getInstance(); // Utilità per l'aggiunta di dati
     // private final ViewUtilita viewUtilita = ViewUtilita.getInstance();

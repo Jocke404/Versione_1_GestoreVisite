@@ -115,24 +115,26 @@ public class AggiuntaUtilita {
 
     // Metodo per aggiungere un volontario
     public void aggiungiVolontario() {
+        if (consoleView.chiediAnnullaOperazione())
+            return;
         String nome = InputDati.leggiStringaNonVuota("inserire il nome del volontario: ");
         String cognome = InputDati.leggiStringaNonVuota("inserire il cognome del volontario: ");
         String email = InputDati.leggiStringaNonVuota("inserire l'email del volontario: ");
         String password = InputDati.leggiStringaNonVuota("inserire la password: ");
         List<String> tipiDiVisite = new ArrayList<>();
-        // Chiedi all'utente di inserire i tipi di visita
-
         
         Volontario nuovoVolontario = new Volontario(nome, cognome, email, password, tipiDiVisite);
-        // Aggiungi il volontario alla HashMap
+        
         volontariMap.putIfAbsent(email, nuovoVolontario);
 
-        // Sincronizza con il database
         volontariManager.aggiungiNuovoVolontario(nuovoVolontario);
     }
 
     // Metodo per aggiungere un luogo
     public void aggiungiLuogo() {
+        if (consoleView.chiediAnnullaOperazione())
+            return;
+        
         String nome = InputDati.leggiStringaNonVuota("inserire il nome del luogo: ");
         String descrizione = InputDati.leggiStringaNonVuota("inserire la descrizione del luogo: ");
 
@@ -147,7 +149,9 @@ public class AggiuntaUtilita {
             consoleView.mostraMessaggio("Errore: volontario non valido");
             return;
         }
-
+        if (consoleView.chiediAnnullaOperazione()) {
+            return;
+        }
         LocalDate oggi = LocalDate.now();
         LocalDate meseProssimo = oggi.plusMonths(1);
         YearMonth ym = YearMonth.of(meseProssimo.getYear(), meseProssimo.getMonthValue());

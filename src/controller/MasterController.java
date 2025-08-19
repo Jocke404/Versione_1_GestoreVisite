@@ -14,12 +14,27 @@ public class MasterController {
     public Volontario volontarioCorrente;
     public Configuratore configuratoreCorrente;
     public Utente utenteCorrente;
-    private ThreadPoolController threadPoolController = ThreadPoolController.getInstance();
+    private ThreadPoolController threadPoolController;
+    private VolontariManager volontariManager;
+    private ConfiguratoriManager configuratoriManager;
+    private LuoghiManager luoghiManager;
+    private VisiteManagerDB visiteManager;
+    private DatabaseUpdater databaseUpdater;
+    private AggiuntaUtilita aggiuntaUtilita;
+    private ModificaUtilita modificaUtilita;
     private AuthenticationController authenticationController;
     private VolontariController volontariController;
     private ConfiguratoriController configuratoriController;
+    private LuoghiController luoghiController;
+    private VisiteController visiteController;
     private MenuFactory menuFactory = new MenuFactory();
-    private DatabaseUpdater databaseUpdater;
+
+
+
+    private ViewUtilita viewUtilita;
+
+
+
 
     private Boolean isAuth = false;
 
@@ -28,34 +43,29 @@ public class MasterController {
 
     public MasterController createApp() {
 
-        ThreadPoolController threadPoolController = ThreadPoolController.getInstance();
-        VolontariManager volontariManager = new VolontariManager(threadPoolController);
-        ConfiguratoriManager configuratoriManager = new ConfiguratoriManager(threadPoolController);
-        LuoghiManager luoghiManager = new LuoghiManager(threadPoolController);
-        VisiteManagerDB visiteManager = new VisiteManagerDB(threadPoolController);
-        DatabaseUpdater databaseUpdater = new DatabaseUpdater(volontariManager, configuratoriManager, luoghiManager, visiteManager);
-        AggiuntaUtilita aggiuntaUtilita = new AggiuntaUtilita(volontariManager, luoghiManager, visiteManager);
-        ModificaUtilita modificaUtilita = new ModificaUtilita(visiteManager);
-        VisiteController visiteController = new VisiteController(visiteManager);
-        ViewUtilita viewUtilita = ViewUtilita.getInstance();
-        LuoghiController luoghiController = new LuoghiController(luoghiManager, aggiuntaUtilita, viewUtilita);
+        threadPoolController = ThreadPoolController.getInstance();
+        volontariManager = new VolontariManager(threadPoolController);
+        configuratoriManager = new ConfiguratoriManager(threadPoolController);
+        luoghiManager = new LuoghiManager(threadPoolController);
+        visiteManager = new VisiteManagerDB(threadPoolController);
+        databaseUpdater = new DatabaseUpdater(volontariManager, configuratoriManager, luoghiManager, visiteManager);
+        aggiuntaUtilita = new AggiuntaUtilita(volontariManager, luoghiManager, visiteManager);
+        modificaUtilita = new ModificaUtilita(visiteManager);
+        viewUtilita = ViewUtilita.getInstance();
+        visiteController = new VisiteController(visiteManager);
+        luoghiController = new LuoghiController(luoghiManager, aggiuntaUtilita, viewUtilita);
 
         ConsoleView consoleView = new ConsoleView();
         CredentialManager credentialManager = new CredentialManager(
             databaseUpdater, volontariManager, configuratoriManager
         );
-
-        VolontariController volontariController = new VolontariController(volontariManager, aggiuntaUtilita, viewUtilita, volontarioCorrente);
-        ConfiguratoriController configuratoriController = new ConfiguratoriController(
-            aggiuntaUtilita, modificaUtilita, viewUtilita, volontariController, luoghiController, visiteController
-        );
         
         
         AuthenticationController authenticationController = new AuthenticationController(
-            credentialManager, consoleView, volontariManager, configuratoriManager, volontariController, configuratoriController
+            credentialManager, consoleView
         );
 
-        MasterController masterController = new MasterController();
+        MasterController masterController = this;
         masterController.authenticationController = authenticationController;
         masterController.volontariController = volontariController;
         masterController.configuratoriController = configuratoriController;
@@ -83,10 +93,13 @@ public class MasterController {
 
     private boolean autentica() {
         isAuth = authenticationController.autentica();
-        if (isAuth)
+        if (isAuth) {
             utenteCorrente = authenticationController.getUtenteCorrente();
-        else
+            volontariController = new VolontariController(volontariManager, aggiuntaUtilita, viewUtilita, volontarioCorrente);
+            configuratoriController = new ConfiguratoriController(aggiuntaUtilita, modificaUtilita, viewUtilita, volontariController, luoghiController, visiteController);
+        } else {
             utenteCorrente = null;
+        }
         return isAuth;
     }
 
@@ -94,11 +107,14 @@ public class MasterController {
         Menu menu = null;
         if (isAuth) {
             utenteCorrente = authenticationController.getUtenteCorrente();
-            System.out.println("Benvenuto " + utenteCorrente.getNome() + "!");
-            if (utenteCorrente instanceof Volontario) 
+            System.out.println("Buongiorno " + utenteCorrente.getNome() + "!");
+            if (utenteCorrente instanceof Volontario){
+                volontariController.volontarioCorrente = (Volontario) utenteCorrente;  
                 menu = menuFactory.creaMenuVolontario(volontariController);
-            else if (utenteCorrente instanceof Configuratore) 
+            } else if (utenteCorrente instanceof Configuratore) 
                 menu = menuFactory.creaMenuConfiguratore(configuratoriController);
+
+
         } else {
             System.out.println("Accesso negato. Effettua prima l'autenticazione.");
         }
