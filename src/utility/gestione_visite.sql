@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 02, 2025 at 12:51 AM
+-- Generation Time: Aug 19, 2025 at 11:14 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -28,20 +28,20 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `configuratori` (
-  `id` int(11) NOT NULL,
   `nome` varchar(255) NOT NULL,
   `cognome` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL
+  `password` varchar(255) NOT NULL,
+  `password_modificata` tinyint(4) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `configuratori`
 --
 
-INSERT INTO `configuratori` (`id`, `nome`, `cognome`, `email`, `password`) VALUES
-(1, 'Admin', 'Configuratore', 'admin@example.com', 'admin123'),
-(2, 'Super', 'User', 'superuser@example.com', 'super456');
+INSERT INTO `configuratori` (`nome`, `cognome`, `email`, `password`, `password_modificata`) VALUES
+('Admin', 'Configuratore', 'admin@example.com', 'admin123', 0),
+('Super', 'User', 'superuser@example.com', 'super456', 0);
 
 -- --------------------------------------------------------
 
@@ -83,6 +83,7 @@ INSERT INTO `luoghi` (`nome`, `descrizione`) VALUES
 ('Acquario Marino', 'Un acquario con una grande varietà di specie marine.'),
 ('Base Aeronautica', 'LoremIpsum'),
 ('Brescia', 'Citt� fantastica'),
+('Buffalora', 'LoremIpsumLoremIpsum'),
 ('Castello di Brescia', 'Alla scoperta del fantastico Castello di Brescia'),
 ('Castello Storico', 'Un castello medievale ben conservato.'),
 ('Ghedi', 'Bellissima citta'),
@@ -120,7 +121,8 @@ INSERT INTO `utenti_unificati` (`nome`, `cognome`, `email`, `password`, `tipo_ut
 ('Super', 'User', 'superuser@example.com', 'super456', 'Configuratore', 0),
 ('Nome Temporaneo', 'Cognome Temporaneo', 'tempuser1', 'temppass1', 'TEMP', 1),
 ('Nome Temporaneo', 'Cognome Temporaneo', 'tempuser2', 'temppass2', 'TEMP', 1),
-('Nome Temporaneo', 'Cognome Temporaneo', 'tempuser3', 'temppass3', 'TEMP', 1);
+('Nome Temporaneo', 'Cognome Temporaneo', 'tempuser3', 'temppass3', 'TEMP', 1),
+('TestAdd', 'Add', 'Test@gmail.com', '12345', 'Volontario', 0);
 
 -- --------------------------------------------------------
 
@@ -143,20 +145,23 @@ CREATE TABLE `visite` (
 --
 
 INSERT INTO `visite` (`id`, `luogo`, `tipo_visita`, `volontario`, `data`, `max_persone`, `stato`) VALUES
-(1, 'Museo d\'Arte Moderna', 'Arte Moderna', 'Mario Rossi', '2025-03-16', 25, 'Effettuata'),
-(2, 'Parco Naturale', 'Escursione', 'Luisa Bianchi', '2025-03-16', 25, 'Confermata'),
-(3, 'Castello Storico', 'Storia Medievale', 'Giulia Verdi', '2025-03-16', 25, 'Proposta'),
-(4, 'Acquario Marino', 'Biologia Marina', 'Alessandro Neri', '2025-03-16', 25, 'Proposta'),
-(5, 'Teatro Antico', 'Spettacolo Teatrale', 'Francesca Gialli', '2025-03-16', 25, 'Proposta'),
-(6, 'Acquario Marino', 'Biologia Marina', 'Mario Rossi', '2025-03-16', 25, 'Proposta'),
-(7, 'Acquario Marino', 'Biologia Marina', 'Mario Rossi', '2025-06-05', 25, 'Proposta'),
-(8, 'Castello Storico', 'Storia Medievale', 'Giulia Verdi', '2025-06-30', 25, 'Proposta'),
-(9, 'Castello di Brescia', 'Storico Medievale', 'Francesca Gialli', '2025-03-31', 25, 'Proposta'),
-(10, 'Montichiari', 'Visita citta', 'Mario Rossi', '2025-03-31', 25, 'Proposta'),
-(11, 'Montichiari', 'Caccia al tesoro Cittadina', 'luisa.bianchi@example.com', '2025-03-31', 25, 'Proposta'),
-(12, 'Brescia', 'Caccia al tesoro', 'Mario Rossi', '2025-03-31', 25, 'Proposta'),
-(13, 'Ghedi', 'Aeronautica', 'Mario Rossi', '2025-03-31', 25, 'Proposta'),
-(14, 'Base Aeronautica', 'Scuola di volo', 'Mario Rossi', '2025-03-31', 25, 'Proposta');
+(1, 'Museo d\'Arte Moderna', 'Arte Moderna', 'Mario Rossi', '2025-03-16', 50, 'Effettuata'),
+(2, 'Parco Naturale', 'Escursione', 'Luisa Bianchi', '2025-03-16', 50, 'Confermata'),
+(3, 'Castello Storico', 'Storia Medievale', 'Giulia Verdi', '2025-03-16', 50, 'Proposta'),
+(4, 'Acquario Marino', 'Biologia Marina', 'Alessandro Neri', '2025-03-16', 50, 'Proposta'),
+(5, 'Teatro Antico', 'Spettacolo Teatrale', 'Francesca Gialli', '2025-03-16', 50, 'Proposta'),
+(6, 'Acquario Marino', 'Biologia Marina', 'Mario Rossi', '2025-03-16', 50, 'Proposta'),
+(7, 'Acquario Marino', 'Biologia Marina', 'Mario Rossi', '2025-06-05', 50, 'Proposta'),
+(8, 'Castello Storico', 'Storia Medievale', 'Giulia Verdi', '2025-06-30', 50, 'Proposta'),
+(9, 'Castello di Brescia', 'Storico Medievale', 'Francesca Gialli', '2025-03-31', 50, 'Proposta'),
+(10, 'Montichiari', 'Visita citta', 'Mario Rossi', '2025-03-31', 50, 'Proposta'),
+(11, 'Montichiari', 'Caccia al tesoro Cittadina', 'luisa.bianchi@example.com', '2025-03-31', 50, 'Proposta'),
+(12, 'Brescia', 'Caccia al tesoro', 'Mario Rossi', '2025-03-31', 50, 'Proposta'),
+(13, 'Ghedi', 'Aeronautica', 'Mario Rossi', '2025-03-31', 50, 'Proposta'),
+(14, 'Base Aeronautica', 'Scuola di volo', 'Mario Rossi', '2025-03-31', 50, 'Completa'),
+(15, 'Base Aeronautica', 'scuola di volo', 'Mario Rossi', '2025-05-12', 50, 'Cancellata'),
+(16, 'Buffalora', 'Museo Metro', 'Alessandro Neri', '2025-08-01', 50, 'Effettuata'),
+(17, 'Brescia', 'museo', 'TestAdd Add', '2025-11-03', 20, 'Confermata');
 
 -- --------------------------------------------------------
 
@@ -165,7 +170,6 @@ INSERT INTO `visite` (`id`, `luogo`, `tipo_visita`, `volontario`, `data`, `max_p
 --
 
 CREATE TABLE `volontari` (
-  `id` int(11) NOT NULL,
   `nome` varchar(255) NOT NULL,
   `cognome` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
@@ -178,12 +182,13 @@ CREATE TABLE `volontari` (
 -- Dumping data for table `volontari`
 --
 
-INSERT INTO `volontari` (`id`, `nome`, `cognome`, `email`, `password`, `tipi_di_visite`, `password_modificata`) VALUES
-(1, 'Mario', 'Rossi', 'mario.rossi@example.com', 'passmodificata123', 'Arte, Storia', 1),
-(2, 'Luisa', 'Bianchi', 'luisa.bianchi@example.com', 'passmodificata456', 'Natura, Scienza', 1),
-(3, 'Giulia', 'Verdi', 'giulia.verdi@example.com', 'passmodificata789', 'Storia, Natura', 1),
-(4, 'Alessandro', 'Neri', 'alessandro.neri@example.com', 'password321', 'Arte, Scienza', 0),
-(5, 'Francesca', 'Gialli', 'francesca.gialli@example.com', 'password654', 'Natura, Storia', 0);
+INSERT INTO `volontari` (`nome`, `cognome`, `email`, `password`, `tipi_di_visite`, `password_modificata`) VALUES
+('Alessandro', 'Neri', 'alessandro.neri@example.com', 'password321', 'Arte, Scienza', 0),
+('Francesca', 'Gialli', 'francesca.gialli@example.com', 'password654', 'Natura, Storia', 0),
+('Giulia', 'Verdi', 'giulia.verdi@example.com', 'passmodificata789', 'Storia, Natura', 1),
+('Luisa', 'Bianchi', 'luisa.bianchi@example.com', 'passmodificata456', 'Natura, Scienza', 1),
+('Mario', 'Rossi', 'mario.rossi@example.com', 'passmodificata123', 'Arte, Storia', 1),
+('TestAdd', 'Add', 'Test@gmail.com', '12345', '', 0);
 
 --
 -- Indexes for dumped tables
@@ -193,7 +198,6 @@ INSERT INTO `volontari` (`id`, `nome`, `cognome`, `email`, `password`, `tipi_di_
 -- Indexes for table `configuratori`
 --
 ALTER TABLE `configuratori`
-  ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `email` (`email`);
 
 --
@@ -226,18 +230,11 @@ ALTER TABLE `visite`
 -- Indexes for table `volontari`
 --
 ALTER TABLE `volontari`
-  ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `email` (`email`);
 
 --
 -- AUTO_INCREMENT for dumped tables
 --
-
---
--- AUTO_INCREMENT for table `configuratori`
---
-ALTER TABLE `configuratori`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `credenziali_temporanee`
@@ -249,13 +246,7 @@ ALTER TABLE `credenziali_temporanee`
 -- AUTO_INCREMENT for table `visite`
 --
 ALTER TABLE `visite`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
-
---
--- AUTO_INCREMENT for table `volontari`
---
-ALTER TABLE `volontari`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- Constraints for dumped tables
