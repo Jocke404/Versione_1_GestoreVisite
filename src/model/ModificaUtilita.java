@@ -55,6 +55,8 @@ public class ModificaUtilita {
 
     // Metodo per impostare il numero massimo di persone per visita
     public void modificaMaxPersone() {
+        if (consoleView.chiediAnnullaOperazione())
+            return;
         int numeroMax = InputDati.leggiInteroConMinimo("Inserisci il numero massimo di persone per visita: ", 2);
         visiteManagerDB.aggiornaMaxPersonePerVisita(numeroMax);
         consoleView.mostraMessaggio("Numero massimo di persone per visita aggiornato a: " + numeroMax);
@@ -62,6 +64,9 @@ public class ModificaUtilita {
 
     // Metodo per visualizzare le visite in base allo stato
     public void modificaStatoVisita() {
+        if (consoleView.chiediAnnullaOperazione())
+            return;
+
         ConcurrentHashMap<Integer, Visite> visiteMap = visiteManagerDB.getVisiteMap();
     
         if (visiteMap.isEmpty()) {

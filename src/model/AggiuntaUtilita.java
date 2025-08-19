@@ -39,6 +39,8 @@ public class AggiuntaUtilita {
 
     // Metodo per aggiungere una nuova visita
     public void aggiungiVisita() {
+        if (consoleView.chiediAnnullaOperazione())
+            return;
     
         if (luoghiMap.isEmpty()) {
             consoleView.mostraMessaggio("aggiungi_visita.nessun_luogo_disponibile");

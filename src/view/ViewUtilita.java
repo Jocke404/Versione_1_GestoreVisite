@@ -17,7 +17,8 @@ import src.controller.ThreadPoolController;
 public class ViewUtilita {
 
     private ConcurrentHashMap<Integer, Visite> visiteMap = new VisiteManagerDB(ThreadPoolController.getInstance()).getVisiteMap();
-
+    private final ConsoleView consoleView = new ConsoleView();
+    
     private static ViewUtilita instance;
 
     private ViewUtilita() {}
@@ -81,7 +82,8 @@ public class ViewUtilita {
 
     // Metodo per visualizzare le visite per stato
     public void stampaVisitePerStato(VisiteController visiteController) {
-        
+        if(consoleView.chiediAnnullaOperazione())
+            return; 
         if (visiteMap.isEmpty()) {
             System.out.println("Non ci sono visite disponibili.");
             return;
