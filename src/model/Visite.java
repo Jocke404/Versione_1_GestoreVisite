@@ -5,14 +5,14 @@ import java.time.LocalDate;
 public class Visite {
     private int id; // ID univoco della visita
     private String luogo;
-    private String tipoVisita;
+    private TipiVisita tipoVisita;
     private String volontario;
     private LocalDate data;
     private int maxPersone; // Numero massimo di persone per la visita
     private String stato; // Stato della visita (es. "Proposta", "Confermata", ecc.)
 
     // Costruttore completo (inclusi tutti i campi)
-    public Visite(int id, String luogo, String tipoVisita, String volontario, LocalDate data, int maxPersone, String stato) {
+    public Visite(int id, String luogo, TipiVisita tipoVisita, String volontario, LocalDate data, int maxPersone, String stato) {
         this.id = id;
         this.luogo = luogo;
         this.tipoVisita = tipoVisita;
@@ -31,8 +31,12 @@ public class Visite {
         return luogo;
     }
 
-    public String getTipoVisita() {
+    public TipiVisita getTipoVisita() {
         return tipoVisita;
+    }
+
+    public String getTipoVisitaString() {
+        return tipoVisita != null ? tipoVisita.getNome() : "";
     }
 
     public String getVolontario() {

@@ -23,6 +23,7 @@ public class AggiuntaUtilita {
     private final VisiteManagerDB visiteManagerDB;
     ConcurrentHashMap<String, Luogo> luoghiMap;
     ConcurrentHashMap<String, Volontario> volontariMap;
+    ConcurrentHashMap<String, TipiVisita> tipiVisitaMap;
     ConcurrentHashMap<Integer, Visite> visiteMap;
 
     private final ConsoleView consoleView = new ConsoleView();
@@ -49,27 +50,26 @@ public class AggiuntaUtilita {
     
         consoleView.mostraMessaggio("Elenco dei luoghi disponibili:");
         List<String> luoghiNomi = new ArrayList<>(luoghiMap.keySet());
-        for (int i = 0; i < luoghiNomi.size(); i++) {
-            System.out.printf("%d. %s%n", i + 1, luoghiNomi.get(i));
-        }
-    
+        consoleView.mostraElenco(luoghiNomi);
         int luogoIndex = InputDati.leggiIntero("Seleziona il numero del luogo: ", 1, luoghiNomi.size()) - 1;
         String luogoNomeScelto = luoghiNomi.get(luogoIndex);
-    
-        String tipoVisitaScelto = InputDati.leggiStringaNonVuota("Inserisci il tipo di visita: ");
-    
+
+        List<TipiVisita> tipoVisita = new ArrayList<>(visiteMap.values().stream()
+                .map(Visite::getTipoVisita)
+                .distinct()
+                .toList());
+        consoleView.mostraElencoConOggetti(tipoVisita);
+        int tipoVisitaIndex = InputDati.leggiIntero("Seleziona il numero del tipo di visita: ", 1, tipoVisita.size()) - 1;
+        TipiVisita tipoVisitaScelto = tipoVisita.get(tipoVisitaIndex);
+
         if (volontariMap.isEmpty()) {
             consoleView.mostraMessaggio("Nessun volontario disponibile.");
             return;
         }
     
         consoleView.mostraMessaggio("\nElenco dei volontari disponibili:");
-        List<Volontario> volontariNomi = new ArrayList<>(volontariMap.values());//TODO: controllare se è giusto
-        for (int i = 0; i < volontariNomi.size(); i++) {
-            System.out.printf("%d. %s %s%n", i + 1, volontariNomi.get(i).getNome(), volontariNomi.get(i).getCognome());
-        }
-
-        // Chiedi all'utente di selezionare un volontario
+        List<Volontario> volontariNomi = new ArrayList<>(volontariMap.values());
+        consoleView.mostraElencoConOggetti(volontariNomi);
         int volontarioIndex = InputDati.leggiIntero("Seleziona il numero del volontario: ", 1, volontariNomi.size()) - 1;
         String volontarioNomeScelto = volontariNomi.get(volontarioIndex).getNome() + " " + volontariNomi.get(volontarioIndex).getCognome();
     
@@ -92,10 +92,7 @@ public class AggiuntaUtilita {
             }
     
             consoleView.mostraMessaggio("\nDate disponibili per la visita:");
-            for (int i = 0; i < dateValide.size(); i++) {
-                System.out.printf("%d. %s%n", i + 1, dateValide.get(i));
-            }
-    
+            consoleView.mostraElencoConOggetti(dateValide);
             int dataIndex = InputDati.leggiIntero("Seleziona il numero della data: ", 1, dateValide.size()) - 1;
             dataVisita = dateValide.get(dataIndex);
         }

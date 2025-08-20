@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.concurrent.ConcurrentHashMap;
 import src.controller.ThreadPoolController;
+import src.model.TipiVisita;
 import src.model.Visite;
 
 public class VisiteManagerDB extends DatabaseManager {
@@ -30,7 +31,7 @@ public class VisiteManagerDB extends DatabaseManager {
                 while (rs.next()) {
                     int id = rs.getInt("id"); // ID della visita
                     String luogo = rs.getString("luogo");
-                    String tipoVisita = rs.getString("tipo_visita");
+                    TipiVisita tipoVisita = TipiVisita.valueOf(rs.getString("tipo_visita"));
                     String volontario = rs.getString("volontario");
                     LocalDate data = rs.getDate("data") != null ? rs.getDate("data").toLocalDate() : null; // Converte la data in LocalDate
                     int maxPersone = rs.getInt("max_persone");
@@ -54,7 +55,7 @@ public class VisiteManagerDB extends DatabaseManager {
                  PreparedStatement pstmt = conn.prepareStatement(inserisciSql)) {
     
                 pstmt.setString(1, visita.getLuogo());
-                pstmt.setString(2, visita.getTipoVisita());
+                pstmt.setString(2, visita.getTipoVisitaString());
                 pstmt.setString(3, visita.getVolontario());
                 pstmt.setDate(4, visita.getData() != null ? java.sql.Date.valueOf(visita.getData()) : null);
                 pstmt.setString(5, visita.getStato());
@@ -74,20 +75,13 @@ public class VisiteManagerDB extends DatabaseManager {
             try (Connection conn = DatabaseConnection.connect();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
                 pstmt.setString(1, visitaAggiornata.getLuogo());
-                pstmt.setString(2, visitaAggiornata.getTipoVisita());
+                pstmt.setString(2, visitaAggiornata.getTipoVisitaString());
                 pstmt.setString(3, visitaAggiornata.getVolontario());
                 pstmt.setDate(4, visitaAggiornata.getData() != null ? java.sql.Date.valueOf(visitaAggiornata.getData()) : null);
                 pstmt.setString(5, visitaAggiornata.getStato());
                 pstmt.setInt(6, visitaAggiornata.getMaxPersone());
                 pstmt.setInt(7, visitaId);
-
-                int rowsUpdated = pstmt.executeUpdate();
-
-                if (rowsUpdated > 0) {
-                    System.err.println("Visita aggiornata con successo.");
-                } else {
-                    System.err.println("Errore: Nessuna visita trovata con l'ID specificato.");
-                }
+                pstmt.executeUpdate();
             } catch (SQLException e) {
                 System.err.println("Errore durante l'aggiornamento della visita: " + e.getMessage());
             }
@@ -134,7 +128,7 @@ public class VisiteManagerDB extends DatabaseManager {
              ResultSet rs = pstmt.executeQuery()) {
     
             if (rs.next()) {
-                return rs.getInt("max_persone"); // Restituisce il numero massimo di persone
+                return rs.getInt("max_persone");
             }
         } catch (SQLException e) {
             System.err.println("Errore durante il recupero del numero massimo di persone: " + e.getMessage());
@@ -149,9 +143,5 @@ public class VisiteManagerDB extends DatabaseManager {
     public void setVisiteMap(ConcurrentHashMap<Integer, Visite> visiteMap) {
         this.visiteMap = visiteMap;
     }
-
-    // public static VisiteManagerDB getInstance() {
-    //     return new VisiteManagerDB(ThreadPoolController.getInstance());
-    // }
 
 }

@@ -2,6 +2,8 @@ package src.view;
 
 import java.time.LocalDate;
 
+import javax.swing.JOptionPane;
+
 import lib.MyMenu;
 import src.controller.ConfiguratoriController;
 import src.controller.MasterController;
@@ -42,5 +44,4 @@ public class MenuConfiguratore implements Menu {
             }
         } while (goOn);
     }
-
 }

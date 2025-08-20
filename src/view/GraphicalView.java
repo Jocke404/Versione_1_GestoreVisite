@@ -4,8 +4,8 @@ import javax.swing.*;
 import java.util.List;
 
 public class GraphicalView implements View {
-    private JFrame frame;
-    private JTextArea outputArea;
+    public JFrame frame;
+    public JTextArea outputArea;
 
     public GraphicalView() {
         frame = new JFrame("Gestore Visite");
@@ -50,4 +50,14 @@ public class GraphicalView implements View {
             }
         });
     }
+
+    
+    public void mostraElencoConList(String[] oggetti) {
+        SwingUtilities.invokeLater(() -> {
+            for (int i = 0; i < oggetti.length; i++) {
+                outputArea.append(String.format("%d. %s\n", i + 1, oggetti[i]));
+            }
+        });
+    }
+
 }
