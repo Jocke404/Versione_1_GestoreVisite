@@ -32,13 +32,14 @@ public class MenuConfiguratore implements Menu {
                 case 1 -> configuratoriController.aggiungiLuogo();
                 case 2 -> configuratoriController.aggiungiVolontario();
                 case 3 -> configuratoriController.aggiungiVisita();
-                case 4 -> configuratoriController.mostraLuoghi();
-                case 5 -> configuratoriController.mostraVolontari();
-                case 6 -> configuratoriController.mostraVisite();
-                case 7 -> configuratoriController.modificaNumeroMaxPersonePerVisita();
-                case 8 -> configuratoriController.modificaStatoVisita();
-                case 9 -> configuratoriController.visualizzaVisitePerStato();
-                case 10 -> configuratoriController.visualizzaArchivioStorico();
+                case 4 -> configuratoriController.aggiungiDatePrecluse();
+                case 5 -> configuratoriController.mostraLuoghi();
+                case 6 -> configuratoriController.mostraVolontari();
+                case 7 -> configuratoriController.mostraVisite();
+                case 8 -> configuratoriController.modificaNumeroMaxPersonePerVisita();
+                case 9 -> configuratoriController.modificaStatoVisita();
+                case 10 -> configuratoriController.visualizzaVisitePerStato();
+                case 11 -> configuratoriController.visualizzaArchivioStorico();
                 case 0 -> goOn = false; // Esce dal menu
                 default -> System.out.println("Opzione non valida.");
             }

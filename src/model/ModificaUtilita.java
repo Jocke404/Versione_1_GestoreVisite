@@ -1,6 +1,7 @@
 package src.model;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import src.model.db.VisiteManagerDB;

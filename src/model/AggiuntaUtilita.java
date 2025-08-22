@@ -25,6 +25,7 @@ public class AggiuntaUtilita {
     ConcurrentHashMap<String, Volontario> volontariMap;
     ConcurrentHashMap<String, TipiVisita> tipiVisitaMap;
     ConcurrentHashMap<Integer, Visite> visiteMap;
+    ConcurrentHashMap<LocalDate, String> datePrecluseMap;
 
     private final ConsoleView consoleView = new ConsoleView();
     private final Map<String, List<String>> disponibilitaVolontari = new ConcurrentHashMap<>();
@@ -36,6 +37,7 @@ public class AggiuntaUtilita {
         this.luoghiMap = luoghiManager.getLuoghiMap();
         this.volontariMap = volontariManager.getVolontariMap();
         this.visiteMap = visiteManagerDB.getVisiteMap();
+        this.datePrecluseMap = visiteManagerDB.getDatePrecluseMap();
     }
 
     // Metodo per aggiungere una nuova visita
@@ -216,7 +218,6 @@ public class AggiuntaUtilita {
                 consoleView.mostraMessaggio("Formato data non valido: " + trimmed);
             }
         }
-        
         return dateDisponibili;
     }
 
@@ -231,21 +232,34 @@ public class AggiuntaUtilita {
         String giorno = giornoSettimana.trim().toUpperCase();
 
         switch (tipo) {
-            case "enogastronomica":
+            case "ENOGASTRONOMICA":
                 // Venerdì, Sabato, Domenica
                 return giorno.equals("FRIDAY") || giorno.equals("SATURDAY") || giorno.equals("SUNDAY");
-            case "didattica":
+            case "LABBAMBINI":
                 // Lunedì, Martedì, Mercoledì, Giovedì
                 return giorno.equals("MONDAY") || giorno.equals("TUESDAY") || giorno.equals("WEDNESDAY") || giorno.equals("THURSDAY");
-            case "storica":
+            case "STORICA":
                 // Martedì, Giovedì, Sabato
                 return giorno.equals("TUESDAY") || giorno.equals("THURSDAY") || giorno.equals("SATURDAY");
-            case "scientifica":
+            case "SCIENTIFICA":
                 // Mercoledì, Venerdì, Domenica
                 return giorno.equals("WEDNESDAY") || giorno.equals("FRIDAY") || giorno.equals("SUNDAY");
             default:
                 // Se il tipo non è riconosciuto, non permette nessun giorno
                 return false;
         }
+    }
+
+    public void aggiungiDatePrecluse() {
+        if (consoleView.chiediAnnullaOperazione())
+            return;
+
+        List<LocalDate> data = InputDati.leggiDataMultipla("Inserisci la data da aggiungere alle date precluse: ");
+        String motivo = null;
+        for (LocalDate d : data) {
+            motivo = InputDati.leggiStringa("Inserisci il motivo della preclusione per la data " + d + ": ");
+            visiteManagerDB.aggiungiDataPreclusa(d, motivo);
+        }
+        visiteManagerDB.caricaDatePrecluse();
     }
 }

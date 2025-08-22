@@ -1,4 +1,5 @@
 package lib;
+import java.time.LocalDate;
 import java.util.*;
 public class InputDati 
 {
@@ -200,4 +201,40 @@ public class InputDati
 			return false;
 	  }
 
+      public static LocalDate leggiData(String string) {
+          boolean finito = false;
+		  LocalDate dataLetta = null;
+		  do {
+			  System.out.print(string);
+			  try {
+				  String input = lettore.next();
+				  dataLetta = LocalDate.parse(input);
+				  finito = true;
+			  } catch (Exception e) {
+				  System.out.println(ERRORE_FORMATO + ". Formato corretto: DD-MM-YYYY");
+			  }
+		  } while (!finito);
+		  return dataLetta;
+      }
+	  
+	  public static List<LocalDate> leggiDataMultipla(String string) {
+		  boolean finito = false;
+		  List<LocalDate> dateLettere = new ArrayList<>();
+		  do {
+			  System.out.print(string);
+			  try {
+				  String input = lettore.next();
+				  LocalDate data = LocalDate.parse(input);
+				  dateLettere.add(data);
+				  System.out.print("Vuoi inserire un'altra data? (S/N): ");
+				  char risposta = lettore.next().toUpperCase().charAt(0);
+				  if (risposta != 'S') {
+					  finito = true;
+				  }
+			  } catch (Exception e) {
+				  System.out.println(ERRORE_FORMATO + ". Formato corretto: DD-MM-YYYY");
+			  }
+		  } while (!finito);
+		  return dateLettere;
+		}
 }

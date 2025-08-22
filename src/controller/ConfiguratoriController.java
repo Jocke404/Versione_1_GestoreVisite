@@ -12,12 +12,7 @@ public class ConfiguratoriController {
     private final VolontariController volontariController;
     private final LuoghiController luoghiController;
     private final VisiteController visiteController;
-    // private final AggiuntaUtilita addUtilita = AggiuntaUtilita.getInstance();
-    // private final ModificaUtilita modificaUtilita = ModificaUtilita.getInstance();
-    // private final ViewUtilita viewUtilita = ViewUtilita.getInstance();
-    // private final ConfiguratoriManager configuratoriManager = ConfiguratoriManager.getInstance();
 
-    // public ConfiguratoriController() {}
     public ConfiguratoriController(
         AggiuntaUtilita addUtilita, 
         ModificaUtilita modificaUtilita, 
@@ -78,7 +73,7 @@ public class ConfiguratoriController {
         viewUtilita.stampaArchivioStorico(visiteController);
     }
 
-    // public static ConfiguratoriController getInstance() {
-    //     return new ConfiguratoriController();
-    // }
+    public void aggiungiDatePrecluse() {
+        addUtilita.aggiungiDatePrecluse();
+    }
 }

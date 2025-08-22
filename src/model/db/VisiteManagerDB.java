@@ -12,6 +12,7 @@ import src.model.Visite;
 
 public class VisiteManagerDB extends DatabaseManager {
     private ConcurrentHashMap<Integer, Visite> visiteMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<LocalDate, String> datePrecluseMap = new ConcurrentHashMap<>();
 
     public VisiteManagerDB(ThreadPoolController threadPoolManager) {
         super(threadPoolManager);
@@ -119,6 +120,22 @@ public class VisiteManagerDB extends DatabaseManager {
             return;
         }
     }
+    
+    public void aggiungiDataPreclusa(LocalDate data, String motivo) {
+        String sql = "INSERT INTO date_precluse (data, motivo) VALUES (?, ?)";
+        executorService.submit(() -> {
+            try (Connection conn = DatabaseConnection.connect();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setDate(1, java.sql.Date.valueOf(data));
+                pstmt.setString(2, motivo);
+                pstmt.executeUpdate();
+                
+                consoleView.mostraMessaggio("Data preclusa aggiunta con successo.");  
+            } catch (SQLException e) {
+                System.err.println("Errore durante l'aggiunta della data preclusa: " + e.getMessage());
+            }
+        });
+    }
 
     // Metodo per recuperare il numero massimo di persone per visita dal database
     public int getMaxPersoneDefault() {
@@ -143,5 +160,11 @@ public class VisiteManagerDB extends DatabaseManager {
     public void setVisiteMap(ConcurrentHashMap<Integer, Visite> visiteMap) {
         this.visiteMap = visiteMap;
     }
+
+    public ConcurrentHashMap<LocalDate, String> getDatePrecluseMap() {
+        return datePrecluseMap;
+    }
+
+    
 
 }
