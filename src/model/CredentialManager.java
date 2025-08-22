@@ -1,7 +1,6 @@
 package src.model;
 
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 import lib.InputDati;
 import src.view.ConsoleView;
@@ -25,55 +24,6 @@ public class CredentialManager {
         this.configuratoriManager = configuratoriManager;
     }
 
-
-    //Autenticazione-------------------------------------------------------------------------
-    
-    // public Utente autentica() {
-    //     String email = InputDati.leggiStringaNonVuota("Inserisci (email): ");
-    //     String password = InputDati.leggiStringaNonVuota("Inserisci la password: ");
-    //     String tipoUtente = verificaCredenziali(email, password);
-    //     boolean credenzialiModificate = isPasswordModificata(email);
-    //     // String name = volontariMap.get(email) != null ? volontariMap.get(email).getNome() : configuratoriManager.getConfiguratoriMap().get(email).getNome();
-    //     // String cognome = volontariMap.get(email) != null ? volontariMap.get(email).getCognome() : configuratoriManager.getConfiguratoriMap().get(email).getCognome();
-
-    //     if (tipoUtente == null) {
-    //         consoleView.mostraMessaggio("Credenziali non valide.");
-    //         return null;
-    //     }
-
-    //     // userFactory.createUser(tipoUtente, email, name, cognome);
-    
-    //     switch (tipoUtente) {
-    //         case "Volontario":
-    //             consoleView.mostraMessaggio("Accesso come Volontario.");
-    //             Volontario volontario = volontariManager.getVolontariMap().get(email);
-                
-    //             if (volontario == null) {
-    //                 consoleView.mostraMessaggio("Errore: volontario non trovato.");
-    //                 return null;
-    //             }
-    
-    //             if (!credenzialiModificate) {
-    //                 consoleView.mostraMessaggio("Hai credenziali temporanee. Ti preghiamo di modificarle.");
-    //                 salvaNuovaPasswordVol(volontario);
-    //             }
-    //             return volontario;
-                
-    //         case "Configuratore":
-    //             consoleView.mostraMessaggio("Accesso come Configuratore.");
-    //             Configuratore configuratore = configuratoriManager.getConfiguratoriMap().get(email);
-    //             if (configuratore == null) {
-    //                 consoleView.mostraMessaggio("Errore: configuratore non trovato.");
-    //                 return null;
-    //             }
-    //             return configuratore;
-    
-    //         default:
-    //             consoleView.mostraMessaggio("Ruolo non riconosciuto: " + tipoUtente);
-    //             return null;
-    //     }
-    // }
-
     public Utente autentica() {
         String email = InputDati.leggiStringaNonVuota("email: ");
         String password = InputDati.leggiStringaNonVuota("password: ");
@@ -91,34 +41,30 @@ public class CredentialManager {
 
         switch (tipoUtente) {
             case UserFactory.VOLONTARIO:
-                Volontario volontario = volontariManager.getVolontariMap().get(email);
-                if (volontario == null) {
+                volontarioCorrente = volontariManager.getVolontariMap().get(email);
+                if (volontarioCorrente == null) {
                     consoleView.mostraMessaggio("Errore: volontario non trovato.");
                     return null;
                 }
-                nome = volontario.getNome();
-                cognome = volontario.getCognome();
-                tipidiVisite = volontario.getTipiDiVisite();
+                nome = volontarioCorrente.getNome();
+                cognome = volontarioCorrente.getCognome();
+                tipidiVisite = volontarioCorrente.getTipiDiVisite();
 
                 // Controlla se la password è temporanea
                 if (!isPasswordModificata(email)) {
                     consoleView.mostraMessaggio("Hai credenziali temporanee. Ti preghiamo di modificarle.");
-                    salvaNuovaPassword(volontario);
+                    salvaNuovaPassword(volontarioCorrente);
                 }
                 break;
 
             case UserFactory.CONFIGURATORE:
-                Configuratore configuratore = configuratoriManager.getConfiguratoriMap().get(email);
-                if (configuratore == null) {
-                    consoleView.mostraMessaggio("Errore: configuratore non trovato.");
-                    return null;
-                }
-                if (isPasswordModificata(email)) {
+                if (email == "admin@example.com" && password == "admin123") {
                     consoleView.mostraMessaggio("Hai credenziali temporanee. Ti preghiamo di modificarle.");
-                    salvaNuovaPassword(configuratore);
+                    salvaNuoveCredenzialiConf();
                 }
-                nome = configuratore.getNome();
-                cognome = configuratore.getCognome();
+                configuratoreCorrente = configuratoriManager.getConfiguratoriMap().get(email);
+                nome = configuratoreCorrente.getNome();
+                cognome = configuratoreCorrente.getCognome();
                 break;
 
             default:
@@ -134,7 +80,7 @@ public class CredentialManager {
         databaseUpdater.getTemporaryCredentials();
     }
 
-    public void salvaNuovaPassword(Utente utente) {    
+    private void salvaNuovaPassword(Utente utente) {    
         // Inserisci la nuova password
         String nuovaPassword = InputDati.leggiStringaNonVuota("Inserisci la nuova password: ");
         
@@ -144,28 +90,29 @@ public class CredentialManager {
             volontariManager.getVolontariMap().put(utente.getEmail(), (Volontario) utente);
             // Sincronizza con il database
             volontariManager.aggiornaPswVolontario(utente.getEmail(), nuovaPassword);
-        } else if (utente instanceof Configuratore) {
-            configuratoriManager.getConfiguratoriMap().put(utente.getEmail(), (Configuratore) utente);
-            // Sincronizza con il database
-            configuratoriManager.aggiornaPswConfiguratore(utente.getEmail(), nuovaPassword);
         }
+        // } else if (utente instanceof Configuratore) {
+        //     configuratoriManager.getConfiguratoriMap().put(utente.getEmail(), (Configuratore) utente);
+        //     // Sincronizza con il database
+        //     configuratoriManager.aggiornaPswConfiguratore(utente.getEmail(), nuovaPassword);
+        // }
     }
 
-    public void salvaNuoveCredenzialiConf() {
-        // Raccogli i dati del nuovo configuratore
-        String newEmail = InputDati.leggiStringaNonVuota("Inserisci la nuova email: ");
-        String newPassword = InputDati.leggiStringaNonVuota("Inserisci la nuova password: ");
+    private void salvaNuoveCredenzialiConf() {
+        // Raccogli i dati del nuovo configuratore        
         String name = InputDati.leggiStringaNonVuota("Inserisci il nome: ");
         String surname = InputDati.leggiStringaNonVuota("Inserisci il cognome: ");
-        
+        String newEmail = InputDati.leggiStringaNonVuota("Inserisci la nuova email: ");
+        String newPassword = InputDati.leggiStringaNonVuota("Inserisci la nuova password: ");
+
         // Crea un nuovo oggetto Configuratore
-        Configuratore updatedConfiguratore = new Configuratore(name, surname, newEmail, newPassword);
-        
+        Configuratore newConfiguratore = (Configuratore) UserFactory.createUser(UserFactory.CONFIGURATORE, newEmail, newPassword, name, surname,null);
+
         // Aggiorna la HashMap
-        configuratoriManager.getConfiguratoriMap().put(newEmail, updatedConfiguratore);
-    
+        configuratoriManager.getConfiguratoriMap().put(newEmail, newConfiguratore);
+
         // Sincronizza con il database
-        configuratoriManager.aggiungiNuovoConf(updatedConfiguratore);
+        configuratoriManager.aggiungiNuovoConf(newConfiguratore);
     }
 
     // Restituisci il tipo_utente dell'utente o null se non autenticato

@@ -36,7 +36,7 @@ public abstract class DatabaseManager {
         String cognome = utente.getCognome();
         String email = utente.getEmail();
         String password = utente.getPassword();
-        String tipoUtente = utente.getClass().getSimpleName(); // Ottiene il nome della classe come tipo utente
+        String tipoUtente = utente.getClass().getSimpleName();
     
         String inserisciSqlUtentiUnificati = "INSERT INTO utenti_unificati (nome, cognome, email, password, tipo_utente) VALUES (?, ?, ?, ?, ?)";
     

@@ -14,21 +14,6 @@ public class Volontario extends Utente {
         super(email, password, nome, cognome);
         this.tipiDiVisite = tipiDiVisite;
     }
-
-    // @Override
-    // public String getNome() {
-    //     return nome;
-    // }
-
-    // @Override
-    // public String getEmail() {
-    //     return email;
-    // }
-    
-    // @Override
-    // public String getCognome() {
-    //     return cognome;
-    // }
     
     public List<String> getTipiDiVisite() {
         return tipiDiVisite;

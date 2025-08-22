@@ -50,15 +50,16 @@ public class ConfiguratoriManager extends DatabaseManager {
     }
 
     // Metodo per aggiungere un configuratore al database
-    protected void aggiungiConfiguratore(Configuratore configuratore) {
-        String inserisciSqlConfiguratori = "INSERT INTO configuratori (nome, cognome, email, password) VALUES (?, ?, ?, ?)";
-    
+    private void aggiungiConfiguratore(Configuratore configuratore) {
+        String inserisciSqlConfiguratori = "INSERT INTO configuratori (nome, cognome, email, password, password_modificata) VALUES (?, ?, ?, ?, ?)";
+
         try (Connection conn = DatabaseConnection.connect();
              PreparedStatement pstmt = conn.prepareStatement(inserisciSqlConfiguratori)) {
             pstmt.setString(1, configuratore.getNome());
             pstmt.setString(2, configuratore.getCognome());
             pstmt.setString(3, configuratore.getEmail());
             pstmt.setString(4, configuratore.getPassword());
+            pstmt.setBoolean(5, true);
             pstmt.executeUpdate();
             consoleView.mostraMessaggio("Configuratore aggiunto con successo nella tabella 'configuratori'.");
     
