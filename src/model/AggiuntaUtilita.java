@@ -227,6 +227,25 @@ public class AggiuntaUtilita {
     }
 
     private boolean isTipoVisitaProgrammabileInGiorno(String tipoVisita, String giornoSettimana) {
-        return !giornoSettimana.equals("SUNDAY");
+        String tipo = tipoVisita.trim().toLowerCase();
+        String giorno = giornoSettimana.trim().toUpperCase();
+
+        switch (tipo) {
+            case "enogastronomica":
+                // Venerdì, Sabato, Domenica
+                return giorno.equals("FRIDAY") || giorno.equals("SATURDAY") || giorno.equals("SUNDAY");
+            case "didattica":
+                // Lunedì, Martedì, Mercoledì, Giovedì
+                return giorno.equals("MONDAY") || giorno.equals("TUESDAY") || giorno.equals("WEDNESDAY") || giorno.equals("THURSDAY");
+            case "storica":
+                // Martedì, Giovedì, Sabato
+                return giorno.equals("TUESDAY") || giorno.equals("THURSDAY") || giorno.equals("SATURDAY");
+            case "scientifica":
+                // Mercoledì, Venerdì, Domenica
+                return giorno.equals("WEDNESDAY") || giorno.equals("FRIDAY") || giorno.equals("SUNDAY");
+            default:
+                // Se il tipo non è riconosciuto, non permette nessun giorno
+                return false;
+        }
     }
 }
