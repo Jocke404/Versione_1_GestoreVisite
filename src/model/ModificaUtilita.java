@@ -1,8 +1,16 @@
 package src.model;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import src.model.db.VisiteManagerDB;
 
@@ -14,10 +22,21 @@ public class ModificaUtilita {
 
     private final VisiteManagerDB visiteManagerDB;
     private final ConsoleView consoleView = new ConsoleView();
+    private static final String AMBITO_FILE = "src/utility/ambito_territoriale.config";
+    private Set<String> ambitoTerritoriale = new HashSet<>();
 
     public ModificaUtilita(VisiteManagerDB visiteManagerDB) {
         this.visiteManagerDB = visiteManagerDB;
-    }   
+    }
+    
+    public void verificaOAggiornaAmbitoTerritoriale() {
+        if (!isAmbitoConfigurato()) {
+            scegliAmbitoTerritoriale();
+            salvaAmbitoTerritoriale();
+        } else {
+            caricaAmbitoTerritoriale();
+        }
+    }
 
     // Metodo per modificare la data di una visita
     public void modificaDataVisita() {
@@ -126,6 +145,58 @@ public class ModificaUtilita {
         int scelta = InputDati.leggiIntero("Seleziona la data preclusa da eliminare: ", 1, datePrecluse.size()) - 1;
         LocalDate dataDaEliminare = datePrecluse.get(scelta).getKey();
         visiteManagerDB.eliminaData(dataDaEliminare);
+    }
+
+
+    // Controlla se l'ambito è già stato configurato
+    public boolean isAmbitoConfigurato() {
+        File file = new File(AMBITO_FILE);
+        return file.exists();
+    }
+
+    // Metodo per la scelta dell'ambito territoriale (uno o più comuni)
+    public void scegliAmbitoTerritoriale() {
+        consoleView.mostraMessaggio("Configurazione ambito territoriale (inserisci uno o più comuni).");
+        boolean aggiungiAltro = true;
+        while (aggiungiAltro) {
+            String comune = InputDati.leggiStringaNonVuota("Inserisci il nome del comune: ");
+            ambitoTerritoriale.add(comune);
+            aggiungiAltro = InputDati.yesOrNo("Vuoi aggiungere un altro comune? (s/n): ");
+        }
+        consoleView.mostraMessaggio("Ambito territoriale configurato: " + ambitoTerritoriale);
+    }
+
+    // Salva l'ambito territoriale su file
+    public void salvaAmbitoTerritoriale() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(AMBITO_FILE))) {
+            for (String comune : ambitoTerritoriale) {
+                writer.write(comune);
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            consoleView.mostraMessaggio("Errore nel salvataggio dell'ambito territoriale.");
+        }
+    }
+
+    // Carica l'ambito territoriale da file
+    public void caricaAmbitoTerritoriale() {
+        ambitoTerritoriale.clear();
+        try (BufferedReader reader = new BufferedReader(new FileReader(AMBITO_FILE))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                ambitoTerritoriale.add(line.trim());
+            }
+        } catch (IOException e) {
+            consoleView.mostraMessaggio("Errore nel caricamento dell'ambito territoriale.");
+        }
+    }
+
+    // Metodo pubblico per ottenere l'ambito territoriale
+    public Set<String> getAmbitoTerritoriale() {
+        if (ambitoTerritoriale.isEmpty()) {
+            caricaAmbitoTerritoriale();
+        }
+        return new HashSet<>(ambitoTerritoriale);
     }
 
 }

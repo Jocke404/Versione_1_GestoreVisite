@@ -1,13 +1,16 @@
 package src.view;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lib.InputDati;
 import src.controller.VolontariController;
 import src.model.Luogo;
+import src.model.ModificaUtilita;
 import src.model.Visite;
 import src.model.Volontario;
 import src.model.db.VisiteManagerDB;
@@ -90,7 +93,7 @@ public class ViewUtilita {
             return;
         }
 
-        String[] stati = {"Proposta", "Completa", "Confermata", "Cancellata", "Effettuata"};
+        String[] stati = {"Proposta", "Completa", "Confermata", "Cancellata"};
         System.out.println("Stati disponibili:");
         for (int i = 0; i < stati.length; i++) {
             System.out.printf("%d. %s%n", i + 1, stati[i]);
@@ -172,6 +175,61 @@ public class ViewUtilita {
         System.out.println("Date Precluse:");
         for (Map.Entry<LocalDate, String> entry : datePrecluseMap) {
             System.out.printf("Data: %s, Motivo: %s%n", entry.getKey(), entry.getValue());
+        }
+    }
+
+  // Metodo per visualizzare l'ambito territoriale
+    public void stampaAmbitoTerritoriale(ModificaUtilita modificaUtilita) {
+        Set<String> ambito = modificaUtilita.getAmbitoTerritoriale();
+        if (ambito.isEmpty()) {
+            System.out.println("Ambito territoriale non configurato.");
+        } else {
+            System.out.println("Ambito territoriale:");
+            for (String comune : ambito) {
+                System.out.println("- " + comune);
+            }
+        }
+    }
+
+    //Metodo per visualizzare i tipi di visita per luogo
+    public void stampaTipiVisitaPerLuogo(VisiteController visiteController) {
+        List<Visite> visite = visiteController.getVisite();
+        if (visite.isEmpty()) {
+            System.out.println("Nessun luogo disponibile.");
+            return;
+        }
+
+        Map<String, List<Visite>> visitePerLuogo =new HashMap<>();
+        for (Visite visita : visite) {
+            String luogo = visita.getLuogo();
+            visitePerLuogo.computeIfAbsent(luogo, k -> new java.util.ArrayList<>()).add(visita);
+        }
+
+        System.out.println ("Tipi di visita per luogo:");
+
+        for (Map.Entry<String, List<Visite>> entry : visitePerLuogo.entrySet()) {
+            String luogo = entry.getKey();
+            List<Visite> visiteNelLuogo = entry.getValue();
+            System.out.println("Luogo: " + luogo);
+            System.out.println("Tipi di Visita:");
+            
+            Set<String> tipiVisitaUnici = new java.util.HashSet<>();
+            for (Visite visita : visiteNelLuogo) {
+                String tipoVisita = visita.getTipoVisitaString();
+                tipiVisitaUnici.add(tipoVisita);
+            }
+
+            if (tipiVisitaUnici. isEmpty()) {
+                System.out.println("  Nessun tipo di visita disponibile.");
+            } else {
+                int counter = 1;
+                for (String tipo : tipiVisitaUnici) {
+                    System.out.println("  " + counter + ". " + tipo);
+                    counter++;
+                }
+            }
+
+            System.out.println("-------------------------");
         }
     }
 

@@ -110,10 +110,15 @@ public class MasterController {
             if (utenteCorrente instanceof Volontario){
                 volontariController.volontarioCorrente = (Volontario) utenteCorrente;  
                 menu = menuFactory.creaMenuVolontario(volontariController);
-            } else if (utenteCorrente instanceof Configuratore) 
+            } else if (utenteCorrente instanceof Configuratore){
+                if(!modificaUtilita.isAmbitoConfigurato()){
+                    modificaUtilita.scegliAmbitoTerritoriale();
+                    modificaUtilita.salvaAmbitoTerritoriale();
+                } else {
+                    modificaUtilita.caricaAmbitoTerritoriale();
+                }
                 menu = menuFactory.creaMenuConfiguratore(configuratoriController);
-
-
+            }
         } else {
             System.out.println("Accesso negato. Effettua prima l'autenticazione.");
         }

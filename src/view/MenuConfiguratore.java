@@ -8,8 +8,8 @@ import src.controller.ConfiguratoriController;
 public class MenuConfiguratore implements Menu {
     private static final String[] SELECT = {"Aggiungi Luogo", "Aggiungi Volontario", "Aggiungi Visita", 
     "Aggiungi Date Precluse", "Visualizza Luoghi", "Visualizza Volontari", "Visualizza Visite", 
-    "Visualizza Date Precluse", "Modifica numero massimo di persone per visita",
-    "Modifica stato della visita", "Elimina date precluse", "Visualizza visite per stato", "Visualizza archivio storico"};
+    "Visualizza Date Precluse", "Mostra Ambito Territoriale", "Modifica numero massimo di persone per visita",
+    "Modifica stato della visita", "Elimina date precluse", "Visualizza visite per stato", "Visualizza archivio storico", "Stampa Tipi Visita per Luogo"};
     private final ConfiguratoriController configuratoriController; // Riferimento all'istanza di ConfiguratoriController che ha creato questo menu
 
     public MenuConfiguratore(ConfiguratoriController configuratoriController) {
@@ -34,11 +34,13 @@ public class MenuConfiguratore implements Menu {
                 case 6 -> configuratoriController.mostraVolontari();
                 case 7 -> configuratoriController.mostraVisite();
                 case 8 -> configuratoriController.mostraDatePrecluse();
-                case 9 -> configuratoriController.modificaNumeroMaxPersonePerVisita();
-                case 10 -> configuratoriController.modificaStatoVisita();
-                case 11 -> configuratoriController.eliminaDatePrecluse();
-                case 12 -> configuratoriController.visualizzaVisitePerStato();
-                case 13 -> configuratoriController.visualizzaArchivioStorico();
+                case 9 -> configuratoriController.mostraAmbitoTerritoriale();
+                case 10 -> configuratoriController.modificaNumeroMaxPersonePerVisita();
+                case 11 -> configuratoriController.modificaStatoVisita();
+                case 12 -> configuratoriController.eliminaDatePrecluse();
+                case 13 -> configuratoriController.visualizzaVisitePerStato();
+                case 14 -> configuratoriController.visualizzaArchivioStorico();
+                case 15 -> configuratoriController.stampaTipiVisitaPerLuogo();
                 case 0 -> goOn = false; // Esce dal menu
                 default -> System.out.println("Opzione non valida.");
             }

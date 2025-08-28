@@ -84,4 +84,12 @@ public class ConfiguratoriController {
     public void eliminaDatePrecluse() {
         modificaUtilita.eliminaDatePrecluse();
     }
+
+    public void mostraAmbitoTerritoriale() {
+        viewUtilita.stampaAmbitoTerritoriale(modificaUtilita);
+    }
+
+    public void stampaTipiVisitaPerLuogo(){
+       viewUtilita.stampaTipiVisitaPerLuogo(visiteController);
+    }
 }
