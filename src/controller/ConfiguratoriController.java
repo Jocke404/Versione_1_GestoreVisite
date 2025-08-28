@@ -50,7 +50,7 @@ public class ConfiguratoriController {
     }
     
     public void visualizzaVisitePerStato(){
-        viewUtilita.stampaVisitePerStato(visiteController);
+        viewUtilita.stampaVisitePerStato();
     }
 
     public void modificaNumeroMaxPersonePerVisita() {
@@ -75,5 +75,13 @@ public class ConfiguratoriController {
 
     public void aggiungiDatePrecluse() {
         addUtilita.aggiungiDatePrecluse();
+    }
+
+    public void mostraDatePrecluse() {
+        viewUtilita.stampaDatePrecluse(visiteController);
+    }
+
+    public void eliminaDatePrecluse() {
+        modificaUtilita.eliminaDatePrecluse();
     }
 }

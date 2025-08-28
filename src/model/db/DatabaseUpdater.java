@@ -52,6 +52,7 @@ public class DatabaseUpdater {
                     configuratoriManager.caricaConfiguratori();
                     luoghiManager.caricaLuoghi();
                     visiteManagerDB.caricaVisite();
+                    visiteManagerDB.caricaDatePrecluse();
                 } catch (Exception e) {
                     System.err.println("Errore durante la sincronizzazione dal database: " + e.getMessage());
                 }

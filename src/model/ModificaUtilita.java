@@ -59,7 +59,7 @@ public class ModificaUtilita {
         if (consoleView.chiediAnnullaOperazione())
             return;
         int numeroMax = InputDati.leggiInteroConMinimo("Inserisci il numero massimo di persone per visita: ", 2);
-        visiteManagerDB.aggiornaMaxPersonePerVisita(numeroMax);
+        visiteManagerDB.aggiornaMaxPersone(numeroMax);
         consoleView.mostraMessaggio("Numero massimo di persone per visita aggiornato a: " + numeroMax);
     }
 
@@ -103,6 +103,29 @@ public class ModificaUtilita {
         // Aggiorna la visita nel database
         visiteManagerDB.aggiornaVisita(visitaId, visitaAggiornata);
         consoleView.mostraMessaggio("Stato della visita aggiornato con successo.");
+    }
+
+    public void eliminaDatePrecluse() {
+        if (consoleView.chiediAnnullaOperazione())
+            return;
+
+        List<Map.Entry<LocalDate, String>> datePrecluse = visiteManagerDB.getDatePrecluseMap().entrySet().stream().toList();
+
+        if (datePrecluse.isEmpty()) {
+            consoleView.mostraMessaggio("Non ci sono date precluse da eliminare.");
+            return;
+        }
+    
+        consoleView.mostraMessaggio("Date precluse disponibili:");
+
+        for (int i = 0; i < datePrecluse.size(); i++) {
+            Map.Entry<LocalDate, String> entry = datePrecluse.get(i);
+            System.out.printf("%d. Data: %s, Motivo: %s%n", i + 1, entry.getKey(), entry.getValue());
+        }
+    
+        int scelta = InputDati.leggiIntero("Seleziona la data preclusa da eliminare: ", 1, datePrecluse.size()) - 1;
+        LocalDate dataDaEliminare = datePrecluse.get(scelta).getKey();
+        visiteManagerDB.eliminaData(dataDaEliminare);
     }
 
 }

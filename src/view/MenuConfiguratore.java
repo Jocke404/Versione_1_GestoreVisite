@@ -2,17 +2,14 @@ package src.view;
 
 import java.time.LocalDate;
 
-import javax.swing.JOptionPane;
-
 import lib.MyMenu;
 import src.controller.ConfiguratoriController;
-import src.controller.MasterController;
 
 public class MenuConfiguratore implements Menu {
     private static final String[] SELECT = {"Aggiungi Luogo", "Aggiungi Volontario", "Aggiungi Visita", 
-    "Visualizza Luoghi", "Visualizza Volontari", "Visualizza Visite", 
-    "Modifica numero massimo di persone per visita",
-    "Modifica stato della visita", "Visualizza visite per stato", "Visualizza archivio storico"};
+    "Aggiungi Date Precluse", "Visualizza Luoghi", "Visualizza Volontari", "Visualizza Visite", 
+    "Visualizza Date Precluse", "Modifica numero massimo di persone per visita",
+    "Modifica stato della visita", "Elimina date precluse", "Visualizza visite per stato", "Visualizza archivio storico"};
     private final ConfiguratoriController configuratoriController; // Riferimento all'istanza di ConfiguratoriController che ha creato questo menu
 
     public MenuConfiguratore(ConfiguratoriController configuratoriController) {
@@ -36,10 +33,12 @@ public class MenuConfiguratore implements Menu {
                 case 5 -> configuratoriController.mostraLuoghi();
                 case 6 -> configuratoriController.mostraVolontari();
                 case 7 -> configuratoriController.mostraVisite();
-                case 8 -> configuratoriController.modificaNumeroMaxPersonePerVisita();
-                case 9 -> configuratoriController.modificaStatoVisita();
-                case 10 -> configuratoriController.visualizzaVisitePerStato();
-                case 11 -> configuratoriController.visualizzaArchivioStorico();
+                case 8 -> configuratoriController.mostraDatePrecluse();
+                case 9 -> configuratoriController.modificaNumeroMaxPersonePerVisita();
+                case 10 -> configuratoriController.modificaStatoVisita();
+                case 11 -> configuratoriController.eliminaDatePrecluse();
+                case 12 -> configuratoriController.visualizzaVisitePerStato();
+                case 13 -> configuratoriController.visualizzaArchivioStorico();
                 case 0 -> goOn = false; // Esce dal menu
                 default -> System.out.println("Opzione non valida.");
             }

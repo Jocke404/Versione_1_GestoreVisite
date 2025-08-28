@@ -17,6 +17,7 @@ public class VisiteManagerDB extends DatabaseManager {
     public VisiteManagerDB(ThreadPoolController threadPoolManager) {
         super(threadPoolManager);
         caricaVisite();
+        caricaDatePrecluse();
     }
 
     //Logiche delle visite--------------------------------------------------
@@ -69,8 +70,65 @@ public class VisiteManagerDB extends DatabaseManager {
             }
     }
 
+    protected void aggiungiDataPreclusa(LocalDate data, String motivo) {
+        String sql = "INSERT INTO date_precluse (data, motivo) VALUES (?, ?)";
+        executorService.submit(() -> {
+            try (Connection conn = DatabaseConnection.connect();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setDate(1, java.sql.Date.valueOf(data));
+                pstmt.setString(2, motivo);
+                pstmt.executeUpdate();
+
+                synchronized (datePrecluseMap) {
+                    datePrecluseMap.putIfAbsent(data, motivo);
+                }
+
+            } catch (SQLException e) {
+                System.err.println("Errore durante l'aggiunta della data preclusa: " + e.getMessage());
+            }
+        });
+    }
+
+    protected void caricaDatePrecluse() {
+        String sql = "SELECT data, motivo FROM date_precluse";
+        try (Connection conn = DatabaseConnection.connect();
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                ResultSet rs = pstmt.executeQuery()) {
+
+            synchronized (datePrecluseMap) {
+                datePrecluseMap.clear();
+                while (rs.next()) {
+                    LocalDate data = rs.getDate("data").toLocalDate();
+                    String motivo = rs.getString("motivo");
+                    datePrecluseMap.putIfAbsent(data, motivo);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Errore durante il caricamento delle date precluse: " + e.getMessage());
+        }
+    }
+
+    protected void eliminaDataPreclusa(LocalDate dataDaEliminare) {
+        String sql = "DELETE FROM date_precluse WHERE data = ?";
+        executorService.submit(() -> {
+            try (Connection conn = DatabaseConnection.connect();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setDate(1, java.sql.Date.valueOf(dataDaEliminare));
+                int rowsAffected = pstmt.executeUpdate();
+
+                if (rowsAffected > 0) {
+                    caricaDatePrecluse();
+                } else {
+                    System.err.println("Nessuna data preclusa trovata da eliminare.");
+                }
+            } catch (SQLException e) {
+                System.err.println("Errore durante l'eliminazione della data preclusa: " + e.getMessage());
+            }
+        });
+    }
+
     // Metodo per aggiornare una visita specifica
-    public void aggiornaVisita(int visitaId, Visite visitaAggiornata) {
+    protected void aggiornaVisitaDB(int visitaId, Visite visitaAggiornata) {
         String sql = "UPDATE visite SET luogo = ?, tipo_visita = ?, volontario = ?, data = ?, stato = ?, max_persone = ? WHERE id = ?";
         executorService.submit(() -> {
             try (Connection conn = DatabaseConnection.connect();
@@ -90,7 +148,7 @@ public class VisiteManagerDB extends DatabaseManager {
     }
 
     // Metodo per aggiornare il numero massimo di persone per tutte le visite
-    public void aggiornaMaxPersonePerVisita(int maxPersonePerVisita) {
+    protected void aggiornaMaxPersonePerVisita(int maxPersonePerVisita) {
         String sql = "UPDATE visite SET max_persone = ?";
         executorService.submit(() -> {
             try (Connection conn = DatabaseConnection.connect();
@@ -114,31 +172,24 @@ public class VisiteManagerDB extends DatabaseManager {
         if(!recordEsiste(verificaSql, nuovaVisita.getLuogo(), nuovaVisita.getData(), nuovaVisita.getVolontario())){
             consoleView.mostraMessaggio("La visita non esiste già. Procedo con l'aggiunta.");
             aggiungiVisita(nuovaVisita);
-        }
-        else{
+        } else {
             consoleView.mostraMessaggio("La visita esiste già. Non posso aggiungerla.");
             return;
         }
     }
-    
-    public void aggiungiDataPreclusa(LocalDate data, String motivo) {
-        String sql = "INSERT INTO date_precluse (data, motivo) VALUES (?, ?)";
-        executorService.submit(() -> {
-            try (Connection conn = DatabaseConnection.connect();
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
-                pstmt.setDate(1, java.sql.Date.valueOf(data));
-                pstmt.setString(2, motivo);
-                pstmt.executeUpdate();
-                
-                consoleView.mostraMessaggio("Data preclusa aggiunta con successo.");  
-            } catch (SQLException e) {
-                System.err.println("Errore durante l'aggiunta della data preclusa: " + e.getMessage());
-            }
-        });
+
+    public void aggiungiNuovaDataPreclusa(LocalDate data, String motivo) {
+        String verificaSql = "SELECT 1 FROM date_precluse WHERE data = ?";
+        if(!recordEsiste(verificaSql, data)){
+            aggiungiDataPreclusa(data, motivo);
+        } else {
+            consoleView.mostraMessaggio("La data preclusa esiste già. Non posso aggiungerla.");
+            return;
+        }
     }
 
     // Metodo per recuperare il numero massimo di persone per visita dal database
-    public int getMaxPersoneDefault() {
+    protected int getMaxPersoneDefault() {
         String sql = "SELECT max_persone FROM visite";
         try (Connection conn = DatabaseConnection.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -150,21 +201,32 @@ public class VisiteManagerDB extends DatabaseManager {
         } catch (SQLException e) {
             System.err.println("Errore durante il recupero del numero massimo di persone: " + e.getMessage());
         }
-        return 10; // Valore di default se non trovato nel database
+        return 10;
+    }
+
+    public int getMaxPersone() {
+        return getMaxPersoneDefault();
     }
 
     public ConcurrentHashMap<Integer, Visite> getVisiteMap() {
         return visiteMap;
-    }
-    
-    public void setVisiteMap(ConcurrentHashMap<Integer, Visite> visiteMap) {
-        this.visiteMap = visiteMap;
     }
 
     public ConcurrentHashMap<LocalDate, String> getDatePrecluseMap() {
         return datePrecluseMap;
     }
 
-    
+    public void eliminaData(LocalDate data){
+        eliminaDataPreclusa(data);
+    }
+
+    public void aggiornaVisita(int visitaId, Visite visitaAggiornata){
+        aggiornaVisitaDB(visitaId, visitaAggiornata);
+    }
+
+    public void aggiornaMaxPersone(int numeroMax) {
+        aggiornaMaxPersonePerVisita(numeroMax);
+    }
+
 
 }

@@ -37,7 +37,6 @@ public class AggiuntaUtilita {
         this.luoghiMap = luoghiManager.getLuoghiMap();
         this.volontariMap = volontariManager.getVolontariMap();
         this.visiteMap = visiteManagerDB.getVisiteMap();
-        this.datePrecluseMap = visiteManagerDB.getDatePrecluseMap();
     }
 
     // Metodo per aggiungere una nuova visita
@@ -99,7 +98,7 @@ public class AggiuntaUtilita {
             dataVisita = dateValide.get(dataIndex);
         }
     
-        int maxPersone = visiteManagerDB.getMaxPersoneDefault();
+        int maxPersone = visiteManagerDB.getMaxPersone();
         String stato = "Proposta"; // Stato iniziale della visita
     
         // Genera un ID univoco per la visita
@@ -251,15 +250,17 @@ public class AggiuntaUtilita {
     }
 
     public void aggiungiDatePrecluse() {
-        if (consoleView.chiediAnnullaOperazione())
-            return;
-
-        List<LocalDate> data = InputDati.leggiDataMultipla("Inserisci la data da aggiungere alle date precluse: ");
-        String motivo = null;
-        for (LocalDate d : data) {
-            motivo = InputDati.leggiStringa("Inserisci il motivo della preclusione per la data " + d + ": ");
-            visiteManagerDB.aggiungiDataPreclusa(d, motivo);
-        }
-        visiteManagerDB.caricaDatePrecluse();
+        boolean continua = true;
+        do {
+            if (consoleView.chiediAnnullaOperazione()){
+                continua = false;
+                break;
+            }
+            LocalDate data = InputDati.leggiData("Inserisci la data da aggiungere alle date precluse: ");
+            if (data != null) {
+                String motivo = InputDati.leggiStringa("Inserisci il motivo della preclusione per la data " + data + ": ");
+                visiteManagerDB.aggiungiNuovaDataPreclusa(data, motivo);
+            }
+        } while (continua);
     }
 }

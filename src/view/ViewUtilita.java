@@ -1,5 +1,6 @@
 package src.view;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -81,7 +82,7 @@ public class ViewUtilita {
     }
 
     // Metodo per visualizzare le visite per stato
-    public void stampaVisitePerStato(VisiteController visiteController) {
+    public void stampaVisitePerStato() {
         if(consoleView.chiediAnnullaOperazione())
             return; 
         if (visiteMap.isEmpty()) {
@@ -110,6 +111,7 @@ public class ViewUtilita {
 
     // Metodo per visualizzare l'archivio storico delle visite
     public void stampaArchivioStorico(VisiteController visiteController) {
+        ConcurrentHashMap<Integer, Visite> visiteMap = visiteController.getVisiteMap();
 
         if (visiteMap.isEmpty()) {
             System.out.println("Non ci sono visite disponibili nell'archivio storico.");
@@ -160,5 +162,18 @@ public class ViewUtilita {
         }
     }
 
+    public void stampaDatePrecluse(VisiteController visiteController) {
+        List<Map.Entry<LocalDate, String>> datePrecluseMap = visiteController.getDatePrecluse();
+        if (datePrecluseMap.isEmpty()) {
+            System.out.println("Nessuna data preclusa disponibile.");
+            return;
+        }
 
+        System.out.println("Date Precluse:");
+        for (Map.Entry<LocalDate, String> entry : datePrecluseMap) {
+            System.out.printf("Data: %s, Motivo: %s%n", entry.getKey(), entry.getValue());
+        }
+    }
+
+    
 }

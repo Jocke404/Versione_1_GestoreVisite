@@ -3,7 +3,6 @@ package src.controller;
 import java.util.concurrent.ExecutorService;
 
 import src.factory.MenuFactory;
-import src.factory.UserFactory;
 import src.model.*;
 import src.model.db.*;
 import src.view.*;
