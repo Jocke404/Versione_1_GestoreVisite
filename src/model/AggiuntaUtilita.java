@@ -92,9 +92,14 @@ public class AggiuntaUtilita {
             dataVisita = dateValide.get(dataIndex);
         }
 
-        //TODO 
-        LocalTime oraInizio = InputDati.leggiOra("Inserisci l'ora di inizio della visita (formato HH:MM): ");
-        int durataMinuti = InputDati.leggiIntero("Inserisci la durata della visita in minuti: ", 1, 480);
+        do {
+            if (validaVisita()){
+                LocalTime oraInizio = InputDati.leggiOra("Inserisci l'ora di inizio della visita (formato HH:MM): ");
+                int durataMinuti = InputDati.leggiIntero("Inserisci la durata della visita in minuti: ", 1, 480);
+            }
+            
+        } while (oraInizio == null);
+
 
         int maxPersone = visiteManagerDB.getMaxPersone();
         String stato = "Proposta"; // Stato iniziale della visita
@@ -109,6 +114,10 @@ public class AggiuntaUtilita {
         visiteManagerDB.aggiungiNuovaVisita(nuovaVisita);
     
         consoleView.mostraMessaggio("Visita assegnata con successo per la data " + dataVisita + "!");
+    }
+
+    private boolean validaVisita() {
+        
     }
 
     // Metodo per aggiungere un volontario
