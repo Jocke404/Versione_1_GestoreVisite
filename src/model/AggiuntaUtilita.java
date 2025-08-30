@@ -92,7 +92,7 @@ public class AggiuntaUtilita {
             dataVisita = dateValide.get(dataIndex);
         }
 
-        
+        //TODO 
         LocalTime oraInizio = InputDati.leggiOra("Inserisci l'ora di inizio della visita (formato HH:MM): ");
         int durataMinuti = InputDati.leggiIntero("Inserisci la durata della visita in minuti: ", 1, 480);
 
