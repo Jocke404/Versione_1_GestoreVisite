@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.concurrent.ConcurrentHashMap;
 import src.controller.ThreadPoolController;
 import src.model.TipiVisita;
@@ -38,9 +39,11 @@ public class VisiteManagerDB extends DatabaseManager {
                     LocalDate data = rs.getDate("data") != null ? rs.getDate("data").toLocalDate() : null; // Converte la data in LocalDate
                     int maxPersone = rs.getInt("max_persone");
                     String stato = rs.getString("stato");
+                    LocalTime oraInizio = rs.getTime("ora_inizio") != null ? rs.getTime("ora_inizio").toLocalTime() : null;
+                    int durataMinuti = rs.getInt("durata_minuti");
 
                     // Usa il costruttore completo di Visite
-                    Visite visita = new Visite(id, luogo, tipoVisita, volontario, data, maxPersone, stato);
+                    Visite visita = new Visite(id, luogo, tipoVisita, volontario, data, maxPersone, stato, oraInizio, durataMinuti);
                     visiteMap.putIfAbsent(id, visita);
                 }
             }
@@ -51,7 +54,7 @@ public class VisiteManagerDB extends DatabaseManager {
 
     // Metodo per aggiungere una visita al database
     protected void aggiungiVisita(Visite visita) {
-        String inserisciSql = "INSERT INTO visite (luogo, tipo_visita, volontario, data, stato, max_persone) VALUES (?, ?, ?, ?, ?, ?)";
+        String inserisciSql = "INSERT INTO visite (luogo, tipo_visita, volontario, data, stato, max_persone, ora_inizio, durata_minuti) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
             try (Connection conn = DatabaseConnection.connect();
                  PreparedStatement pstmt = conn.prepareStatement(inserisciSql)) {
@@ -62,6 +65,8 @@ public class VisiteManagerDB extends DatabaseManager {
                 pstmt.setDate(4, visita.getData() != null ? java.sql.Date.valueOf(visita.getData()) : null);
                 pstmt.setString(5, visita.getStato());
                 pstmt.setInt(6, visita.getMaxPersone());
+                pstmt.setTime(7, visita.getOraInizio() != null ? java.sql.Time.valueOf(visita.getOraInizio()) : null);
+                pstmt.setInt(8, visita.getDurataMinuti());
                 pstmt.executeUpdate();
     
                 consoleView.mostraMessaggio("Visita aggiunta con successo.");
@@ -129,7 +134,7 @@ public class VisiteManagerDB extends DatabaseManager {
 
     // Metodo per aggiornare una visita specifica
     protected void aggiornaVisitaDB(int visitaId, Visite visitaAggiornata) {
-        String sql = "UPDATE visite SET luogo = ?, tipo_visita = ?, volontario = ?, data = ?, stato = ?, max_persone = ? WHERE id = ?";
+        String sql = "UPDATE visite SET luogo = ?, tipo_visita = ?, volontario = ?, data = ?, stato = ?, max_persone = ?, ora_inizio = ?, durata_minuti = ? WHERE id = ?";
         executorService.submit(() -> {
             try (Connection conn = DatabaseConnection.connect();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -139,7 +144,9 @@ public class VisiteManagerDB extends DatabaseManager {
                 pstmt.setDate(4, visitaAggiornata.getData() != null ? java.sql.Date.valueOf(visitaAggiornata.getData()) : null);
                 pstmt.setString(5, visitaAggiornata.getStato());
                 pstmt.setInt(6, visitaAggiornata.getMaxPersone());
-                pstmt.setInt(7, visitaId);
+                pstmt.setTime(7, visitaAggiornata.getOraInizio() != null ? java.sql.Time.valueOf(visitaAggiornata.getOraInizio()) : null);
+                pstmt.setInt(8, visitaAggiornata.getDurataMinuti());
+                pstmt.setInt(9, visitaId);
                 pstmt.executeUpdate();
             } catch (SQLException e) {
                 System.err.println("Errore durante l'aggiornamento della visita: " + e.getMessage());

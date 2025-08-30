@@ -9,7 +9,7 @@ public class MenuConfiguratore implements Menu {
     private static final String[] SELECT = {"Aggiungi Luogo", "Aggiungi Volontario", "Aggiungi Visita", 
     "Aggiungi Date Precluse", "Visualizza Luoghi", "Visualizza Volontari", "Visualizza Visite", 
     "Visualizza Date Precluse", "Mostra Ambito Territoriale", "Modifica numero massimo di persone per visita",
-    "Modifica stato della visita", "Elimina date precluse", "Visualizza visite per stato", "Visualizza archivio storico", "Stampa Tipi Visita per Luogo"};
+    "Modifica stato della visita", "Elimina date precluse", "Elimina luogo", "Visualizza visite per stato", "Visualizza archivio storico", "Stampa Tipi Visita per Luogo"};
     private final ConfiguratoriController configuratoriController; // Riferimento all'istanza di ConfiguratoriController che ha creato questo menu
 
     public MenuConfiguratore(ConfiguratoriController configuratoriController) {
@@ -37,10 +37,12 @@ public class MenuConfiguratore implements Menu {
                 case 9 -> configuratoriController.mostraAmbitoTerritoriale();
                 case 10 -> configuratoriController.modificaNumeroMaxPersonePerVisita();
                 case 11 -> configuratoriController.modificaStatoVisita();
-                case 12 -> configuratoriController.eliminaDatePrecluse();
-                case 13 -> configuratoriController.visualizzaVisitePerStato();
-                case 14 -> configuratoriController.visualizzaArchivioStorico();
-                case 15 -> configuratoriController.stampaTipiVisitaPerLuogo();
+                case 12 -> configuratoriController.modificaLuogo();
+                case 13 -> configuratoriController.eliminaDatePrecluse();
+                case 14 -> configuratoriController.eliminaLuogo();
+                case 15 -> configuratoriController.visualizzaVisitePerStato();
+                case 16 -> configuratoriController.visualizzaArchivioStorico();
+                case 17 -> configuratoriController.stampaTipiVisitaPerLuogo();
                 case 0 -> goOn = false; // Esce dal menu
                 default -> System.out.println("Opzione non valida.");
             }

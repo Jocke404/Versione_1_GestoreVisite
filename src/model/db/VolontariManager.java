@@ -161,8 +161,5 @@ public class VolontariManager extends DatabaseManager {
         this.volontariMap = volontariMap;
     }
 
-    // public static VolontariManager getInstance() {
-    //     return new VolontariManager(ThreadPoolController.getInstance());
-    // }
 
 }

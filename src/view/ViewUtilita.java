@@ -1,7 +1,9 @@
 package src.view;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -202,7 +204,7 @@ public class ViewUtilita {
         Map<String, List<Visite>> visitePerLuogo =new HashMap<>();
         for (Visite visita : visite) {
             String luogo = visita.getLuogo();
-            visitePerLuogo.computeIfAbsent(luogo, k -> new java.util.ArrayList<>()).add(visita);
+            visitePerLuogo.computeIfAbsent(luogo, k -> new ArrayList<>()).add(visita);
         }
 
         System.out.println ("Tipi di visita per luogo:");
@@ -213,7 +215,7 @@ public class ViewUtilita {
             System.out.println("Luogo: " + luogo);
             System.out.println("Tipi di Visita:");
             
-            Set<String> tipiVisitaUnici = new java.util.HashSet<>();
+            Set<String> tipiVisitaUnici = new HashSet<>();
             for (Visite visita : visiteNelLuogo) {
                 String tipoVisita = visita.getTipoVisitaString();
                 tipiVisitaUnici.add(tipoVisita);

@@ -1,6 +1,5 @@
 package src.model;
 // import it.unibs.mylib.*;
-import lib.InputDati;
 
 import java.util.*;
 
@@ -8,13 +7,15 @@ public class Luogo {
     
     private String nome;
     private String descrizione;
+    private String collocazione;
     private HashMap<String, List<String>> volontari;
     private HashMap<String, List<String>> tipiVisita; 
 
 
-    public Luogo(String nome, String descrizione) {
+    public Luogo(String nome, String descrizione, String collocazione) {
         this.nome = nome;
         this.descrizione = descrizione;
+        this.collocazione = collocazione;
         this.tipiVisita = new HashMap<>();
     }
 
@@ -25,30 +26,29 @@ public class Luogo {
     public String getDescrizione() {
         return descrizione;
     }
+
+    public String getCollocazione() {
+        return collocazione;
+    }
+
+    public void setName(String nuovoNome) {
+        this.nome = nuovoNome;
+    }
+
+    public void setDescrizione(String nuovaDescrizione) {
+        this.descrizione = nuovaDescrizione;
+    }
+
+    public void setCollocazione(String nuovaCollocazione) {
+        this.collocazione = nuovaCollocazione;
+    }
     
-
-  /* public void aggiungiTipoVisita(String tipo) {
-        tipiVisita.add(tipo);
-    } */
-
-    /*public void assegnaVolontario(String volontario) {
-        volontari.add(volontario);
-    }*/
-
-    public static Luogo creaLuogo(){
-        String nome = InputDati.leggiStringaNonVuota("inserire il nome del luogo: ");
-        String descrizione = InputDati.leggiStringaNonVuota("inserire una descrizione: ");
-        return new Luogo(nome, descrizione);
-    }
-
-    public static Luogo creaLuogoUtente(String nome, String descrizione) {
-        return new Luogo(nome, descrizione);
-    }
-
-
     @Override
     public String toString() {
         return "Luogo [descrizione=" + descrizione + ", nome=" + nome + "]";
     }
+
+
+
 
 }

@@ -92,4 +92,12 @@ public class ConfiguratoriController {
     public void stampaTipiVisitaPerLuogo(){
        viewUtilita.stampaTipiVisitaPerLuogo(visiteController);
     }
+
+    public void eliminaLuogo() {
+        modificaUtilita.eliminaLuogo(luoghiController);
+    }
+
+    public void modificaLuogo() {
+        modificaUtilita.modificaLuogo(luoghiController);
+    }
 }

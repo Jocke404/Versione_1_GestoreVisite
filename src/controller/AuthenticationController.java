@@ -21,29 +21,21 @@ public class AuthenticationController {
         Utente utenteBase = credentialManager.autentica();
         utenteLoggato = utenteBase;
 
-        if (!validaAutenticazioneBase(utenteBase)) {
+        if (!validaAutenticazioneBase(utenteLoggato)) {
             return false;
         }
 
         return true;
     }
 
-    private boolean validaAutenticazioneBase(Utente utenteBase) {
-        if (utenteBase == null) {
+    private boolean validaAutenticazioneBase(Utente utenteLoggato) {
+        if (utenteLoggato == null) {
             consoleView.mostraMessaggio("Autenticazione fallita.");
             // resetUtenti();
             return false;
         }
         return true;
     }
-
-    // private void resetUtenti() {
-    //     this.utenteCorrente = null;
-    //     this.volontarioCorrente = null;
-    //     this.configuratoreCorrente = null;
-    // }
-
-
 
     public Utente getUtenteCorrente() {
         return utenteLoggato;

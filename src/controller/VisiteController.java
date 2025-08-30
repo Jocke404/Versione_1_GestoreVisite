@@ -16,7 +16,6 @@ public class VisiteController {
 
     public List<Visite> getVisite() {
         return List.copyOf(visiteManagerDB.getVisiteMap().values());
-
     }
 
     public ConcurrentHashMap<Integer, Visite> getVisiteMap() {

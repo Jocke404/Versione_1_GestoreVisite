@@ -1,5 +1,6 @@
 package lib;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
@@ -196,7 +197,7 @@ public class InputDati
 	  
 	  public static boolean yesOrNo(String messaggio)
 	  {
-		  String mioMessaggio = messaggio + "("+RISPOSTA_SI+"/"+RISPOSTA_NO+")";
+		  String mioMessaggio = messaggio + "("+RISPOSTA_SI+"/"+RISPOSTA_NO+"):";
 		  char valoreLetto = leggiUpperChar(mioMessaggio,String.valueOf(RISPOSTA_SI)+String.valueOf(RISPOSTA_NO));
 		  
 		  if (valoreLetto == RISPOSTA_SI)
@@ -229,5 +230,21 @@ public class InputDati
 			continua = yesOrNo("Vuoi inserire un'altra data?");
 		} while (continua);
 		return dateLette;
+	}
+
+    public static LocalTime leggiOra(String string) {
+		boolean finito = false;
+		LocalTime oraLetta = null;
+		do {
+			System.out.print(string);
+			try {
+				String input = lettore.next();
+				oraLetta = LocalTime.parse(input, DATE_FORMATTER);
+				finito = true;
+			} catch (DateTimeParseException e) {
+				System.out.println(ERRORE_FORMATO + ". Formato corretto: HH:mm");
+			}
+		} while (!finito);
+		return oraLetta;
 	}
 }

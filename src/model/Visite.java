@@ -1,6 +1,7 @@
 package src.model;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 public class Visite {
     private int id; // ID univoco della visita
@@ -8,11 +9,13 @@ public class Visite {
     private TipiVisita tipoVisita;
     private String volontario;
     private LocalDate data;
-    private int maxPersone; // Numero massimo di persone per la visita
-    private String stato; // Stato della visita (es. "Proposta", "Confermata", ecc.)
+    private int maxPersone; 
+    private String stato; 
+    private LocalTime oraInizio; 
+    private int durataMinuti; 
 
     // Costruttore completo (inclusi tutti i campi)
-    public Visite(int id, String luogo, TipiVisita tipoVisita, String volontario, LocalDate data, int maxPersone, String stato) {
+    public Visite(int id, String luogo, TipiVisita tipoVisita, String volontario, LocalDate data, int maxPersone, String stato, LocalTime oraInizio, int durataMinuti) {
         this.id = id;
         this.luogo = luogo;
         this.tipoVisita = tipoVisita;
@@ -20,7 +23,30 @@ public class Visite {
         this.data = data;
         this.maxPersone = maxPersone;
         this.stato = stato;
+        this.oraInizio = oraInizio;
+        this.durataMinuti = durataMinuti;
     }
+
+    
+    public LocalTime getOraInizio() {
+        return oraInizio;
+    }
+
+
+    public void setOraInizio(LocalTime oraInizio) {
+        this.oraInizio = oraInizio;
+    }
+
+
+    public int getDurataMinuti() {
+        return durataMinuti;
+    }
+
+
+    public void setDurataMinuti(int durataMinuti) {
+        this.durataMinuti = durataMinuti;
+    }
+
 
     // Getter e Setter
     public int getId() {
@@ -62,19 +88,5 @@ public class Visite {
     public void setStato(String stato) {
         this.stato = stato;
     }
-
-    // Metodo toString per rappresentare l'oggetto come stringa
-    // @Override
-    // public String toString() {
-    //     return "Visite{" +
-    //             "id=" + id +
-    //             ", luogo='" + luogo + '\'' +
-    //             ", tipoVisita='" + tipoVisita + '\'' +
-    //             ", volontario='" + volontario + '\'' +
-    //             ", data=" + data +
-    //             ", maxPersone=" + maxPersone +
-    //             ", stato='" + stato + '\'' +
-    //             '}';
-    // }
 }
    

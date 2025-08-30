@@ -5,10 +5,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.time.LocalDate;
-import java.time.YearMonth;
+import java.time.*;
 import java.time.format.TextStyle;
-import java.time.DayOfWeek;
+
 import src.model.db.*;
 
 import lib.InputDati;
@@ -43,11 +42,6 @@ public class AggiuntaUtilita {
     public void aggiungiVisita() {
         if (consoleView.chiediAnnullaOperazione())
             return;
-    
-        if (luoghiMap.isEmpty()) {
-            consoleView.mostraMessaggio("aggiungi_visita.nessun_luogo_disponibile");
-            return;
-        }
     
         consoleView.mostraMessaggio("Elenco dei luoghi disponibili:");
         List<String> luoghiNomi = new ArrayList<>(luoghiMap.keySet());
@@ -97,7 +91,11 @@ public class AggiuntaUtilita {
             int dataIndex = InputDati.leggiIntero("Seleziona il numero della data: ", 1, dateValide.size()) - 1;
             dataVisita = dateValide.get(dataIndex);
         }
-    
+
+        
+        LocalTime oraInizio = InputDati.leggiOra("Inserisci l'ora di inizio della visita (formato HH:MM): ");
+        int durataMinuti = InputDati.leggiIntero("Inserisci la durata della visita in minuti: ", 1, 480);
+
         int maxPersone = visiteManagerDB.getMaxPersone();
         String stato = "Proposta"; // Stato iniziale della visita
     
@@ -105,7 +103,7 @@ public class AggiuntaUtilita {
         int id = visiteMap.size() + 1;
     
         // Crea l'oggetto Visite utilizzando il costruttore completo
-        Visite nuovaVisita = new Visite(id, luogoNomeScelto, tipoVisitaScelto, volontarioNomeScelto, dataVisita, maxPersone, stato);
+        Visite nuovaVisita = new Visite(id, luogoNomeScelto, tipoVisitaScelto, volontarioNomeScelto, dataVisita, maxPersone, stato, oraInizio, durataMinuti);
         visiteMap.put(id, nuovaVisita);
 
         visiteManagerDB.aggiungiNuovaVisita(nuovaVisita);
@@ -137,8 +135,9 @@ public class AggiuntaUtilita {
         
         String nome = InputDati.leggiStringaNonVuota("inserire il nome del luogo: ");
         String descrizione = InputDati.leggiStringaNonVuota("inserire la descrizione del luogo: ");
+        String collocazione = InputDati.leggiStringaNonVuota("inserire la collocazione del luogo: ");
 
-        Luogo nuovoLuogo = new Luogo(nome, descrizione);
+        Luogo nuovoLuogo = new Luogo(nome, descrizione, collocazione);
         luoghiMap.putIfAbsent(nome, nuovoLuogo);
         luoghiManager.aggiungiNuovoLuogo(nuovoLuogo);  
         consoleView.mostraMessaggio("Luogo aggiunto: " + nuovoLuogo);

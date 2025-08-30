@@ -17,13 +17,7 @@ public class LuoghiManager extends DatabaseManager {
     }
     
     // Metodo per sincronizzare i luoghi
-    public void sincronizzaLuoghi() {
-        for (Luogo luogo : luoghiMap.values()) {
-            aggiungiLuogo(luogo);
-            aggiornaLuogo(luogo.getNome(), luogo);
-        }
-        consoleView.mostraMessaggio("Sincronizzazione dei luoghi completata.");
-    }
+
 
     //Logiche dei luoghi--------------------------------------------------
     // Metodo per caricare i luoghi dal database e memorizzarli nella HashMap
@@ -39,7 +33,8 @@ public class LuoghiManager extends DatabaseManager {
                     String nome = rs.getString("nome");
                     Luogo luogo = new Luogo(
                             nome,
-                            rs.getString("descrizione")
+                            rs.getString("descrizione"),
+                            rs.getString("collocazione")
                     );
                     luoghiMap.putIfAbsent(nome, luogo);
                 }
@@ -51,40 +46,42 @@ public class LuoghiManager extends DatabaseManager {
 
     // Metodo per aggiornare un luogo nel database
     private void aggiornaLuogo(String nome, Luogo luogoAggiornato) {
-        String sql = "UPDATE luoghi SET descrizione = ? WHERE nome = ?";
+        String sql = "UPDATE luoghi SET descrizione = ?, collocazione = ? WHERE nome = ?";
         executorService.submit(() -> {
             try (Connection conn = DatabaseConnection.connect();
                     PreparedStatement pstmt = conn.prepareStatement(sql)) {
                 pstmt.setString(1, luogoAggiornato.getDescrizione());
-                pstmt.setString(2, nome);
+                pstmt.setString(2, luogoAggiornato.getCollocazione());
+                pstmt.setString(3, nome);
     
                 int rowsUpdated = pstmt.executeUpdate();
     
                 if (rowsUpdated > 0) {
-                    System.err.println("Luogo aggiornato con successo.");
+                    consoleView.mostraMessaggio("Luogo aggiornato con successo.");
                 } else {
-                    System.err.println("Errore: Nessun luogo trovato con il nome specificato.");
+                    consoleView.mostraMessaggio("Errore: Nessun luogo trovato con il nome specificato.");
                 }
             } catch (SQLException e) {
-                System.err.println("Errore durante l'aggiornamento del luogo: " + e.getMessage());
+                consoleView.mostraMessaggio("Errore durante l'aggiornamento del luogo: " + e.getMessage());
             }
         });
     }
 
     // Metodo per aggiungere un luogo al database
     private void aggiungiLuogo(Luogo luogo) {
-        String inserisciSql = "INSERT INTO luoghi (nome, descrizione) VALUES (?, ?)";
+        String inserisciSql = "INSERT INTO luoghi (nome, descrizione, collocazione) VALUES (?, ?, ?)";
 
             try (Connection conn = DatabaseConnection.connect();
                  PreparedStatement pstmt = conn.prepareStatement(inserisciSql)) {
     
                 pstmt.setString(1, luogo.getNome());
                 pstmt.setString(2, luogo.getDescrizione());
+                pstmt.setString(3, luogo.getCollocazione());
                 pstmt.executeUpdate();
     
                 consoleView.mostraMessaggio("Luogo aggiunto con successo.");
             } catch (SQLException e) {
-                System.err.println("Errore durante l'aggiunta del luogo: " + e.getMessage());
+                consoleView.mostraMessaggio("Errore durante l'aggiunta del luogo: " + e.getMessage());
             }
     }
 
@@ -99,6 +96,24 @@ public class LuoghiManager extends DatabaseManager {
         }
     }
 
+    private void rimuoviLuogoDalDatabase(Luogo luogoDaEliminare) {
+        String sql = "DELETE FROM luoghi WHERE nome = ?";
+        executorService.submit(() -> {
+            try (Connection conn = DatabaseConnection.connect();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setString(1, luogoDaEliminare.getNome());
+                int rowsDeleted = pstmt.executeUpdate();
+                if (rowsDeleted > 0) {
+                    consoleView.mostraMessaggio("Luogo rimosso con successo.");
+                } else {
+                    consoleView.mostraMessaggio("Errore: Nessun luogo trovato con il nome specificato.");
+                }
+            } catch (SQLException e) {
+                consoleView.mostraMessaggio("Errore durante la rimozione del luogo: " + e.getMessage());
+            }
+        });
+    }
+
     public ConcurrentHashMap<String, Luogo> getLuoghiMap() {
         return luoghiMap;
     }
@@ -107,8 +122,13 @@ public class LuoghiManager extends DatabaseManager {
         this.luoghiMap = luoghiMap;
     }
 
-    // public static LuoghiManager getInstance() {
-    //     return new LuoghiManager(ThreadPoolController.getInstance());
-    // }
+    public void rimuoviLuogo(Luogo luogoDaEliminare) {
+        rimuoviLuogoDalDatabase(luogoDaEliminare);
+        luoghiMap.remove(luogoDaEliminare.getNome());
+    }
+
+    public void aggiornaLuoghi(Luogo luogo) {
+        aggiornaLuogo(luogo.getNome(), luogo);
+    }
 
 }

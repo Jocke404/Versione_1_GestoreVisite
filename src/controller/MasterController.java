@@ -27,6 +27,7 @@ public class MasterController {
     private LuoghiController luoghiController;
     private VisiteController visiteController;
     private MenuFactory menuFactory = new MenuFactory();
+    private ConsoleView consoleView = new ConsoleView();
 
 
 
@@ -105,7 +106,7 @@ public class MasterController {
     private void showMenu() {
         Menu menu = null;
         if (isAuth) {
-            utenteCorrente = authenticationController.getUtenteCorrente();
+            //utenteCorrente = authenticationController.getUtenteCorrente();
             System.out.println("Buongiorno " + utenteCorrente.getNome() + "!");
             if (utenteCorrente instanceof Volontario){
                 volontariController.volontarioCorrente = (Volontario) utenteCorrente;  
@@ -120,12 +121,12 @@ public class MasterController {
                 menu = menuFactory.creaMenuConfiguratore(configuratoriController);
             }
         } else {
-            System.out.println("Accesso negato. Effettua prima l'autenticazione.");
+            consoleView.mostraMessaggio("Accesso negato. Effettua prima l'autenticazione.");
         }
         if (menu != null) {
             menu.mostraMenu();
         } else {
-            System.out.println("Errore nella creazione del menu.");
+            consoleView.mostraMessaggio("Errore nella creazione del menu.");
         }
     }
 

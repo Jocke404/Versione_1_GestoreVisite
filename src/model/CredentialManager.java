@@ -58,13 +58,16 @@ public class CredentialManager {
                 break;
 
             case UserFactory.CONFIGURATORE:
-                if (email == "admin@example.com" && password == "admin123") {
+                if (email.equals("admin@example.com") && password.equals("admin123")) {
                     consoleView.mostraMessaggio("Hai credenziali temporanee. Ti preghiamo di modificarle.");
-                    salvaNuoveCredenzialiConf();
+                    Configuratore newConfig = salvaNuoveCredenzialiConf();
+                    nome = newConfig.getNome();
+                    cognome = newConfig.getCognome();
+                } else {
+                    configuratoreCorrente = configuratoriManager.getConfiguratoriMap().get(email);
+                    nome = configuratoreCorrente.getNome();
+                    cognome = configuratoreCorrente.getCognome();
                 }
-                configuratoreCorrente = configuratoriManager.getConfiguratoriMap().get(email);
-                nome = configuratoreCorrente.getNome();
-                cognome = configuratoreCorrente.getCognome();
                 break;
 
             default:
@@ -91,14 +94,9 @@ public class CredentialManager {
             // Sincronizza con il database
             volontariManager.aggiornaPswVolontario(utente.getEmail(), nuovaPassword);
         }
-        // } else if (utente instanceof Configuratore) {
-        //     configuratoriManager.getConfiguratoriMap().put(utente.getEmail(), (Configuratore) utente);
-        //     // Sincronizza con il database
-        //     configuratoriManager.aggiornaPswConfiguratore(utente.getEmail(), nuovaPassword);
-        // }
     }
 
-    private void salvaNuoveCredenzialiConf() {
+    private Configuratore salvaNuoveCredenzialiConf() {
         // Raccogli i dati del nuovo configuratore        
         String name = InputDati.leggiStringaNonVuota("Inserisci il nome: ");
         String surname = InputDati.leggiStringaNonVuota("Inserisci il cognome: ");
@@ -113,6 +111,8 @@ public class CredentialManager {
 
         // Sincronizza con il database
         configuratoriManager.aggiungiNuovoConf(newConfiguratore);
+
+        return newConfiguratore;
     }
 
     // Restituisci il tipo_utente dell'utente o null se non autenticato

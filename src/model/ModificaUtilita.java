@@ -13,8 +13,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import src.model.db.VisiteManagerDB;
-
-
+import src.controller.LuoghiController;
+import src.factory.UserFactory;
 import lib.InputDati;
 import src.view.ConsoleView;
 
@@ -197,6 +197,61 @@ public class ModificaUtilita {
             caricaAmbitoTerritoriale();
         }
         return new HashSet<>(ambitoTerritoriale);
+    }
+
+    public void eliminaLuogo(LuoghiController luoghiController) {
+        if (consoleView.chiediAnnullaOperazione())
+            return;
+        do {
+            List<Luogo> luoghi = luoghiController.getLuoghi();
+            if (luoghi.isEmpty()) {
+                consoleView.mostraMessaggio("Nessun luogo disponibile per la modifica.");
+                return;
+            }
+        
+            consoleView.mostraMessaggio("Luoghi disponibili:");
+            consoleView.mostraElencoConOggetti(luoghi);
+            int scelta = InputDati.leggiIntero("Seleziona il luogo da eliminare: ", 1, luoghi.size()) - 1;
+            Luogo luogoDaEliminare = luoghi.get(scelta);
+            
+            if (InputDati.yesOrNo("Sei sicuro di voler eliminare il luogo: " + luogoDaEliminare.getNome() + "?. QUESTA AZIONE ELIMINERA' ANCHE LE VISITE AD ESSO COLLEGATE")) {
+                luoghiController.eliminaLuogo(luogoDaEliminare);
+            } else {
+                consoleView.mostraMessaggio("Operazione annullata.");
+            }
+            if (luoghiController.getLuoghi().isEmpty()) {
+                consoleView.mostraMessaggio("Non ci sono più luoghi disponibili.");
+                break;
+            }
+        } while (InputDati.yesOrNo("Vuoi eliminare un altro luogo? "));
+    }
+
+    public void modificaLuogo(LuoghiController luoghiController) {
+        if (consoleView.chiediAnnullaOperazione())
+            return;
+
+        List<Luogo> luoghi = luoghiController.getLuoghi();
+        if (luoghi.isEmpty()) {
+            consoleView.mostraMessaggio("Nessun luogo disponibile per la modifica.");
+            return;
+        }
+
+        consoleView.mostraMessaggio("Luoghi disponibili:");
+        consoleView.mostraElencoConOggetti(luoghi);
+        int scelta = InputDati.leggiIntero("Seleziona il luogo da modificare: ", 1, luoghi.size()) - 1;
+        Luogo luogoDaModificare = luoghi.get(scelta);
+
+        // Chiedi i nuovi dati per il luogo
+        String nuovoNome = InputDati.leggiStringaNonVuota("Inserisci il nuovo nome del luogo (lascia vuoto per mantenere il valore attuale: " + luogoDaModificare.getNome() + "): ");
+        String nuovaDescrizione = InputDati.leggiStringaNonVuota("Inserisci la nuova descrizione del luogo (lascia vuoto per mantenere il valore attuale): " + luogoDaModificare.getDescrizione() + ": ");
+        String nuovaCollocazione = InputDati.leggiStringaNonVuota("Inserisci la nuova collocazione del luogo (lascia vuoto per mantenere il valore attuale): " + luogoDaModificare.getCollocazione() + ": ");
+
+        luogoDaModificare.setName(nuovoNome);
+        luogoDaModificare.setDescrizione(nuovaDescrizione);
+        luogoDaModificare.setCollocazione(nuovaCollocazione);
+
+        // Modifica il luogo
+        luoghiController.aggiornaLuoghi(luogoDaModificare);
     }
 
 }

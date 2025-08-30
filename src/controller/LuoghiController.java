@@ -33,4 +33,14 @@ public class LuoghiController {
     public List<Luogo> getLuoghi() {
         return List.copyOf(luoghiManager.getLuoghiMap().values());
     }
+
+    public void eliminaLuogo(Luogo luogoDaEliminare) {
+        luoghiManager.rimuoviLuogo(luogoDaEliminare);
+    }
+
+    public void aggiornaLuoghi(Luogo luogoDaModificare) {
+        luoghiManager.aggiornaLuoghi(luogoDaModificare);
+    }
+
+
 }
