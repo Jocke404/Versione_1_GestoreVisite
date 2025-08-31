@@ -94,18 +94,24 @@ public class ModificaUtilita {
             return;
         }
     
+        // Converti le voci della mappa in una lista per avere un ordine stabile e un accesso tramite indice
+        List<Map.Entry<Integer, Visita>> visiteList = visiteMap.entrySet().stream().toList();
+
         consoleView.mostraMessaggio("Visite disponibili:");
-        for (Map.Entry<Integer, Visita> entry : visiteMap.entrySet()) {
+        for (int i = 0; i < visiteList.size(); i++) {
+            Map.Entry<Integer, Visita> entry = visiteList.get(i);
             Visita visita = entry.getValue();
-            System.out.printf("%d. Luogo: %s, Tipo Visita: %s, Stato: %s%n",
-                    entry.getKey(), visita.getLuogo(), visita.getTipoVisita(), visita.getStato());
+            System.out.printf("%d. Luogo: %s, Tipo Visita: %s, Stato: %s, Data: %s, Ora Inizio: %s, Durata: %d minuti%n",
+                    i + 1, visita.getLuogo(), visita.getTipoVisita(), visita.getStato(),
+                    visita.getData() != null ? visita.getData() : "Nessuna data",
+                    visita.getOraInizio() != null ? visita.getOraInizio() : "Nessuna ora",
+                    visita.getDurataMinuti());
         }
     
-        int visitaId = InputDati.leggiIntero("Seleziona la visita da modificare: ");
-        if (!visiteMap.containsKey(visitaId)) {
-            consoleView.mostraMessaggio("Visita non valida.");
-            return;
-        }
+        int sceltaVisita = InputDati.leggiIntero("Seleziona la visita da modificare: ", 1, visiteList.size());
+        
+        // Recupera l'ID reale della visita dalla lista usando l'indice scelto dall'utente
+        int visitaId = visiteList.get(sceltaVisita - 1).getKey();
     
         String[] stati = {"Proposta", "Completa", "Confermata", "Cancellata", "Effettuata"};
         consoleView.mostraMessaggio("Stati disponibili:");
@@ -242,13 +248,24 @@ public class ModificaUtilita {
         Luogo luogoDaModificare = luoghi.get(scelta);
 
         // Chiedi i nuovi dati per il luogo
-        String nuovoNome = InputDati.leggiStringaNonVuota("Inserisci il nuovo nome del luogo (lascia vuoto per mantenere il valore attuale: " + luogoDaModificare.getNome() + "): ");
-        String nuovaDescrizione = InputDati.leggiStringaNonVuota("Inserisci la nuova descrizione del luogo (lascia vuoto per mantenere il valore attuale): " + luogoDaModificare.getDescrizione() + ": ");
-        String nuovaCollocazione = InputDati.leggiStringaNonVuota("Inserisci la nuova collocazione del luogo (lascia vuoto per mantenere il valore attuale): " + luogoDaModificare.getCollocazione() + ": ");
+        String nuovoNome = InputDati.leggiStringa("Inserisci il nuovo nome del luogo (lascia vuoto per mantenere il valore attuale: " + luogoDaModificare.getNome() + "): ");
+        if (!nuovoNome.isEmpty()) {
+            luogoDaModificare.setName(nuovoNome);
+        }
 
-        luogoDaModificare.setName(nuovoNome);
-        luogoDaModificare.setDescrizione(nuovaDescrizione);
-        luogoDaModificare.setCollocazione(nuovaCollocazione);
+        String nuovaDescrizione = InputDati.leggiStringa("Inserisci la nuova descrizione del luogo (lascia vuoto per mantenere il valore attuale): " + luogoDaModificare.getDescrizione() + "): ");
+        if (!nuovaDescrizione.isEmpty()) {
+            luogoDaModificare.setDescrizione(nuovaDescrizione);
+        }
+
+        String nuovaCollocazione = InputDati.leggiStringa("Inserisci la nuova collocazione del luogo (lascia vuoto per mantenere il valore attuale): " + luogoDaModificare.getCollocazione() + "): ");
+        if (!nuovaCollocazione.isEmpty()) {
+            luogoDaModificare.setCollocazione(nuovaCollocazione);
+        }
+
+        // luogoDaModificare.setName(nuovoNome);
+        // luogoDaModificare.setDescrizione(nuovaDescrizione);
+        // luogoDaModificare.setCollocazione(nuovaCollocazione);
 
         // Modifica il luogo
         luoghiController.aggiornaLuoghi(luogoDaModificare);

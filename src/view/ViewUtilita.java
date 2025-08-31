@@ -107,9 +107,11 @@ public class ViewUtilita {
         System.out.printf("Visite in stato '%s':%n", statoScelto);
         for (Visita visita : visiteMap.values()) {
             if (visita.getStato().equalsIgnoreCase(statoScelto)) {
-                System.out.printf("Luogo: %s, Tipo Visita: %s, Volontario: %s, Data: %s%n",
+                System.out.printf("Luogo: %s, Tipo Visita: %s, Volontario: %s, Data: %s, Ora Inizio: %s, Durata: %d minuti%n",
                         visita.getLuogo(), visita.getTipoVisita(), visita.getVolontario(),
-                        visita.getData() != null ? visita.getData() : "Nessuna data");
+                        visita.getData() != null ? visita.getData() : "Nessuna data",
+                        visita.getOraInizio() != null ? visita.getOraInizio() : "Nessuna ora",
+                        visita.getDurataMinuti());
             }
         }
     }

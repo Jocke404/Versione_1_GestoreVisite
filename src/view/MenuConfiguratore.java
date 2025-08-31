@@ -9,8 +9,8 @@ public class MenuConfiguratore implements Menu {
     private static final String[] SELECT = {"Aggiungi Luogo", "Aggiungi Volontario", "Aggiungi Visita", 
     "Aggiungi Date Precluse", "Visualizza Luoghi", "Visualizza Volontari", "Visualizza Visite", 
     "Visualizza Date Precluse", "Mostra Ambito Territoriale", "Modifica numero massimo di persone per visita",
-    "Modifica stato della visita", "Elimina date precluse", "Elimina luogo", "Visualizza visite per stato", "Visualizza archivio storico", "Stampa Tipi Visita per Luogo"};
-    private final ConfiguratoriController configuratoriController; // Riferimento all'istanza di ConfiguratoriController che ha creato questo menu
+    "Modifica stato della visita", "Modifica luogo", "Elimina date precluse", "Elimina luogo", "Visualizza visite per stato", "Visualizza archivio storico", "Stampa Tipi Visita per Luogo"};
+    private final ConfiguratoriController configuratoriController;
 
     public MenuConfiguratore(ConfiguratoriController configuratoriController) {
         this.configuratoriController = configuratoriController;
@@ -43,7 +43,7 @@ public class MenuConfiguratore implements Menu {
                 case 15 -> configuratoriController.visualizzaVisitePerStato();
                 case 16 -> configuratoriController.visualizzaArchivioStorico();
                 case 17 -> configuratoriController.stampaTipiVisitaPerLuogo();
-                case 0 -> goOn = false; // Esce dal menu
+                case 0 -> goOn = false;
                 default -> System.out.println("Opzione non valida.");
             }
         } while (goOn);

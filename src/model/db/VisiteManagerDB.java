@@ -250,14 +250,38 @@ public class VisiteManagerDB extends DatabaseManager {
                 .collect(Collectors.toList());
         
         List<LocalTime> slotDisponibili = new ArrayList<>();
-        LocalTime slotCorrente = LocalTime.of(9, 0);
+        final LocalTime INIZIO_GIORNATA = LocalTime.of(9, 0);
+        final LocalTime FINE_GIORNATA = LocalTime.of(19, 0);
+        final LocalTime ULTIMO_ORARIO_CONSENTITO = LocalTime.of(17, 40);
         
-        while (slotCorrente.plusMinutes(durataMinuti).isBefore(LocalTime.of(18, 0))) {
+        // Verifica se la durata è compatibile con l'orario di chiusura
+        if (INIZIO_GIORNATA.plusMinutes(durataMinuti).isAfter(FINE_GIORNATA)) {
+            consoleView.mostraErrore("Durata troppo lunga: la visita non rientra nell'orario di apertura");
+            return slotDisponibili; // Lista vuota
+        }
+        
+        LocalTime slotCorrente = INIZIO_GIORNATA;
+        
+        while (slotCorrente.isBefore(ULTIMO_ORARIO_CONSENTITO)) {
+            LocalTime fineVisita = slotCorrente.plusMinutes(durataMinuti);
+            
+            // Controllo 1: la visita deve finire entro le 19:00
+            if (fineVisita.isAfter(FINE_GIORNATA)) {
+                // Salta questo slot e passa al successivo
+                slotCorrente = slotCorrente.plusMinutes(30);
+                continue;
+            }
+            
+            // Controllo 2: nessuna visita può iniziare dopo le 17:40
+            if (slotCorrente.isAfter(ULTIMO_ORARIO_CONSENTITO)) {
+                break;
+            }
+            
             boolean slotLibero = true;
             
-            // Crea visita temporanea per il check
+            // Controllo 3: verifica sovrapposizione con visite esistenti
             Visita visitaTemp = new Visita(0, luogo, TipiVisita.STORICA, "temp", data, 0, "", slotCorrente, durataMinuti);
-
+            
             for (Visita visitaEsistente : visiteGiorno) {
                 if (siSovrappongono(visitaTemp, visitaEsistente)) {
                     slotLibero = false;
