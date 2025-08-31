@@ -23,8 +23,9 @@ public class AggiuntaUtilita {
     ConcurrentHashMap<String, Luogo> luoghiMap;
     ConcurrentHashMap<String, Volontario> volontariMap;
     ConcurrentHashMap<String, TipiVisita> tipiVisitaMap;
-    ConcurrentHashMap<Integer, Visite> visiteMap;
+    ConcurrentHashMap<Integer, Visita> visiteMap;
     ConcurrentHashMap<LocalDate, String> datePrecluseMap;
+    private final List<Integer> durataList = List.of(30, 60, 90, 120);
 
     private final ConsoleView consoleView = new ConsoleView();
     private final Map<String, List<String>> disponibilitaVolontari = new ConcurrentHashMap<>();
@@ -50,7 +51,7 @@ public class AggiuntaUtilita {
         String luogoNomeScelto = luoghiNomi.get(luogoIndex);
 
         List<TipiVisita> tipoVisita = new ArrayList<>(visiteMap.values().stream()
-                .map(Visite::getTipoVisita)
+                .map(Visita::getTipoVisita)
                 .distinct()
                 .toList());
         consoleView.mostraElencoConOggetti(tipoVisita);
@@ -91,33 +92,53 @@ public class AggiuntaUtilita {
             int dataIndex = InputDati.leggiIntero("Seleziona il numero della data: ", 1, dateValide.size()) - 1;
             dataVisita = dateValide.get(dataIndex);
         }
-
-        do {
-            if (validaVisita()){
-                LocalTime oraInizio = InputDati.leggiOra("Inserisci l'ora di inizio della visita (formato HH:MM): ");
-                int durataMinuti = InputDati.leggiIntero("Inserisci la durata della visita in minuti: ", 1, 480);
-            }
-            
-        } while (oraInizio == null);
-
-
+        int id = visiteMap.size() + 1;
         int maxPersone = visiteManagerDB.getMaxPersone();
         String stato = "Proposta"; // Stato iniziale della visita
-    
-        // Genera un ID univoco per la visita
-        int id = visiteMap.size() + 1;
-    
-        // Crea l'oggetto Visite utilizzando il costruttore completo
-        Visite nuovaVisita = new Visite(id, luogoNomeScelto, tipoVisitaScelto, volontarioNomeScelto, dataVisita, maxPersone, stato, oraInizio, durataMinuti);
+        LocalTime oraInizio = null;
+        int durataMinuti = 0;
+        Visita nuovaVisita = new Visita(id, luogoNomeScelto, tipoVisitaScelto, volontarioNomeScelto, dataVisita, maxPersone, stato, oraInizio, durataMinuti);
+        
+        if (InputDati.yesOrNo("Vuoi scegliere un orario specifico per la visita?")) {
+            do{
+                oraInizio = InputDati.leggiOra("Inserisci l'ora di inizio della visita (formato HH:MM): ");
+                if(InputDati.yesOrNo("Vuoi inserire la durata della visita?")) {
+                    durataMinuti = InputDati.leggiIntero("Inserisci la durata della visita in minuti: ", 1, 480);
+                } else {
+                    consoleView.mostraElencoConOggetti(durataList);
+                    int durataIndex = InputDati.leggiIntero("Seleziona il numero della durata della visita: ", 1, durataList.size()) - 1;
+                    durataMinuti = durataList.get(durataIndex);
+                }   
+                nuovaVisita.setOraInizio(oraInizio);
+                nuovaVisita.setDurataMinuti(durataMinuti);
+                if (visiteManagerDB.validaVisita(nuovaVisita)) {
+                    consoleView.mostraMessaggio("Visita valida.");
+                } else {
+                    consoleView.mostraMessaggio("Visita non valida per l'orario selezionato.");
+                }
+            } while (!visiteManagerDB.validaVisita(nuovaVisita));
+            visiteManagerDB.aggiungiNuovaVisita(nuovaVisita);
+        } else {
+            durataMinuti = InputDati.leggiIntero("Inserisci la durata della visita in minuti: ", 1, 480);
+            List<LocalTime> slotDisponibili = visiteManagerDB.trovaSlotDisponibili(dataVisita, luogoNomeScelto, durataMinuti);
+            if (slotDisponibili.isEmpty()) {
+                consoleView.mostraMessaggio("Nessuno slot disponibile per la data selezionata.");
+                return;
+            }
+            consoleView.mostraMessaggio("\nSlot orari disponibili:");
+            consoleView.mostraElencoConOggetti(slotDisponibili);
+            int slotIndex = InputDati.leggiIntero("Seleziona il numero dello slot orario: ", 1, slotDisponibili.size()) - 1;
+            oraInizio = slotDisponibili.get(slotIndex);
+            nuovaVisita.setOraInizio(oraInizio);
+            nuovaVisita.setDurataMinuti(durataMinuti);
+        }
+
+        
         visiteMap.put(id, nuovaVisita);
 
         visiteManagerDB.aggiungiNuovaVisita(nuovaVisita);
     
         consoleView.mostraMessaggio("Visita assegnata con successo per la data " + dataVisita + "!");
-    }
-
-    private boolean validaVisita() {
-        
     }
 
     // Metodo per aggiungere un volontario
@@ -195,7 +216,7 @@ public class AggiuntaUtilita {
         return giorniDisponibili;
     }
 
-    private boolean isGiornoDisponibile(LocalDate data, ConcurrentHashMap<Integer, Visite> visiteMap, 
+    private boolean isGiornoDisponibile(LocalDate data, ConcurrentHashMap<Integer, Visita> visiteMap, 
                                     List<String> tipiVisitaVolontario) {
         boolean visitaProgrammata = visiteMap.values().stream()
             .anyMatch(v -> v.getData() != null && v.getData().equals(data));

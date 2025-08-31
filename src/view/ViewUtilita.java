@@ -13,7 +13,7 @@ import lib.InputDati;
 import src.controller.VolontariController;
 import src.model.Luogo;
 import src.model.ModificaUtilita;
-import src.model.Visite;
+import src.model.Visita;
 import src.model.Volontario;
 import src.model.db.VisiteManagerDB;
 import src.controller.VisiteController;
@@ -22,7 +22,7 @@ import src.controller.ThreadPoolController;
 
 public class ViewUtilita {
 
-    private ConcurrentHashMap<Integer, Visite> visiteMap = new VisiteManagerDB(ThreadPoolController.getInstance()).getVisiteMap();
+    private ConcurrentHashMap<Integer, Visita> visiteMap = new VisiteManagerDB(ThreadPoolController.getInstance()).getVisiteMap();
     private final ConsoleView consoleView = new ConsoleView();
     
     private static ViewUtilita instance;
@@ -69,14 +69,14 @@ public class ViewUtilita {
 
     // Metodo per stampare le visite
     public void stampaVisite(VisiteController visiteController) {
-        List<Visite> visite = visiteController.getVisite();
+        List<Visita> visite = visiteController.getVisite();
         if (visite.isEmpty()) {
             System.out.println("Nessuna visita disponibile.");
             return;
         }
 
         System.out.println("Visite:");
-        for (Visite visita : visite) {
+        for (Visita visita : visite) {
             System.out.println("Luogo: " + visita.getLuogo());
             System.out.println("Tipo Visita: " + visita.getTipoVisita());
             System.out.println("Volontario: " + visita.getVolontario());
@@ -105,7 +105,7 @@ public class ViewUtilita {
         String statoScelto = stati[sceltaStato];
 
         System.out.printf("Visite in stato '%s':%n", statoScelto);
-        for (Visite visita : visiteMap.values()) {
+        for (Visita visita : visiteMap.values()) {
             if (visita.getStato().equalsIgnoreCase(statoScelto)) {
                 System.out.printf("Luogo: %s, Tipo Visita: %s, Volontario: %s, Data: %s%n",
                         visita.getLuogo(), visita.getTipoVisita(), visita.getVolontario(),
@@ -116,7 +116,7 @@ public class ViewUtilita {
 
     // Metodo per visualizzare l'archivio storico delle visite
     public void stampaArchivioStorico(VisiteController visiteController) {
-        ConcurrentHashMap<Integer, Visite> visiteMap = visiteController.getVisiteMap();
+        ConcurrentHashMap<Integer, Visita> visiteMap = visiteController.getVisiteMap();
 
         if (visiteMap.isEmpty()) {
             System.out.println("Non ci sono visite disponibili nell'archivio storico.");
@@ -124,7 +124,7 @@ public class ViewUtilita {
         }
 
         System.out.println("Archivio storico delle visite effettuate:");
-        for (Visite visita : visiteMap.values()) {
+        for (Visita visita : visiteMap.values()) {
             if ("Effettuata".equalsIgnoreCase(visita.getStato())) {
                 System.out.printf("Luogo: %s, Tipo Visita: %s, Volontario: %s, Data: %s%n",
                         visita.getLuogo(), visita.getTipoVisita(), visita.getVolontario(),
@@ -149,8 +149,8 @@ public class ViewUtilita {
 
         boolean visiteTrovate = false;
     
-        for (Map.Entry<Integer, Visite> entry : visiteMap.entrySet()) {
-            Visite visita = entry.getValue();
+        for (Map.Entry<Integer, Visita> entry : visiteMap.entrySet()) {
+            Visita visita = entry.getValue();
             if (visita.getVolontario().equals(volontario.getNome() + " " + volontario.getCognome())) {
                 System.out.println("ID: " + entry.getKey());
                 System.out.println("Luogo: " + visita.getLuogo());
@@ -195,28 +195,28 @@ public class ViewUtilita {
 
     //Metodo per visualizzare i tipi di visita per luogo
     public void stampaTipiVisitaPerLuogo(VisiteController visiteController) {
-        List<Visite> visite = visiteController.getVisite();
+        List<Visita> visite = visiteController.getVisite();
         if (visite.isEmpty()) {
             System.out.println("Nessun luogo disponibile.");
             return;
         }
 
-        Map<String, List<Visite>> visitePerLuogo =new HashMap<>();
-        for (Visite visita : visite) {
+        Map<String, List<Visita>> visitePerLuogo =new HashMap<>();
+        for (Visita visita : visite) {
             String luogo = visita.getLuogo();
             visitePerLuogo.computeIfAbsent(luogo, k -> new ArrayList<>()).add(visita);
         }
 
         System.out.println ("Tipi di visita per luogo:");
 
-        for (Map.Entry<String, List<Visite>> entry : visitePerLuogo.entrySet()) {
+        for (Map.Entry<String, List<Visita>> entry : visitePerLuogo.entrySet()) {
             String luogo = entry.getKey();
-            List<Visite> visiteNelLuogo = entry.getValue();
+            List<Visita> visiteNelLuogo = entry.getValue();
             System.out.println("Luogo: " + luogo);
             System.out.println("Tipi di Visita:");
             
             Set<String> tipiVisitaUnici = new HashSet<>();
-            for (Visite visita : visiteNelLuogo) {
+            for (Visita visita : visiteNelLuogo) {
                 String tipoVisita = visita.getTipoVisitaString();
                 tipiVisitaUnici.add(tipoVisita);
             }

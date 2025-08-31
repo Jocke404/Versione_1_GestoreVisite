@@ -232,14 +232,14 @@ public class InputDati
 		return dateLette;
 	}
 
-    public static LocalTime leggiOra(String string) {
+	public static LocalTime leggiOra(String messaggio) {
 		boolean finito = false;
 		LocalTime oraLetta = null;
 		do {
-			System.out.print(string);
+			System.out.print(messaggio + ". Inserisci l'ora (HH:mm): ");
 			try {
 				String input = lettore.next();
-				oraLetta = LocalTime.parse(input, DATE_FORMATTER);
+				oraLetta = LocalTime.parse(input, DateTimeFormatter.ofPattern("HH:mm"));
 				finito = true;
 			} catch (DateTimeParseException e) {
 				System.out.println(ERRORE_FORMATO + ". Formato corretto: HH:mm");

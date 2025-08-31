@@ -40,7 +40,7 @@ public class ModificaUtilita {
 
     // Metodo per modificare la data di una visita
     public void modificaDataVisita() {
-        ConcurrentHashMap<Integer, Visite> visiteMap = visiteManagerDB.getVisiteMap();
+        ConcurrentHashMap<Integer, Visita> visiteMap = visiteManagerDB.getVisiteMap();
 
         if (visiteMap.isEmpty()) {
             consoleView.mostraMessaggio("Non ci sono visite disponibili da modificare.");
@@ -48,8 +48,8 @@ public class ModificaUtilita {
         }
 
         consoleView.mostraMessaggio("Visite disponibili:");
-        for (Map.Entry<Integer, Visite> entry : visiteMap.entrySet()) {
-            Visite visita = entry.getValue();
+        for (Map.Entry<Integer, Visita> entry : visiteMap.entrySet()) {
+            Visita visita = entry.getValue();
             System.out.printf("%d. Luogo: %s, Tipo Visita: %s, Volontario: %s, Data: %s%n",
                     entry.getKey(), visita.getLuogo(), visita.getTipoVisita(), visita.getVolontario(),
                     visita.getData() != null ? visita.getData() : "Nessuna data");
@@ -66,7 +66,7 @@ public class ModificaUtilita {
         int giorno = InputDati.leggiIntero("Inserisci il nuovo giorno della visita: ", 1, LocalDate.of(anno, mese, 1).lengthOfMonth());
         LocalDate nuovaData = LocalDate.of(anno, mese, giorno);
 
-        Visite visitaAggiornata = visiteMap.get(visitaId);
+        Visita visitaAggiornata = visiteMap.get(visitaId);
         visitaAggiornata.setData(nuovaData);
 
         visiteManagerDB.aggiornaVisita(visitaId, visitaAggiornata);
@@ -87,7 +87,7 @@ public class ModificaUtilita {
         if (consoleView.chiediAnnullaOperazione())
             return;
 
-        ConcurrentHashMap<Integer, Visite> visiteMap = visiteManagerDB.getVisiteMap();
+        ConcurrentHashMap<Integer, Visita> visiteMap = visiteManagerDB.getVisiteMap();
     
         if (visiteMap.isEmpty()) {
             consoleView.mostraMessaggio("Non ci sono visite disponibili da modificare.");
@@ -95,8 +95,8 @@ public class ModificaUtilita {
         }
     
         consoleView.mostraMessaggio("Visite disponibili:");
-        for (Map.Entry<Integer, Visite> entry : visiteMap.entrySet()) {
-            Visite visita = entry.getValue();
+        for (Map.Entry<Integer, Visita> entry : visiteMap.entrySet()) {
+            Visita visita = entry.getValue();
             System.out.printf("%d. Luogo: %s, Tipo Visita: %s, Stato: %s%n",
                     entry.getKey(), visita.getLuogo(), visita.getTipoVisita(), visita.getStato());
         }
@@ -116,7 +116,7 @@ public class ModificaUtilita {
         int sceltaStato = InputDati.leggiIntero("Seleziona il nuovo stato: ", 1, stati.length) - 1;
         String nuovoStato = stati[sceltaStato];
     
-        Visite visitaAggiornata = visiteMap.get(visitaId);
+        Visita visitaAggiornata = visiteMap.get(visitaId);
         visitaAggiornata.setStato(nuovoStato);
     
         // Aggiorna la visita nel database

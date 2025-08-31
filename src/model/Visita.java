@@ -3,7 +3,7 @@ package src.model;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-public class Visite {
+public class Visita {
     private int id; // ID univoco della visita
     private String luogo;
     private TipiVisita tipoVisita;
@@ -15,7 +15,8 @@ public class Visite {
     private int durataMinuti; 
 
     // Costruttore completo (inclusi tutti i campi)
-    public Visite(int id, String luogo, TipiVisita tipoVisita, String volontario, LocalDate data, int maxPersone, String stato, LocalTime oraInizio, int durataMinuti) {
+    public Visita(int id, String luogo, TipiVisita tipoVisita, String volontario, 
+                LocalDate data, int maxPersone, String stato, LocalTime oraInizio, int durataMinuti) {
         this.id = id;
         this.luogo = luogo;
         this.tipoVisita = tipoVisita;

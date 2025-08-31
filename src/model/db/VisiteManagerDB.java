@@ -6,13 +6,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
 import src.controller.ThreadPoolController;
 import src.model.TipiVisita;
-import src.model.Visite;
+import src.model.Visita;
 
 public class VisiteManagerDB extends DatabaseManager {
-    private ConcurrentHashMap<Integer, Visite> visiteMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Integer, Visita> visiteMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<LocalDate, String> datePrecluseMap = new ConcurrentHashMap<>();
 
     public VisiteManagerDB(ThreadPoolController threadPoolManager) {
@@ -24,7 +28,7 @@ public class VisiteManagerDB extends DatabaseManager {
     //Logiche delle visite--------------------------------------------------
     // Metodo per caricare un luogo nel database e memorizzarlo nella HashMap
     protected void caricaVisite() {
-        String sql = "SELECT id, luogo, tipo_visita, volontario, data, stato, max_persone FROM visite";
+        String sql = "SELECT id, luogo, tipo_visita, volontario, data, stato, max_persone, ora_inizio, durata_minuti FROM visite";
         try (Connection conn = DatabaseConnection.connect();
             PreparedStatement pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery()) {
@@ -43,7 +47,7 @@ public class VisiteManagerDB extends DatabaseManager {
                     int durataMinuti = rs.getInt("durata_minuti");
 
                     // Usa il costruttore completo di Visite
-                    Visite visita = new Visite(id, luogo, tipoVisita, volontario, data, maxPersone, stato, oraInizio, durataMinuti);
+                    Visita visita = new Visita(id, luogo, tipoVisita, volontario, data, maxPersone, stato, oraInizio, durataMinuti);
                     visiteMap.putIfAbsent(id, visita);
                 }
             }
@@ -53,7 +57,7 @@ public class VisiteManagerDB extends DatabaseManager {
     }
 
     // Metodo per aggiungere una visita al database
-    protected void aggiungiVisita(Visite visita) {
+    protected void aggiungiVisita(Visita visita) {
         String inserisciSql = "INSERT INTO visite (luogo, tipo_visita, volontario, data, stato, max_persone, ora_inizio, durata_minuti) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
             try (Connection conn = DatabaseConnection.connect();
@@ -133,7 +137,7 @@ public class VisiteManagerDB extends DatabaseManager {
     }
 
     // Metodo per aggiornare una visita specifica
-    protected void aggiornaVisitaDB(int visitaId, Visite visitaAggiornata) {
+    protected void aggiornaVisitaDB(int visitaId, Visita visitaAggiornata) {
         String sql = "UPDATE visite SET luogo = ?, tipo_visita = ?, volontario = ?, data = ?, stato = ?, max_persone = ?, ora_inizio = ?, durata_minuti = ? WHERE id = ?";
         executorService.submit(() -> {
             try (Connection conn = DatabaseConnection.connect();
@@ -174,10 +178,10 @@ public class VisiteManagerDB extends DatabaseManager {
         });
     }
 
-    public void aggiungiNuovaVisita(Visite nuovaVisita) {
-        String verificaSql = "SELECT 1 FROM visite WHERE luogo = ? AND data = ? AND volontario = ?";
-        if(!recordEsiste(verificaSql, nuovaVisita.getLuogo(), nuovaVisita.getData(), nuovaVisita.getVolontario())){
-            consoleView.mostraMessaggio("La visita non esiste già. Procedo con l'aggiunta.");
+    public void aggiungiNuovaVisita(Visita nuovaVisita) {
+        String verificaSql = "SELECT 1 FROM visite WHERE luogo = ? AND data = ? AND volontario = ? AND ora_inizio = ?";
+        if(!recordEsiste(verificaSql, nuovaVisita.getLuogo(), nuovaVisita.getData(), nuovaVisita.getVolontario(), nuovaVisita.getOraInizio())){
+            consoleView.mostraMessaggio("La visita non esiste. Procedo con l'aggiunta.");
             aggiungiVisita(nuovaVisita);
         } else {
             consoleView.mostraMessaggio("La visita esiste già. Non posso aggiungerla.");
@@ -211,11 +215,71 @@ public class VisiteManagerDB extends DatabaseManager {
         return 10;
     }
 
+    public boolean validaVisita(Visita nuovaVisita){
+        List<Visita> visiteEsistenti = visiteMap.values().stream()
+                .filter(v -> v.getData().equals(nuovaVisita.getData()) && 
+                             v.getLuogo().equals(nuovaVisita.getLuogo()))
+                .collect(Collectors.toList());
+        
+        // Verifica sovrapposizione con ogni visita esistente
+        for (Visita visitaEsistente : visiteEsistenti) {
+            if (siSovrappongono(nuovaVisita, visitaEsistente)) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
+    public boolean siSovrappongono(Visita nuovaVisita, Visita visitaEsistente) {
+        if (!nuovaVisita.getData().equals(visitaEsistente.getData()) || !nuovaVisita.getLuogo().equals(visitaEsistente.getLuogo())) {
+            return false;
+        }
+
+        LocalTime inizio1 = nuovaVisita.getOraInizio();
+        LocalTime fine1 = nuovaVisita.getOraInizio().plusMinutes(nuovaVisita.getDurataMinuti());
+        LocalTime inizio2 = visitaEsistente.getOraInizio();
+        LocalTime fine2 = visitaEsistente.getOraInizio().plusMinutes(visitaEsistente.getDurataMinuti());
+        // if (inizio1.isBefore(fine2))
+        return (inizio1.isBefore(fine2) && fine1.isAfter(inizio2));
+    }
+
+    public List<LocalTime> trovaSlotDisponibili(LocalDate data, String luogo, int durataMinuti) {
+        List<Visita> visiteGiorno = visiteMap.values().stream()
+                .filter(v -> v.getData().equals(data) && v.getLuogo().equals(luogo))
+                .collect(Collectors.toList());
+        
+        List<LocalTime> slotDisponibili = new ArrayList<>();
+        LocalTime slotCorrente = LocalTime.of(9, 0);
+        
+        while (slotCorrente.plusMinutes(durataMinuti).isBefore(LocalTime.of(18, 0))) {
+            boolean slotLibero = true;
+            
+            // Crea visita temporanea per il check
+            Visita visitaTemp = new Visita(0, luogo, TipiVisita.STORICA, "temp", data, 0, "", slotCorrente, durataMinuti);
+
+            for (Visita visitaEsistente : visiteGiorno) {
+                if (siSovrappongono(visitaTemp, visitaEsistente)) {
+                    slotLibero = false;
+                    break;
+                }
+            }
+            
+            if (slotLibero) {
+                slotDisponibili.add(slotCorrente);
+            }
+            
+            slotCorrente = slotCorrente.plusMinutes(30); // Check ogni 30 minuti
+        }
+        
+        return slotDisponibili;
+    }
+
     public int getMaxPersone() {
         return getMaxPersoneDefault();
     }
 
-    public ConcurrentHashMap<Integer, Visite> getVisiteMap() {
+    public ConcurrentHashMap<Integer, Visita> getVisiteMap() {
         return visiteMap;
     }
 
@@ -227,7 +291,7 @@ public class VisiteManagerDB extends DatabaseManager {
         eliminaDataPreclusa(data);
     }
 
-    public void aggiornaVisita(int visitaId, Visite visitaAggiornata){
+    public void aggiornaVisita(int visitaId, Visita visitaAggiornata){
         aggiornaVisitaDB(visitaId, visitaAggiornata);
     }
 

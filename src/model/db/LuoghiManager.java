@@ -22,7 +22,7 @@ public class LuoghiManager extends DatabaseManager {
     //Logiche dei luoghi--------------------------------------------------
     // Metodo per caricare i luoghi dal database e memorizzarli nella HashMap
     protected void caricaLuoghi() {
-        String sql = "SELECT nome, descrizione FROM luoghi";
+        String sql = "SELECT nome, descrizione, collocazione FROM luoghi";
         try (Connection conn = DatabaseConnection.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
