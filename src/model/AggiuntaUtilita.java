@@ -170,7 +170,16 @@ public class AggiuntaUtilita {
         String descrizione = InputDati.leggiStringaNonVuota("inserire la descrizione del luogo: ");
         String collocazione = InputDati.leggiStringaNonVuota("inserire la collocazione del luogo: ");
         consoleView.mostraElencoConOggetti(tipiVisitaMap.values().stream().toList());
-        List<TipiVisita> tipiVisitaSelezionati = InputDati.leggiIntero("Seleziona i tipi di visita (numeri separati da virgola): ", 1, tipiVisitaMap.values().stream().toList().size());
+        List<TipiVisita> tipiVisitaSelezionati = new ArrayList<>();
+        boolean aggiungiAltri = true;
+
+        while (aggiungiAltri) {
+            int tipoIndex = InputDati.leggiIntero("Seleziona il numero del tipo di visita da aggiungere: ", 1, tipiVisitaMap.size()) - 1;
+            TipiVisita tipoSelezionato = tipiVisitaMap.values().stream().toList().get(tipoIndex);
+            tipiVisitaSelezionati.add(tipoSelezionato);
+
+            aggiungiAltri = InputDati.yesOrNo("Vuoi aggiungere un altro tipo di visita?");
+        }
 
         Luogo nuovoLuogo = new Luogo(nome, descrizione, collocazione, tipiVisitaSelezionati);
         luoghiMap.putIfAbsent(nome, nuovoLuogo);
@@ -348,135 +357,173 @@ public class AggiuntaUtilita {
     //     }
     // }
     
-    // Produzione manuale del piano visite da parte del configuratore
-    public void produzionePianoVisiteManuale() {
-        // Consenti la produzione solo se la raccolta è chiusa
-        try {
-            java.lang.reflect.Method getStatoCiclo = databaseUpdater.getClass().getMethod("getStatoCiclo");
-            Object statoCiclo = getStatoCiclo.invoke(databaseUpdater);
-            if (!"RACCOLTA_CHIUSA".equals(statoCiclo.toString())) {
-                consoleView.mostraMessaggio("Devi prima chiudere la raccolta delle disponibilità per produrre il piano visite.");
-                return;
-            }
-        } catch (Exception e) {
-            // Se non esiste il metodo, non bloccare nulla
-        }
-        // --- SINCRONIZZAZIONE: carica le disponibilità dei volontari dal database/file ---
-        sincronizzaDisponibilitaVolontari();
+    // // Produzione manuale del piano visite da parte del configuratore
+    // public void produzionePianoVisiteManuale() {
+    //     // Consenti la produzione solo se la raccolta è chiusa
+    //     try {
+    //         java.lang.reflect.Method getStatoCiclo = databaseUpdater.getClass().getMethod("getStatoCiclo");
+    //         Object statoCiclo = getStatoCiclo.invoke(databaseUpdater);
+    //         if (!"RACCOLTA_CHIUSA".equals(statoCiclo.toString())) {
+    //             consoleView.mostraMessaggio("Devi prima chiudere la raccolta delle disponibilità per produrre il piano visite.");
+    //             return;
+    //         }
+    //     } catch (Exception e) {
+    //         // Se non esiste il metodo, non bloccare nulla
+    //     }
+    //     // --- SINCRONIZZAZIONE: carica le disponibilità dei volontari dal database/file ---
+    //     sincronizzaDisponibilitaVolontari();
 
-        // 1. Mostra solo volontari con disponibilità
-        List<String> volontariConDisponibilita = new ArrayList<>();
-        for (Map.Entry<String, List<String>> entry : disponibilitaVolontari.entrySet()) {
-            // Filtra le date: solo stringhe che corrispondono a gg-mm-aaaa
-            List<String> soloDate = new ArrayList<>();
-            for (String d : entry.getValue()) {
-                if (d.matches("\\d{2}-\\d{2}-\\d{4}")) {
-                    soloDate.add(d);
-                }
-            }
-            if (!soloDate.isEmpty()) {
-                disponibilitaVolontari.put(entry.getKey(), soloDate);
-                volontariConDisponibilita.add(entry.getKey());
-            }
-        }
-        if (volontariConDisponibilita.isEmpty()) {
-            consoleView.mostraMessaggio("Nessun volontario ha inserito disponibilità.");
-            return;
-        }
-        while (!volontariConDisponibilita.isEmpty()) {
-            consoleView.mostraMessaggio("Volontari con disponibilità:");
-            for (int i = 0; i < volontariConDisponibilita.size(); i++) {
-                String email = volontariConDisponibilita.get(i);
-                Volontario v = volontariMap.get(email);
-                System.out.printf("%d. %s %s (%s)\n", i + 1, v.getNome(), v.getCognome(), email);
-            }
-            int idxVol = InputDati.leggiIntero("Scegli il volontario da pianificare (0 per uscire): ", 0, volontariConDisponibilita.size()) - 1;
-            if (idxVol == -1) return;
-            String emailVol = volontariConDisponibilita.get(idxVol);
-            Volontario volontario = volontariMap.get(emailVol);
-            List<String> dateDisp = disponibilitaVolontari.get(emailVol);
-            if (dateDisp.isEmpty()) {
-                consoleView.mostraMessaggio("Questo volontario non ha date disponibili.");
-                volontariConDisponibilita.remove(emailVol);
-                continue;
-            }
-            List<String> tipiCompatibili = new ArrayList<>(volontario.getTipiDiVisite());
-            if (tipiCompatibili == null || tipiCompatibili.isEmpty()) {
-                consoleView.mostraMessaggio("Nessun tipo di visita compatibile per questo volontario.");
-                volontariConDisponibilita.remove(emailVol);
-                continue;
-            }
-            List<String> tipiVolontario = new ArrayList<>(tipiCompatibili);
-            while (!tipiVolontario.isEmpty()) {
-                consoleView.mostraMessaggio("Tipi di visita disponibili per il volontario:");
-                for (int i = 0; i < tipiVolontario.size(); i++) {
-                    System.out.printf("%d. %s\n", i + 1, tipiVolontario.get(i));
-                }
-                int idxTipo = InputDati.leggiIntero("Scegli il tipo di visita (0 per tornare indietro): ", 0, tipiVolontario.size()) - 1;
-                if (idxTipo == -1) break;
-                String tipoScelto = tipiVolontario.get(idxTipo);
-                boolean pianificatoPerTipo = false;
-                while (true) {
-                    if (dateDisp.isEmpty()) {
-                        consoleView.mostraMessaggio("Tutte le date di questo volontario sono state pianificate.");
-                        break;
-                    }
-                    // Mostra solo le date numeriche (escludi eventuali stringhe che corrispondono al tipo di visita)
-                    consoleView.mostraMessaggio("Date disponibili del volontario:");
-                    consoleView.mostraElenco(dateDisp);
-                    int inputDate = InputDati.leggiIntero("Seleziona la data da pianificare (numero, 0 per tornare indietro): ", 0, dateDisp.size()) - 1;
-                    if (inputDate == -1) break;
-                    String dataStr = dateDisp.get(inputDate);
-                    LocalDate data;
-                    try {
-                        String[] parts = dataStr.contains("-") ? dataStr.split("-") : dataStr.split("/");
-                        int giorno = Integer.parseInt(parts[0]);
-                        int mese = Integer.parseInt(parts[1]);
-                        int anno = (parts.length > 2) ? Integer.parseInt(parts[2]) : LocalDate.now().getYear();
-                        data = LocalDate.of(anno, mese, giorno);
-                    } catch (Exception e) {
-                        consoleView.mostraMessaggio("Formato data non valido: " + dataStr);
-                        continue;
-                    }
-                    List<String> luoghiCompatibili = new ArrayList<>();
-                    for (Luogo luogo : luoghiMap.values()) {
-                        if (luogo.getTipiVisita() != null && luogo.getTipiVisita().contains(tipoScelto)) {
-                            luoghiCompatibili.add(luogo.getNome());
-                        }
-                    }
-                    if (luoghiCompatibili.isEmpty()) {
-                        consoleView.mostraMessaggio("Nessun luogo compatibile con il tipo di visita scelto.");
-                        continue;
-                    }
-                    consoleView.mostraMessaggio("Luoghi compatibili per la data " + data + ":");
-                    consoleView.mostraElenco(luoghiCompatibili);
-                    int idxLuogo = InputDati.leggiIntero("Scegli il luogo per la data " + data + " (0 per annullare): ", 0, luoghiCompatibili.size()) - 1;
-                    if (idxLuogo == -1) continue;
-                    String luogoScelto = luoghiCompatibili.get(idxLuogo);
-                    int durata = InputDati.leggiIntero("Inserisci la durata della visita (in minuti) per la data " + data + ": ", 30, 300);
-                    int id = visiteMap.size() + 1;
-                    Visita nuovaVisita = new Visita(id, luogoScelto, tipoScelto, volontario.getNome() + " " + volontario.getCognome(), data, visiteManagerDB.getMaxPersone(), "Proposta", null, durata);
-                    visiteManagerDB.aggiungiNuovaVisita(nuovaVisita);
-                    consoleView.mostraMessaggio("Visita assegnata e salvata per " + volontario.getNome() + " il " + data + "!");
-                    dateDisp.remove(dataStr);
-                    disponibilitaVolontari.put(emailVol, dateDisp);
-                    salvaStatoERaccolta(disponibilitaVolontari, "RACCOLTA_APERTA");
-                    pianificatoPerTipo = true;
-                    // Dopo aver pianificato una visita, torna subito al menu delle date disponibili
-                }
-                if (pianificatoPerTipo) {
-                    tipiVolontario.remove(tipoScelto);
-                }
-            }
-            if (tipiVolontario.isEmpty() || dateDisp.isEmpty()) {
-                volontariConDisponibilita.remove(emailVol);
-            }
-        }
-    // Messaggio finale senza riferimenti a mese/anno (che potrebbero essere errati)
-    consoleView.mostraMessaggio("Piano visite completato per tutti i volontari. Puoi ora riaprire la raccolta delle date.");
-    // Torna al menu principale del configuratore
-    return;
-    }
+    //     // 1. Mostra solo volontari con disponibilità
+    //     List<String> volontariConDisponibilita = new ArrayList<>();
+    //     for (Map.Entry<String, List<String>> entry : disponibilitaVolontari.entrySet()) {
+    //         // Filtra le date: solo stringhe che corrispondono a gg-mm-aaaa
+    //         List<String> soloDate = new ArrayList<>();
+    //         for (String d : entry.getValue()) {
+    //             if (d.matches("\\d{2}-\\d{2}-\\d{4}")) {
+    //                 soloDate.add(d);
+    //             }
+    //         }
+    //         if (!soloDate.isEmpty()) {
+    //             disponibilitaVolontari.put(entry.getKey(), soloDate);
+    //             volontariConDisponibilita.add(entry.getKey());
+    //         }
+    //     }
+    //     if (volontariConDisponibilita.isEmpty()) {
+    //         consoleView.mostraMessaggio("Nessun volontario ha inserito disponibilità.");
+    //         return;
+    //     }
+    //     while (!volontariConDisponibilita.isEmpty()) {
+    //         consoleView.mostraMessaggio("Volontari con disponibilità:");
+    //         for (int i = 0; i < volontariConDisponibilita.size(); i++) {
+    //             String email = volontariConDisponibilita.get(i);
+    //             Volontario v = volontariMap.get(email);
+    //             System.out.printf("%d. %s %s (%s)\n", i + 1, v.getNome(), v.getCognome(), email);
+    //         }
+    //         int idxVol = InputDati.leggiIntero("Scegli il volontario da pianificare (0 per uscire): ", 0, volontariConDisponibilita.size()) - 1;
+    //         if (idxVol == -1) return;
+    //         String emailVol = volontariConDisponibilita.get(idxVol);
+    //         Volontario volontario = volontariMap.get(emailVol);
+    //         List<String> dateDisp = disponibilitaVolontari.get(emailVol);
+    //         if (dateDisp.isEmpty()) {
+    //             consoleView.mostraMessaggio("Questo volontario non ha date disponibili.");
+    //             volontariConDisponibilita.remove(emailVol);
+    //             continue;
+    //         }
+    //         List<String> tipiCompatibili = new ArrayList<>(volontario.getTipiDiVisite());
+    //         if (tipiCompatibili == null || tipiCompatibili.isEmpty()) {
+    //             consoleView.mostraMessaggio("Nessun tipo di visita compatibile per questo volontario.");
+    //             volontariConDisponibilita.remove(emailVol);
+    //             continue;
+    //         }
+    //         List<String> tipiVolontario = new ArrayList<>(tipiCompatibili);
+    //         while (!tipiVolontario.isEmpty()) {
+    //             consoleView.mostraMessaggio("Tipi di visita disponibili per il volontario:");
+    //             for (int i = 0; i < tipiVolontario.size(); i++) {
+    //                 System.out.printf("%d. %s\n", i + 1, tipiVolontario.get(i));
+    //             }
+    //             int idxTipo = InputDati.leggiIntero("Scegli il tipo di visita (0 per tornare indietro): ", 0, tipiVolontario.size()) - 1;
+    //             if (idxTipo == -1) break;
+    //             String tipoScelto = tipiVolontario.get(idxTipo);
+    //             boolean pianificatoPerTipo = false;
+    //             while (true) {
+    //                 if (dateDisp.isEmpty()) {
+    //                     consoleView.mostraMessaggio("Tutte le date di questo volontario sono state pianificate.");
+    //                     break;
+    //                 }
+    //                 // Mostra solo le date numeriche (escludi eventuali stringhe che corrispondono al tipo di visita)
+    //                 consoleView.mostraMessaggio("Date disponibili del volontario:");
+    //                 consoleView.mostraElenco(dateDisp);
+    //                 int inputDate = InputDati.leggiIntero("Seleziona la data da pianificare (numero, 0 per tornare indietro): ", 0, dateDisp.size()) - 1;
+    //                 if (inputDate == -1) break;
+    //                 String dataStr = dateDisp.get(inputDate);
+    //                 LocalDate data;
+    //                 try {
+    //                     String[] parts = dataStr.contains("-") ? dataStr.split("-") : dataStr.split("/");
+    //                     int giorno = Integer.parseInt(parts[0]);
+    //                     int mese = Integer.parseInt(parts[1]);
+    //                     int anno = (parts.length > 2) ? Integer.parseInt(parts[2]) : LocalDate.now().getYear();
+    //                     data = LocalDate.of(anno, mese, giorno);
+    //                 } catch (Exception e) {
+    //                     consoleView.mostraMessaggio("Formato data non valido: " + dataStr);
+    //                     continue;
+    //                 }
+    //                 List<String> luoghiCompatibili = new ArrayList<>();
+    //                 for (Luogo luogo : luoghiMap.values()) {
+    //                     if (luogo.getTipiVisita() != null && luogo.getTipiVisita().contains(tipoScelto)) {
+    //                         luoghiCompatibili.add(luogo.getNome());
+    //                     }
+    //                 }
+    //                 if (luoghiCompatibili.isEmpty()) {
+    //                     consoleView.mostraMessaggio("Nessun luogo compatibile con il tipo di visita scelto.");
+    //                     continue;
+    //                 }
+    //                 consoleView.mostraMessaggio("Luoghi compatibili per la data " + data + ":");
+    //                 consoleView.mostraElenco(luoghiCompatibili);
+    //                 int idxLuogo = InputDati.leggiIntero("Scegli il luogo per la data " + data + " (0 per annullare): ", 0, luoghiCompatibili.size()) - 1;
+    //                 if (idxLuogo == -1) continue;
+    //                 String luogoScelto = luoghiCompatibili.get(idxLuogo);
+    //                 int durata = InputDati.leggiIntero("Inserisci la durata della visita (in minuti) per la data " + data + ": ", 30, 300);
+    //                 int id = visiteMap.size() + 1;
+    //                 Visita nuovaVisita = new Visita(id, luogoScelto, tipoScelto, volontario.getNome() + " " + volontario.getCognome(), data, visiteManagerDB.getMaxPersone(), "Proposta", null, durata);
+    //                 visiteManagerDB.aggiungiNuovaVisita(nuovaVisita);
+    //                 consoleView.mostraMessaggio("Visita assegnata e salvata per " + volontario.getNome() + " il " + data + "!");
+    //                 dateDisp.remove(dataStr);
+    //                 disponibilitaVolontari.put(emailVol, dateDisp);
+    //                 salvaStatoERaccolta(disponibilitaVolontari, "RACCOLTA_APERTA");
+    //                 pianificatoPerTipo = true;
+    //                 // Dopo aver pianificato una visita, torna subito al menu delle date disponibili
+    //             }
+    //             if (pianificatoPerTipo) {
+    //                 tipiVolontario.remove(tipoScelto);
+    //             }
+    //         }
+    //         if (tipiVolontario.isEmpty() || dateDisp.isEmpty()) {
+    //             volontariConDisponibilita.remove(emailVol);
+    //         }
+    //     }
+    // // Messaggio finale senza riferimenti a mese/anno (che potrebbero essere errati)
+    // consoleView.mostraMessaggio("Piano visite completato per tutti i volontari. Puoi ora riaprire la raccolta delle date.");
+    // // Torna al menu principale del configuratore
+    // return;
+    // }
+
+    private void assegnaNuovaVisita(Volontario volontario, List<String> dateDisponibili, List<String> tipiVolontario) {
+        // Selezione tipo visita
+        String tipoScelto = selezionaTipoVisita(tipiVolontario);
+        if (tipoScelto == null) return;
+
+        // Selezione data
+        String dataScelta = selezionaData(dateDisponibili);
+        if (dataScelta == null) return;
+
+        LocalDate data = parseData(dataScelta);
+        if (data == null) return;
+
+        // Selezione luogo
+        String luogoScelto = selezionaLuogo(tipoScelto);
+        if (luogoScelto == null) return;
+
+        // Selezione orario e durata
+        LocalTime orario = selezionaOrario(data, luogoScelto);
+        if (orario == null) return;
+
+        int durata = InputDati.leggiIntero("Durata in minuti: ", 30, 300);
+
+        // Creazione nuova visita
+        int nuovoId = visiteMap.size() + 1;
+        Visita nuovaVisita = new Visita(nuovoId, luogoScelto, tipoScelto, 
+            volontario.getNome() + " " + volontario.getCognome(), data, 
+            visiteManagerDB.getMaxPersone(), "Confermata", orario, durata);
+
+        visiteManagerDB.aggiungiNuovaVisita(nuovaVisita);
+
+        // Aggiorna disponibilità
+        dateDisponibili.remove(dataScelta);
+        disponibilitaVolontari.put(volontario.getEmail(), dateDisponibili);
+        salvaStatoERaccolta(disponibilitaVolontari, "RACCOLTA_APERTA");
+
+        consoleView.mostraMessaggio("Nuova visita creata e assegnata!");
+}
 
         // Salva lo stato raccolta e le disponibilità dei volontari su stato_raccolta.txt
     public static void salvaStatoERaccolta(Map<String, List<String>> disponibilita, String statoCiclo) {
