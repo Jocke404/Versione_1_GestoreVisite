@@ -1,5 +1,4 @@
 package src.model;
-// import it.unibs.mylib.*;
 
 import java.util.*;
 
@@ -8,15 +7,22 @@ public class Luogo {
     private String nome;
     private String descrizione;
     private String collocazione;
-    private HashMap<String, List<String>> volontari;
-    private HashMap<String, List<String>> tipiVisita; 
+    private List<TipiVisita> tipiVisita; 
 
 
-    public Luogo(String nome, String descrizione, String collocazione) {
+    public Luogo(String nome, String descrizione, String collocazione, List<TipiVisita> tipiVisita) {
         this.nome = nome;
         this.descrizione = descrizione;
         this.collocazione = collocazione;
-        this.tipiVisita = new HashMap<>();
+        this.tipiVisita = tipiVisita;
+    }
+
+    public List<TipiVisita> getTipiVisita() {
+        return tipiVisita;
+    }
+
+    public void setTipiVisita(List<TipiVisita> tipiVisita) {
+        this.tipiVisita = tipiVisita;
     }
 
     public String getNome() {
@@ -43,6 +49,9 @@ public class Luogo {
         this.collocazione = nuovaCollocazione;
     }
     
+    
+
+
     @Override
     public String toString() {
         return "Luogo [descrizione=" + descrizione + ", nome=" + nome + "]";

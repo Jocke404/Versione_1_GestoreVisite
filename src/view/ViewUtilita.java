@@ -45,9 +45,7 @@ public class ViewUtilita {
         }
 
         System.out.println("Luoghi:");
-        for (Luogo luogo : luoghi) {
-            System.out.println(luogo.getNome());
-        }
+        consoleView.mostraElencoConOggetti(luoghi);
     }
 
     // Metodo per stampare i volontari

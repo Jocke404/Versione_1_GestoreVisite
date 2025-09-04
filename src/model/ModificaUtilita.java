@@ -246,8 +246,7 @@ public class ModificaUtilita {
         consoleView.mostraElencoConOggetti(luoghi);
         int scelta = InputDati.leggiIntero("Seleziona il luogo da modificare: ", 1, luoghi.size()) - 1;
         Luogo luogoDaModificare = luoghi.get(scelta);
-
-        // Chiedi i nuovi dati per il luogo
+        
         String nuovoNome = InputDati.leggiStringa("Inserisci il nuovo nome del luogo (lascia vuoto per mantenere il valore attuale: " + luogoDaModificare.getNome() + "): ");
         if (!nuovoNome.isEmpty()) {
             luogoDaModificare.setName(nuovoNome);
@@ -262,10 +261,6 @@ public class ModificaUtilita {
         if (!nuovaCollocazione.isEmpty()) {
             luogoDaModificare.setCollocazione(nuovaCollocazione);
         }
-
-        // luogoDaModificare.setName(nuovoNome);
-        // luogoDaModificare.setDescrizione(nuovaDescrizione);
-        // luogoDaModificare.setCollocazione(nuovaCollocazione);
 
         // Modifica il luogo
         luoghiController.aggiornaLuoghi(luogoDaModificare);

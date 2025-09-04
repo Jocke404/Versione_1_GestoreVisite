@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 import src.controller.ThreadPoolController;
 import src.model.Luogo;
@@ -16,13 +17,8 @@ public class LuoghiManager extends DatabaseManager {
         caricaLuoghi();
     }
     
-    // Metodo per sincronizzare i luoghi
-
-
-    //Logiche dei luoghi--------------------------------------------------
-    // Metodo per caricare i luoghi dal database e memorizzarli nella HashMap
     protected void caricaLuoghi() {
-        String sql = "SELECT nome, descrizione, collocazione FROM luoghi";
+        String sql = "SELECT nome, descrizione, collocazione, tipi_visita FROM luoghi";
         try (Connection conn = DatabaseConnection.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
@@ -34,7 +30,8 @@ public class LuoghiManager extends DatabaseManager {
                     Luogo luogo = new Luogo(
                             nome,
                             rs.getString("descrizione"),
-                            rs.getString("collocazione")
+                            rs.getString("collocazione"),
+                            Arrays.asList((String[]) rs.getArray("tipi_visita").getArray())
                     );
                     luoghiMap.putIfAbsent(nome, luogo);
                 }

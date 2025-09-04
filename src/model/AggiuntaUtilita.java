@@ -166,6 +166,8 @@ public class AggiuntaUtilita {
         String nome = InputDati.leggiStringaNonVuota("inserire il nome del luogo: ");
         String descrizione = InputDati.leggiStringaNonVuota("inserire la descrizione del luogo: ");
         String collocazione = InputDati.leggiStringaNonVuota("inserire la collocazione del luogo: ");
+        consoleView.mostraElencoConOggetti(tipiVisitaMap.values().stream().toList());
+        List<TipiVisita> tipiVisitaSelezionati = InputDati.leggiIntero("Seleziona i tipi di visita (numeri separati da virgola): ", 1, tipiVisitaMap.size());
 
         Luogo nuovoLuogo = new Luogo(nome, descrizione, collocazione);
         luoghiMap.putIfAbsent(nome, nuovoLuogo);
