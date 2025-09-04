@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 import src.controller.ThreadPoolController;
 import src.model.Luogo;
+import src.model.TipiVisita;
 
 public class LuoghiManager extends DatabaseManager {
     private ConcurrentHashMap<String, Luogo> luoghiMap = new ConcurrentHashMap<>();
@@ -18,7 +19,7 @@ public class LuoghiManager extends DatabaseManager {
     }
     
     protected void caricaLuoghi() {
-        String sql = "SELECT nome, descrizione, collocazione, tipi_visita FROM luoghi";
+        String sql = "SELECT nome, descrizione, collocazione, tipi_di_visita FROM luoghi";
         try (Connection conn = DatabaseConnection.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
@@ -31,7 +32,10 @@ public class LuoghiManager extends DatabaseManager {
                             nome,
                             rs.getString("descrizione"),
                             rs.getString("collocazione"),
-                            Arrays.asList((String[]) rs.getArray("tipi_visita").getArray())
+                            rs.getString("tipi_di_visita") != null ? Arrays.stream(rs.getString("tipi_di_visita").split(","))
+                                    .map(String::trim)
+                                    .map(s -> TipiVisita.valueOf(s.toUpperCase()))
+                                    .toList() : null
                     );
                     luoghiMap.putIfAbsent(nome, luogo);
                 }

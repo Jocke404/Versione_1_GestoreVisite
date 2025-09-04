@@ -76,7 +76,7 @@ public class ViewUtilita {
         System.out.println("Visite:");
         for (Visita visita : visite) {
             System.out.println("Luogo: " + visita.getLuogo());
-            System.out.println("Tipo Visita: " + visita.getTipoVisita());
+            System.out.println("Tipi Visita: " + visita.getTipiVisita());
             System.out.println("Volontario: " + visita.getVolontario());
             System.out.println("Data: " + (visita.getData() != null ? visita.getData() : "Nessuna data"));
             System.out.println("Stato: " + visita.getStato());
@@ -106,7 +106,7 @@ public class ViewUtilita {
         for (Visita visita : visiteMap.values()) {
             if (visita.getStato().equalsIgnoreCase(statoScelto)) {
                 System.out.printf("Luogo: %s, Tipo Visita: %s, Volontario: %s, Data: %s, Ora Inizio: %s, Durata: %d minuti%n",
-                        visita.getLuogo(), visita.getTipoVisita(), visita.getVolontario(),
+                        visita.getLuogo(), visita.getTipiVisita(), visita.getVolontario(),
                         visita.getData() != null ? visita.getData() : "Nessuna data",
                         visita.getOraInizio() != null ? visita.getOraInizio() : "Nessuna ora",
                         visita.getDurataMinuti());
@@ -127,7 +127,7 @@ public class ViewUtilita {
         for (Visita visita : visiteMap.values()) {
             if ("Effettuata".equalsIgnoreCase(visita.getStato())) {
                 System.out.printf("Luogo: %s, Tipo Visita: %s, Volontario: %s, Data: %s%n",
-                        visita.getLuogo(), visita.getTipoVisita(), visita.getVolontario(),
+                        visita.getLuogo(), visita.getTipiVisita(), visita.getVolontario(),
                         visita.getData() != null ? visita.getData() : "Nessuna data");
             }
         }
@@ -149,7 +149,7 @@ public class ViewUtilita {
             if (visita.getVolontario().equals(volontario.getNome() + " " + volontario.getCognome())) {
                 System.out.println("ID: " + entry.getKey());
                 System.out.println("Luogo: " + visita.getLuogo());
-                System.out.println("Tipo Visita: " + visita.getTipoVisita());
+                System.out.println("Tipi Visita: " + visita.getTipiVisitaString());
                 System.out.println("Data: " + (visita.getData() != null ? visita.getData() : "Nessuna data"));
                 System.out.println("Stato: " + visita.getStato());
                 System.out.println("-------------------------");
@@ -212,7 +212,7 @@ public class ViewUtilita {
             
             Set<String> tipiVisitaUnici = new HashSet<>();
             for (Visita visita : visiteNelLuogo) {
-                String tipoVisita = visita.getTipoVisitaString();
+                String tipoVisita = visita.getTipiVisitaString();
                 tipiVisitaUnici.add(tipoVisita);
             }
 

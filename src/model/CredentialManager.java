@@ -37,7 +37,7 @@ public class CredentialManager {
         // Recupera i dati necessari per creare l'utente
         String nome = null;
         String cognome = null;
-        List<String> tipidiVisite = null; 
+        List<TipiVisita> tipidiVisite = null; 
 
         switch (tipoUtente) {
             case UserFactory.VOLONTARIO:

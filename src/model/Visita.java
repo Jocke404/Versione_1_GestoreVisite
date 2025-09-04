@@ -2,11 +2,12 @@ package src.model;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 public class Visita {
     private int id; // ID univoco della visita
     private String luogo;
-    private TipiVisita tipoVisita;
+    private List<TipiVisita> tipiVisita;
     private String volontario;
     private LocalDate data;
     private int maxPersone; 
@@ -15,11 +16,11 @@ public class Visita {
     private int durataMinuti; 
 
     // Costruttore completo (inclusi tutti i campi)
-    public Visita(int id, String luogo, TipiVisita tipoVisita, String volontario, 
+    public Visita(int id, String luogo, List<TipiVisita> tipiVisita, String volontario, 
                 LocalDate data, int maxPersone, String stato, LocalTime oraInizio, int durataMinuti) {
         this.id = id;
         this.luogo = luogo;
-        this.tipoVisita = tipoVisita;
+        this.tipiVisita = tipiVisita;
         this.volontario = volontario;
         this.data = data;
         this.maxPersone = maxPersone;
@@ -58,12 +59,19 @@ public class Visita {
         return luogo;
     }
 
-    public TipiVisita getTipoVisita() {
-        return tipoVisita;
+    public List<TipiVisita> getTipiVisita() {
+        return tipiVisita;
     }
 
-    public String getTipoVisitaString() {
-        return tipoVisita != null ? tipoVisita.getNome() : "";
+    public String getTipiVisitaString() {
+        if (tipiVisita == null || tipiVisita.isEmpty()) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        for (TipiVisita tipo : tipiVisita) {
+            sb.append(tipo.getNome()).append(", ");
+        }
+        return sb.substring(0, sb.length() - 2);
     }
 
     public String getVolontario() {

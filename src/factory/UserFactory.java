@@ -2,6 +2,7 @@ package src.factory;
 import java.util.List;
 
 import src.model.Configuratore;
+import src.model.TipiVisita;
 import src.model.Utente;
 import src.model.Visitatore;
 import src.model.Volontario;
@@ -16,7 +17,7 @@ public class UserFactory {
     private UserFactory() {
     }
 
-    public static Utente createUser(String userType, String email, String password,  String nome, String cognome, List<String> tipodiVisita) {
+    public static Utente createUser(String userType, String email, String password,  String nome, String cognome, List<TipiVisita> tipodiVisita) {
         switch (userType) {
             case VOLONTARIO:
                 return new Volontario(nome, cognome, email, password, tipodiVisita);

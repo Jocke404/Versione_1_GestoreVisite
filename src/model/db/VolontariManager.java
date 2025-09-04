@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import src.controller.ThreadPoolController;
+import src.model.TipiVisita;
 import src.model.Volontario;
 
 public class VolontariManager extends DatabaseManager {
@@ -43,10 +44,12 @@ public class VolontariManager extends DatabaseManager {
                 while (rs.next()) {
                     String email = rs.getString("email");
                     String tipiDiVisite = rs.getString("tipi_di_visite");
-                    List<String> listaTipiVisite = new ArrayList<>();
-                                    if (tipiDiVisite != null && !tipiDiVisite.isEmpty()) {
-                    listaTipiVisite = Arrays.asList(tipiDiVisite.split(","));
-                }
+                    List<TipiVisita> listaTipiVisite = new ArrayList<>();
+                    if (tipiDiVisite != null && !tipiDiVisite.isEmpty()) {
+                        for (String tipo : tipiDiVisite.split(",")) {
+                            listaTipiVisite.add(TipiVisita.valueOf(tipo.trim()));
+                        }
+                    }
                     Volontario volontario = new Volontario(
                             rs.getString("nome"),
                             rs.getString("cognome"),
@@ -72,7 +75,7 @@ public class VolontariManager extends DatabaseManager {
             pstmt.setString(2, volontario.getCognome());
             pstmt.setString(3, volontario.getEmail());
             pstmt.setString(4, volontario.getPassword());
-            pstmt.setString(5, String.join(",", volontario.getTipiDiVisite()));
+            pstmt.setString(5, String.join(",", volontario.getTipiDiVisite().stream().map(TipiVisita::name).toArray(String[]::new)));
             pstmt.setBoolean(6, false);
             pstmt.executeUpdate();
             consoleView.mostraMessaggio("Volontario aggiunto con successo nella tabella 'volontari'.");

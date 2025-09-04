@@ -7,15 +7,15 @@ public class Volontario extends Utente {
     private String cognome;
     private String email;
     private String password;
-    private List<String> tipiDiVisite; // Tipi di visite a cui il volontario è assegnato
+    private List<TipiVisita> tipiDiVisite; // Tipi di visite a cui il volontario è assegnato
 
     // Costruttore, getter e setter
-    public Volontario(String nome, String cognome, String email, String password, List<String> tipiDiVisite) {
+    public Volontario(String nome, String cognome, String email, String password, List<TipiVisita> tipiDiVisite) {
         super(email, password, nome, cognome);
         this.tipiDiVisite = tipiDiVisite;
     }
     
-    public List<String> getTipiDiVisite() {
+    public List<TipiVisita> getTipiDiVisite() {
         return tipiDiVisite;
     }
     

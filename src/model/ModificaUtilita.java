@@ -50,8 +50,8 @@ public class ModificaUtilita {
         consoleView.mostraMessaggio("Visite disponibili:");
         for (Map.Entry<Integer, Visita> entry : visiteMap.entrySet()) {
             Visita visita = entry.getValue();
-            System.out.printf("%d. Luogo: %s, Tipo Visita: %s, Volontario: %s, Data: %s%n",
-                    entry.getKey(), visita.getLuogo(), visita.getTipoVisita(), visita.getVolontario(),
+            System.out.printf("%d. Luogo: %s, Tipi Visita: %s, Volontario: %s, Data: %s%n",
+                    entry.getKey(), visita.getLuogo(), visita.getTipiVisitaString(), visita.getVolontario(),
                     visita.getData() != null ? visita.getData() : "Nessuna data");
         }
 
@@ -102,7 +102,7 @@ public class ModificaUtilita {
             Map.Entry<Integer, Visita> entry = visiteList.get(i);
             Visita visita = entry.getValue();
             System.out.printf("%d. Luogo: %s, Tipo Visita: %s, Stato: %s, Data: %s, Ora Inizio: %s, Durata: %d minuti%n",
-                    i + 1, visita.getLuogo(), visita.getTipoVisita(), visita.getStato(),
+                    i + 1, visita.getLuogo(), visita.getTipiVisita(), visita.getStato(),
                     visita.getData() != null ? visita.getData() : "Nessuna data",
                     visita.getOraInizio() != null ? visita.getOraInizio() : "Nessuna ora",
                     visita.getDurataMinuti());

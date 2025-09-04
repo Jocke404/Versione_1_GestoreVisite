@@ -42,107 +42,306 @@ public class AggiuntaUtilita {
         this.visiteMap = visiteManagerDB.getVisiteMap();
     }
 
-    // Metodo per aggiungere una nuova visita
     public void aggiungiVisita() {
         if (consoleView.chiediAnnullaOperazione())
             return;
-    
-        consoleView.mostraMessaggio("Elenco dei luoghi disponibili:");
-        List<String> luoghiNomi = new ArrayList<>(luoghiMap.keySet());
-        consoleView.mostraElenco(luoghiNomi);
-        int luogoIndex = InputDati.leggiIntero("Seleziona il numero del luogo: ", 1, luoghiNomi.size()) - 1;
-        String luogoNomeScelto = luoghiNomi.get(luogoIndex);
 
-        List<TipiVisita> tipoVisita = new ArrayList<>(visiteMap.values().stream()
-                .map(Visita::getTipoVisita)
-                .distinct()
-                .toList());
-        consoleView.mostraElencoConOggetti(tipoVisita);
-        int tipoVisitaIndex = InputDati.leggiIntero("Seleziona il numero del tipo di visita: ", 1, tipoVisita.size()) - 1;
-        TipiVisita tipoVisitaScelto = tipoVisita.get(tipoVisitaIndex);
-
-        if (volontariMap.isEmpty()) {
-            consoleView.mostraMessaggio("Nessun volontario disponibile.");
-            return;
-        }
-    
-        consoleView.mostraMessaggio("\nElenco dei volontari disponibili:");
-        List<Volontario> volontariNomi = new ArrayList<>(volontariMap.values());
-        consoleView.mostraElencoConOggetti(volontariNomi);
-        int volontarioIndex = InputDati.leggiIntero("Seleziona il numero del volontario: ", 1, volontariNomi.size()) - 1;
-        String volontarioNomeScelto = volontariNomi.get(volontarioIndex).getNome() + " " + volontariNomi.get(volontarioIndex).getCognome();
-    
-        LocalDate dataVisita;
-        if (InputDati.yesOrNo("Vuoi inserire una data personale? ")) {
-            int anno = InputDati.leggiIntero("Inserisci l'anno della visita: ");
-            int mese = InputDati.leggiIntero("Inserisci il mese della visita (1-12): ");
-            int giorno = InputDati.leggiIntero("Inserisci il giorno della visita: ");
-            dataVisita = LocalDate.of(anno, mese, giorno);
-        } else {
+        if (InputDati.yesOrNo("Vuoi pianificare la visita usando le disponibilità dei volontari? (s/n)")) {
+            // Pianificazione guidata
+            sincronizzaDisponibilitaVolontari();
+            List<String> volontariConDisp = new ArrayList<>();
+            for (Map.Entry<String, List<String>> entry : disponibilitaVolontari.entrySet()) {
+                if (!entry.getValue().isEmpty()) volontariConDisp.add(entry.getKey());
+                }
+            if (volontariConDisp.isEmpty()) {
+                consoleView.mostraMessaggio("Nessun volontario ha inserito disponibilità.");
+                return;
+            }
+            // Scegli volontario
+            consoleView.mostraMessaggio("Volontari disponibili:");
+                for (int i = 0; i < volontariConDisp.size(); i++) {
+                    Volontario v = volontariMap.get(volontariConDisp.get(i));
+                    consoleView.mostraMessaggio((i + 1) + ". " + v.getNome() + " " + v.getCognome() + " (" + volontariConDisp.get(i) + ")");
+                }
+            int idxVol = InputDati.leggiIntero("Scegli il volontario (0 per uscire): ", 0, volontariConDisp.size()) - 1;
+            if (idxVol == -1) return;
+            Volontario volontario = volontariMap.get(volontariConDisp.get(idxVol));
+            List<String> dateDisp = disponibilitaVolontari.get(volontario.getEmail());
+            if (dateDisp.isEmpty()) return;
+            // Scegli data
+            consoleView.mostraMessaggio("Date disponibili:");
+            consoleView.mostraElenco(dateDisp);
+            int idxData = InputDati.leggiIntero("Scegli la data (0 per uscire): ", 0, dateDisp.size()) - 1;
+            if (idxData == -1) return;
+            String dataStr = dateDisp.get(idxData);
             LocalDate oggi = LocalDate.now();
-            YearMonth meseTarget = YearMonth.of(oggi.getYear(), oggi.getMonth().plus(3));
-            List<LocalDate> dateValide = new ArrayList<>();
-    
-            for (int giorno = 1; giorno <= meseTarget.lengthOfMonth(); giorno++) {
-                LocalDate data = meseTarget.atDay(giorno);
-                if (data.getDayOfWeek() != DayOfWeek.SATURDAY && data.getDayOfWeek() != DayOfWeek.SUNDAY) {
-                    dateValide.add(data);
+            YearMonth ym = YearMonth.of(oggi.plusMonths(1).getYear(), oggi.plusMonths(1).getMonthValue());
+            LocalDate data;
+            try {
+                int giorno = Integer.parseInt(dataStr);
+                data = ym.atDay(giorno);
+            } catch (Exception e) {
+                consoleView.mostraMessaggio("Formato data non valido: " + dataStr);
+                return;
+            }
+            // Scegli tipo visita
+            List<TipiVisita> tipi = volontario.getTipiDiVisite();
+            if (tipi == null || tipi.isEmpty()) return;
+            consoleView.mostraMessaggio("Tipi di visita disponibili:");
+            for (int i = 0; i < tipi.size(); i++) {
+                consoleView.mostraMessaggio((i + 1) + ". " + tipi.get(i));
+            }
+            int idxTipo = InputDati.leggiIntero("Scegli il tipo di visita (0 per uscire): ", 0, tipi.size()) - 1;
+            if (idxTipo == -1) return;
+            TipiVisita tipoScelto = tipi.get(idxTipo);
+            // Scegli luogo compatibile
+            List<String> luoghiCompatibili = new ArrayList<>();
+            for (Luogo luogo : luoghiMap.values()) {
+                if (luogo.getTipiVisita() != null && luogo.getTipiVisita().stream().anyMatch(tv -> tv.equals(tipoScelto))) {
+                    luoghiCompatibili.add(luogo.getNome());
                 }
             }
-    
-            consoleView.mostraMessaggio("\nDate disponibili per la visita:");
-            consoleView.mostraElencoConOggetti(dateValide);
-            int dataIndex = InputDati.leggiIntero("Seleziona il numero della data: ", 1, dateValide.size()) - 1;
-            dataVisita = dateValide.get(dataIndex);
-        }
-        int id = visiteMap.size() + 1;
-        int maxPersone = visiteManagerDB.getMaxPersone();
-        String stato = "Proposta"; // Stato iniziale della visita
-        LocalTime oraInizio = null;
-        int durataMinuti = 0;
-        Visita nuovaVisita = new Visita(id, luogoNomeScelto, tipoVisitaScelto, volontarioNomeScelto, dataVisita, maxPersone, stato, oraInizio, durataMinuti);
-        
-        if (InputDati.yesOrNo("Vuoi scegliere un orario specifico per la visita?")) {
-            do{
-                oraInizio = InputDati.leggiOra("Inserisci l'ora di inizio della visita (formato HH:MM): ");
-                if(InputDati.yesOrNo("Vuoi inserire la durata della visita?")) {
+            if (luoghiCompatibili.isEmpty()) {
+                consoleView.mostraMessaggio("Nessun luogo compatibile con il tipo di visita scelto.");
+                return;
+            }
+            consoleView.mostraMessaggio("Luoghi compatibili:");
+            consoleView.mostraElenco(luoghiCompatibili);
+            int idxLuogo = InputDati.leggiIntero("Scegli il luogo (0 per uscire): ", 0, luoghiCompatibili.size()) - 1;
+            if (idxLuogo == -1) return;
+            String luogoScelto = luoghiCompatibili.get(idxLuogo);
+            int durata = InputDati.leggiIntero("Durata in minuti: ", 30, 300);
+            LocalTime orario = InputDati.leggiOra("Orario di inizio (HH:MM): ");
+            int nuovoId = visiteMap.size() + 1;
+            Visita nuovaVisita = new Visita(nuovoId, luogoScelto, List.of(tipoScelto), volontario.getNome() + " " + volontario.getCognome(), 
+                                            data, visiteManagerDB.getMaxPersone(), "Proposta", orario, durata);
+            visiteManagerDB.aggiungiNuovaVisita(nuovaVisita);
+            dateDisp.remove(dataStr);
+            disponibilitaVolontari.put(volontario.getEmail(), dateDisp);
+            salvaStatoERaccolta(disponibilitaVolontari, "RACCOLTA_APERTA");
+            consoleView.mostraMessaggio("Nuova visita creata e assegnata!");
+        } else {
+            // Pianificazione libera
+            List<String> luoghiNomi = new ArrayList<>(luoghiMap.keySet());
+            if (luoghiNomi.isEmpty()) return;
+            consoleView.mostraMessaggio("Elenco dei luoghi disponibili:");
+            consoleView.mostraElenco(luoghiNomi);
+            int idxLuogo = InputDati.leggiIntero("Seleziona il numero del luogo: ", 1, luoghiNomi.size()) - 1;
+            String luogoNomeScelto = luoghiNomi.get(idxLuogo);
+
+            Luogo luogoSceltoObj = luoghiMap.get(luogoNomeScelto);
+            List<TipiVisita> tipiVisita = luogoSceltoObj.getTipiVisita();
+            if (tipiVisita == null || tipiVisita.isEmpty()) {
+                consoleView.mostraMessaggio("Nessun tipo di visita disponibile per questo luogo.");
+                return;
+            }
+            consoleView.mostraMessaggio("Tipi di visita disponibili:");
+            consoleView.mostraElencoConOggetti(tipiVisita);
+            List<TipiVisita> tipiVisitaScelti = new ArrayList<>();
+            boolean aggiungiAltri = true;
+
+            do {
+                int idxTipo = InputDati.leggiIntero("Seleziona il numero del tipo di visita: ", 1, tipiVisita.size()) - 1;
+                TipiVisita tipoVisitaScelto = tipiVisita.get(idxTipo);
+
+                if (!tipiVisitaScelti.contains(tipoVisitaScelto)) {
+                    tipiVisitaScelti.add(tipoVisitaScelto);
+                } else {
+                    consoleView.mostraMessaggio("Hai già selezionato questo tipo di visita.");
+                }
+
+                aggiungiAltri = InputDati.yesOrNo("Vuoi aggiungere un altro tipo di visita?");
+            } while (aggiungiAltri);
+
+            consoleView.mostraMessaggio("Tipi di visita selezionati: " + tipiVisitaScelti);
+
+            List<String> volontariEmails = new ArrayList<>(volontariMap.keySet());
+            if (volontariEmails.isEmpty()) return;
+            consoleView.mostraMessaggio("Volontari disponibili:");
+            for (int i = 0; i < volontariEmails.size(); i++) {
+                Volontario v = volontariMap.get(volontariEmails.get(i));
+                consoleView.mostraMessaggio((i + 1) + ". " + v.getNome() + " " + v.getCognome() + " (" + volontariEmails.get(i) + ")");
+            }
+            int idxVol = InputDati.leggiIntero("Scegli il volontario (0 per uscire): ", 0, volontariEmails.size()) - 1;
+            if (idxVol == -1) return;
+            Volontario volontario = volontariMap.get(volontariEmails.get(idxVol));
+            String volontarioNomeScelto = volontario.getNome() + " " + volontario.getCognome();
+
+            LocalDate dataVisita;
+            if (InputDati.yesOrNo("Vuoi inserire una data personale? ")) {
+                int anno = InputDati.leggiIntero("Inserisci l'anno della visita: ");
+                int mese = InputDati.leggiIntero("Inserisci il mese della visita (1-12): ");
+                int giorno = InputDati.leggiIntero("Inserisci il giorno della visita: ");
+                dataVisita = LocalDate.of(anno, mese, giorno);
+            } else {
+                LocalDate oggi = LocalDate.now();
+                YearMonth meseTarget = YearMonth.of(oggi.getYear(), oggi.getMonth().plus(3));
+                List<LocalDate> dateValide = new ArrayList<>();
+                for (int giorno = 1; giorno <= meseTarget.lengthOfMonth(); giorno++) {
+                    LocalDate data = meseTarget.atDay(giorno);
+                    if (data.getDayOfWeek() != DayOfWeek.SATURDAY && data.getDayOfWeek() != DayOfWeek.SUNDAY) {
+                        dateValide.add(data);
+                    }
+                }
+                consoleView.mostraMessaggio("\nDate disponibili per la visita:");
+                consoleView.mostraElencoConOggetti(dateValide);
+                int idxData = InputDati.leggiIntero("Seleziona il numero della data: ", 1, dateValide.size()) - 1;
+                dataVisita = dateValide.get(idxData);
+            }
+
+            int id = visiteMap.size() + 1;
+            int maxPersone = visiteManagerDB.getMaxPersone();
+            String stato = "Proposta";
+            LocalTime oraInizio = null;
+            int durataMinuti = 0;
+            Visita nuovaVisita = new Visita(id, luogoNomeScelto, tipiVisitaScelti, volontarioNomeScelto, dataVisita, maxPersone, stato, oraInizio, durataMinuti);
+
+            if (InputDati.yesOrNo("Vuoi scegliere un orario specifico per la visita?")) {
+                do {
+                    oraInizio = InputDati.leggiOra("Inserisci l'ora di inizio della visita (formato HH:MM): ");
+                    if (InputDati.yesOrNo("Vuoi inserire la durata della visita?")) {
+                        durataMinuti = InputDati.leggiIntero("Inserisci la durata della visita in minuti: ", 1, 480);
+                    } else {
+                        consoleView.mostraElencoConOggetti(durataList);
+                        int durataIndex = InputDati.leggiIntero("Seleziona il numero della durata della visita: ", 1, durataList.size()) - 1;
+                        durataMinuti = durataList.get(durataIndex);
+                    }
+                    nuovaVisita.setOraInizio(oraInizio);
+                    nuovaVisita.setDurataMinuti(durataMinuti);
+                    if (visiteManagerDB.validaVisita(nuovaVisita)) {
+                        consoleView.mostraMessaggio("Visita valida.");
+                    } else {
+                        consoleView.mostraMessaggio("Visita non valida per l'orario selezionato.");
+                    }
+                } while (!visiteManagerDB.validaVisita(nuovaVisita));
+                visiteManagerDB.aggiungiNuovaVisita(nuovaVisita);
+            } else {
+                if (InputDati.yesOrNo("Vuoi inserire la durata della visita?")) {
                     durataMinuti = InputDati.leggiIntero("Inserisci la durata della visita in minuti: ", 1, 480);
                 } else {
                     consoleView.mostraElencoConOggetti(durataList);
                     int durataIndex = InputDati.leggiIntero("Seleziona il numero della durata della visita: ", 1, durataList.size()) - 1;
                     durataMinuti = durataList.get(durataIndex);
-                }   
+                }
+                List<LocalTime> slotDisponibili = visiteManagerDB.trovaSlotDisponibili(dataVisita, luogoNomeScelto, durataMinuti);
+                if (slotDisponibili.isEmpty()) {
+                    consoleView.mostraMessaggio("Nessuno slot disponibile per la data selezionata.");
+                    return;
+                }
+                consoleView.mostraMessaggio("\nSlot orari disponibili:");
+                consoleView.mostraElencoConOggetti(slotDisponibili);
+                int slotIndex = InputDati.leggiIntero("Seleziona il numero dello slot orario: ", 1, slotDisponibili.size()) - 1;
+                oraInizio = slotDisponibili.get(slotIndex);
                 nuovaVisita.setOraInizio(oraInizio);
                 nuovaVisita.setDurataMinuti(durataMinuti);
-                if (visiteManagerDB.validaVisita(nuovaVisita)) {
-                    consoleView.mostraMessaggio("Visita valida.");
-                } else {
-                    consoleView.mostraMessaggio("Visita non valida per l'orario selezionato.");
-                }
-            } while (!visiteManagerDB.validaVisita(nuovaVisita));
-            visiteManagerDB.aggiungiNuovaVisita(nuovaVisita);
-        } else {
-            durataMinuti = InputDati.leggiIntero("Inserisci la durata della visita in minuti: ", 1, 480);
-            List<LocalTime> slotDisponibili = visiteManagerDB.trovaSlotDisponibili(dataVisita, luogoNomeScelto, durataMinuti);
-            if (slotDisponibili.isEmpty()) {
-                consoleView.mostraMessaggio("Nessuno slot disponibile per la data selezionata.");
-                return;
+                visiteManagerDB.aggiungiNuovaVisita(nuovaVisita);
             }
-            consoleView.mostraMessaggio("\nSlot orari disponibili:");
-            consoleView.mostraElencoConOggetti(slotDisponibili);
-            int slotIndex = InputDati.leggiIntero("Seleziona il numero dello slot orario: ", 1, slotDisponibili.size()) - 1;
-            oraInizio = slotDisponibili.get(slotIndex);
-            nuovaVisita.setOraInizio(oraInizio);
-            nuovaVisita.setDurataMinuti(durataMinuti);
+            visiteMap.put(id, nuovaVisita);
+            consoleView.mostraMessaggio("Visita assegnata con successo per la data " + dataVisita + "!");
         }
+    }
+
+    // // Metodo per aggiungere una nuova visita
+    // public void aggiungiVisita() {
+    //     if (consoleView.chiediAnnullaOperazione())
+    //         return;
+    
+    //     consoleView.mostraMessaggio("Elenco dei luoghi disponibili:");
+    //     List<String> luoghiNomi = new ArrayList<>(luoghiMap.keySet());
+    //     consoleView.mostraElenco(luoghiNomi);
+    //     int luogoIndex = InputDati.leggiIntero("Seleziona il numero del luogo: ", 1, luoghiNomi.size()) - 1;
+    //     String luogoNomeScelto = luoghiNomi.get(luogoIndex);
+
+    //     List<TipiVisita> tipoVisita = new ArrayList<>(visiteMap.values().stream()
+    //             .map(Visita::getTipoVisita)
+    //             .distinct()
+    //             .toList());
+    //     consoleView.mostraElencoConOggetti(tipoVisita);
+    //     int tipoVisitaIndex = InputDati.leggiIntero("Seleziona il numero del tipo di visita: ", 1, tipoVisita.size()) - 1;
+    //     TipiVisita tipoVisitaScelto = tipoVisita.get(tipoVisitaIndex);
+
+    //     if (volontariMap.isEmpty()) {
+    //         consoleView.mostraMessaggio("Nessun volontario disponibile.");
+    //         return;
+    //     }
+    
+    //     consoleView.mostraMessaggio("\nElenco dei volontari disponibili:");
+    //     List<Volontario> volontariNomi = new ArrayList<>(volontariMap.values());
+    //     consoleView.mostraElencoConOggetti(volontariNomi);
+    //     int volontarioIndex = InputDati.leggiIntero("Seleziona il numero del volontario: ", 1, volontariNomi.size()) - 1;
+    //     String volontarioNomeScelto = volontariNomi.get(volontarioIndex).getNome() + " " + volontariNomi.get(volontarioIndex).getCognome();
+    
+    //     LocalDate dataVisita;
+    //     if (InputDati.yesOrNo("Vuoi inserire una data personale? ")) {
+    //         int anno = InputDati.leggiIntero("Inserisci l'anno della visita: ");
+    //         int mese = InputDati.leggiIntero("Inserisci il mese della visita (1-12): ");
+    //         int giorno = InputDati.leggiIntero("Inserisci il giorno della visita: ");
+    //         dataVisita = LocalDate.of(anno, mese, giorno);
+    //     } else {
+    //         LocalDate oggi = LocalDate.now();
+    //         YearMonth meseTarget = YearMonth.of(oggi.getYear(), oggi.getMonth().plus(3));
+    //         List<LocalDate> dateValide = new ArrayList<>();
+    
+    //         for (int giorno = 1; giorno <= meseTarget.lengthOfMonth(); giorno++) {
+    //             LocalDate data = meseTarget.atDay(giorno);
+    //             if (data.getDayOfWeek() != DayOfWeek.SATURDAY && data.getDayOfWeek() != DayOfWeek.SUNDAY) {
+    //                 dateValide.add(data);
+    //             }
+    //         }
+    
+    //         consoleView.mostraMessaggio("\nDate disponibili per la visita:");
+    //         consoleView.mostraElencoConOggetti(dateValide);
+    //         int dataIndex = InputDati.leggiIntero("Seleziona il numero della data: ", 1, dateValide.size()) - 1;
+    //         dataVisita = dateValide.get(dataIndex);
+    //     }
+    //     int id = visiteMap.size() + 1;
+    //     int maxPersone = visiteManagerDB.getMaxPersone();
+    //     String stato = "Proposta"; // Stato iniziale della visita
+    //     LocalTime oraInizio = null;
+    //     int durataMinuti = 0;
+    //     Visita nuovaVisita = new Visita(id, luogoNomeScelto, tipoVisitaScelto, volontarioNomeScelto, dataVisita, maxPersone, stato, oraInizio, durataMinuti);
+        
+    //     if (InputDati.yesOrNo("Vuoi scegliere un orario specifico per la visita?")) {
+    //         do{
+    //             oraInizio = InputDati.leggiOra("Inserisci l'ora di inizio della visita (formato HH:MM): ");
+    //             if(InputDati.yesOrNo("Vuoi inserire la durata della visita?")) {
+    //                 durataMinuti = InputDati.leggiIntero("Inserisci la durata della visita in minuti: ", 1, 480);
+    //             } else {
+    //                 consoleView.mostraElencoConOggetti(durataList);
+    //                 int durataIndex = InputDati.leggiIntero("Seleziona il numero della durata della visita: ", 1, durataList.size()) - 1;
+    //                 durataMinuti = durataList.get(durataIndex);
+    //             }   
+    //             nuovaVisita.setOraInizio(oraInizio);
+    //             nuovaVisita.setDurataMinuti(durataMinuti);
+    //             if (visiteManagerDB.validaVisita(nuovaVisita)) {
+    //                 consoleView.mostraMessaggio("Visita valida.");
+    //             } else {
+    //                 consoleView.mostraMessaggio("Visita non valida per l'orario selezionato.");
+    //             }
+    //         } while (!visiteManagerDB.validaVisita(nuovaVisita));
+    //         visiteManagerDB.aggiungiNuovaVisita(nuovaVisita);
+    //     } else {
+    //         durataMinuti = InputDati.leggiIntero("Inserisci la durata della visita in minuti: ", 1, 480);
+    //         List<LocalTime> slotDisponibili = visiteManagerDB.trovaSlotDisponibili(dataVisita, luogoNomeScelto, durataMinuti);
+    //         if (slotDisponibili.isEmpty()) {
+    //             consoleView.mostraMessaggio("Nessuno slot disponibile per la data selezionata.");
+    //             return;
+    //         }
+    //         consoleView.mostraMessaggio("\nSlot orari disponibili:");
+    //         consoleView.mostraElencoConOggetti(slotDisponibili);
+    //         int slotIndex = InputDati.leggiIntero("Seleziona il numero dello slot orario: ", 1, slotDisponibili.size()) - 1;
+    //         oraInizio = slotDisponibili.get(slotIndex);
+    //         nuovaVisita.setOraInizio(oraInizio);
+    //         nuovaVisita.setDurataMinuti(durataMinuti);
+    //     }
 
         
-        visiteMap.put(id, nuovaVisita);
+    //     visiteMap.put(id, nuovaVisita);
 
-        visiteManagerDB.aggiungiNuovaVisita(nuovaVisita);
+    //     visiteManagerDB.aggiungiNuovaVisita(nuovaVisita);
     
-        consoleView.mostraMessaggio("Visita assegnata con successo per la data " + dataVisita + "!");
-    }
+    //     consoleView.mostraMessaggio("Visita assegnata con successo per la data " + dataVisita + "!");
+    // }
 
     // Metodo per aggiungere un volontario
     public void aggiungiVolontario() {
@@ -152,10 +351,20 @@ public class AggiuntaUtilita {
         String cognome = InputDati.leggiStringaNonVuota("inserire il cognome del volontario: ");
         String email = InputDati.leggiStringaNonVuota("inserire l'email del volontario: ");
         String password = InputDati.leggiStringaNonVuota("inserire la password: ");
-        List<String> tipiDiVisite = new ArrayList<>();
-        
-        Volontario nuovoVolontario = new Volontario(nome, cognome, email, password, tipiDiVisite);
-        
+        consoleView.mostraElencoConOggetti(tipiVisitaMap.values().stream().toList());
+        List<TipiVisita> tipiVisitaSelezionati = new ArrayList<>();
+        boolean aggiungiAltri = true;
+
+        while (aggiungiAltri) {
+            int tipoIndex = InputDati.leggiIntero("Seleziona il numero del tipo di visita da aggiungere: ", 1, tipiVisitaMap.size()) - 1;
+            TipiVisita tipoSelezionato = tipiVisitaMap.values().stream().toList().get(tipoIndex);
+            tipiVisitaSelezionati.add(tipoSelezionato);
+
+            aggiungiAltri = InputDati.yesOrNo("Vuoi aggiungere un altro tipo di visita?");
+        }
+
+        Volontario nuovoVolontario = new Volontario(nome, cognome, email, password, tipiVisitaSelezionati);
+
         volontariMap.putIfAbsent(email, nuovoVolontario);
 
         volontariManager.aggiungiNuovoVolontario(nuovoVolontario);
@@ -212,7 +421,7 @@ public class AggiuntaUtilita {
 
     private List<Integer> trovaGiorniDisponibili(Volontario volontario, LocalDate meseProssimo, YearMonth ym) {
         List<Integer> giorniDisponibili = new ArrayList<>();
-        List<String> tipiVisitaVolontario = volontario.getTipiDiVisite();
+        List<TipiVisita> tipiVisitaVolontario = volontario.getTipiDiVisite();
 
         consoleView.mostraMessaggio("Calendario del mese di " + meseProssimo.getMonth() + " " + meseProssimo.getYear() + ":");
         consoleView.mostraMessaggio("Giorno\tGiorno della settimana");
@@ -231,7 +440,7 @@ public class AggiuntaUtilita {
     }
 
     private boolean isGiornoDisponibile(LocalDate data, ConcurrentHashMap<Integer, Visita> visiteMap, 
-                                    List<String> tipiVisitaVolontario) {
+                                    List<TipiVisita> tipiVisitaVolontario) {
         boolean visitaProgrammata = visiteMap.values().stream()
             .anyMatch(v -> v.getData() != null && v.getData().equals(data));
 
@@ -267,15 +476,15 @@ public class AggiuntaUtilita {
         disponibilitaVolontari.put(volontario.getEmail(), dateDisponibili);
         // Salva anche su file stato_raccolta.txt (stato ciclo lasciato invariato)
         // Recupera il tipo di visita scelto (se uno solo, lo usa; se più di uno, chiede all'utente)
-        List<String> tipi = volontario.getTipiDiVisite();
-        String tipoScelto = (tipi.size() == 1) ? tipi.get(0) : "";
+        List<TipiVisita> tipi = volontario.getTipiDiVisite();
+        String tipoScelto = (tipi.size() == 1) ? tipi.get(0).toString() : "";
         if (tipi.size() > 1) {
             consoleView.mostraMessaggio("Tipi di visita disponibili:");
             for (int i = 0; i < tipi.size(); i++) {
                 System.out.printf("%d. %s\n", i + 1, tipi.get(i));
             }
             int idx = InputDati.leggiIntero("Scegli il tipo di visita da associare alle date: ", 1, tipi.size()) - 1;
-            tipoScelto = tipi.get(idx);
+            tipoScelto = tipi.get(idx).toString();
         }
         // Salva nel file: email:tipo,data1,data2,...;
         Map<String, List<String>> mappaPerFile = new java.util.HashMap<>();
@@ -294,8 +503,8 @@ public class AggiuntaUtilita {
         consoleView.mostraMessaggio("Date salvate per " + volontario.getEmail() + ": " + dateDisponibili);
     }
 
-    private boolean isTipoVisitaProgrammabileInGiorno(String tipoVisita, String giornoSettimana) {
-        String tipo = tipoVisita.trim().toLowerCase();
+    private boolean isTipoVisitaProgrammabileInGiorno(TipiVisita tipoVisita, String giornoSettimana) {
+        String tipo = tipoVisita.toString().trim().toLowerCase();
         String giorno = giornoSettimana.trim().toUpperCase();
 
         switch (tipo) {
@@ -333,13 +542,79 @@ public class AggiuntaUtilita {
     }
 
     // Sincronizza la mappa delle disponibilità con il file stato_raccolta.txt
-    public void sincronizzaDisponibilitaVolontari() {
+    private void sincronizzaDisponibilitaVolontari() {
         Map<String, List<String>> dalFile = leggiDisponibilitaDaFile();
         disponibilitaVolontari.clear();
         disponibilitaVolontari.putAll(dalFile);
     }
 
-//Gia' presente in ViewUtilita
+        // Salva lo stato raccolta e le disponibilità dei volontari su stato_raccolta.txt
+    public static void salvaStatoERaccolta(Map<String, List<String>> disponibilita, String statoCiclo) {
+        try {
+            // Leggi tutte le righe esistenti
+            List<String> lines = new ArrayList<>();
+            File file = new File("src/utility/stato_raccolta.txt");
+            if (file.exists()) {
+                try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        if (!line.startsWith("disponibilita_volontari=")) {
+                            lines.add(line);
+                        }
+                    }
+                }
+            }
+            // Ricostruisci la riga delle disponibilità
+            StringBuilder disp = new StringBuilder();
+            disp.append("disponibilita_volontari=");
+            boolean first = true;
+            for (Map.Entry<String, List<String>> entry : disponibilita.entrySet()) {
+                if (!first) disp.append(";");
+                first = false;
+                disp.append(entry.getKey()).append(":").append(String.join(",", entry.getValue()));
+            }
+            disp.append(";");
+            // Sovrascrivi il file con tutte le righe precedenti + la nuova riga delle disponibilità
+            try (java.io.PrintWriter writer = new java.io.PrintWriter("src/utility/stato_raccolta.txt", "UTF-8")) {
+                for (String l : lines) writer.println(l);
+                writer.println(disp.toString());
+            }
+        } catch (Exception e) {
+            System.err.println("Errore nel salvataggio di stato_raccolta.txt: " + e.getMessage());
+        }
+    }
+
+    // Legge le disponibilità dei volontari da stato_raccolta.txt
+    public static Map<String, List<String>> leggiDisponibilitaDaFile() {
+        Map<String, List<String>> disp = new ConcurrentHashMap<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader("src/utility/stato_raccolta.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith("disponibilita_volontari=")) {
+                    String data = line.substring("disponibilita_volontari=".length());
+                    String[] parts = data.split(";");
+                    for (String part : parts) {
+                        if (part.trim().isEmpty()) continue;
+                        String[] kv = part.split(":");
+                        if (kv.length == 2) {
+                            String email = kv[0].trim();
+                            List<String> giorni = new ArrayList<>();
+                            for (String g : kv[1].split(",")) {
+                                if (!g.trim().isEmpty()) giorni.add(g.trim());
+                            }
+                            disp.put(email, giorni);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Errore nella lettura di stato_raccolta.txt: " + e.getMessage());
+        }
+        return disp;
+    }
+
+
+    //Gia' presente in ViewUtilita
     // // Mostra le visite assegnate a un volontario
     // public void mostraVisiteAssegnateAlVolontario(Volontario volontario) {
     //     String nomeCompleto = volontario.getNome() + " " + volontario.getCognome();
@@ -486,107 +761,4 @@ public class AggiuntaUtilita {
     // // Torna al menu principale del configuratore
     // return;
     // }
-
-    private void assegnaNuovaVisita(Volontario volontario, List<String> dateDisponibili, List<String> tipiVolontario) {
-        // Selezione tipo visita
-        String tipoScelto = selezionaTipoVisita(tipiVolontario);
-        if (tipoScelto == null) return;
-
-        // Selezione data
-        String dataScelta = selezionaData(dateDisponibili);
-        if (dataScelta == null) return;
-
-        LocalDate data = parseData(dataScelta);
-        if (data == null) return;
-
-        // Selezione luogo
-        String luogoScelto = selezionaLuogo(tipoScelto);
-        if (luogoScelto == null) return;
-
-        // Selezione orario e durata
-        LocalTime orario = selezionaOrario(data, luogoScelto);
-        if (orario == null) return;
-
-        int durata = InputDati.leggiIntero("Durata in minuti: ", 30, 300);
-
-        // Creazione nuova visita
-        int nuovoId = visiteMap.size() + 1;
-        Visita nuovaVisita = new Visita(nuovoId, luogoScelto, tipoScelto, 
-            volontario.getNome() + " " + volontario.getCognome(), data, 
-            visiteManagerDB.getMaxPersone(), "Confermata", orario, durata);
-
-        visiteManagerDB.aggiungiNuovaVisita(nuovaVisita);
-
-        // Aggiorna disponibilità
-        dateDisponibili.remove(dataScelta);
-        disponibilitaVolontari.put(volontario.getEmail(), dateDisponibili);
-        salvaStatoERaccolta(disponibilitaVolontari, "RACCOLTA_APERTA");
-
-        consoleView.mostraMessaggio("Nuova visita creata e assegnata!");
-}
-
-        // Salva lo stato raccolta e le disponibilità dei volontari su stato_raccolta.txt
-    public static void salvaStatoERaccolta(Map<String, List<String>> disponibilita, String statoCiclo) {
-        try {
-            // Leggi tutte le righe esistenti
-            List<String> lines = new ArrayList<>();
-            File file = new File("src/utility/stato_raccolta.txt");
-            if (file.exists()) {
-                try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        if (!line.startsWith("disponibilita_volontari=")) {
-                            lines.add(line);
-                        }
-                    }
-                }
-            }
-            // Ricostruisci la riga delle disponibilità
-            StringBuilder disp = new StringBuilder();
-            disp.append("disponibilita_volontari=");
-            boolean first = true;
-            for (Map.Entry<String, List<String>> entry : disponibilita.entrySet()) {
-                if (!first) disp.append(";");
-                first = false;
-                disp.append(entry.getKey()).append(":").append(String.join(",", entry.getValue()));
-            }
-            disp.append(";");
-            // Sovrascrivi il file con tutte le righe precedenti + la nuova riga delle disponibilità
-            try (java.io.PrintWriter writer = new java.io.PrintWriter("src/utility/stato_raccolta.txt", "UTF-8")) {
-                for (String l : lines) writer.println(l);
-                writer.println(disp.toString());
-            }
-        } catch (Exception e) {
-            System.err.println("Errore nel salvataggio di stato_raccolta.txt: " + e.getMessage());
-        }
-    }
-
-    // Legge le disponibilità dei volontari da stato_raccolta.txt
-    public static Map<String, List<String>> leggiDisponibilitaDaFile() {
-        Map<String, List<String>> disp = new ConcurrentHashMap<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader("src/utility/stato_raccolta.txt"))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.startsWith("disponibilita_volontari=")) {
-                    String data = line.substring("disponibilita_volontari=".length());
-                    String[] parts = data.split(";");
-                    for (String part : parts) {
-                        if (part.trim().isEmpty()) continue;
-                        String[] kv = part.split(":");
-                        if (kv.length == 2) {
-                            String email = kv[0].trim();
-                            List<String> giorni = new ArrayList<>();
-                            for (String g : kv[1].split(",")) {
-                                if (!g.trim().isEmpty()) giorni.add(g.trim());
-                            }
-                            disp.put(email, giorni);
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("Errore nella lettura di stato_raccolta.txt: " + e.getMessage());
-        }
-        return disp;
-    }
 }
