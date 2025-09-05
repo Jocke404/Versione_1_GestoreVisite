@@ -38,7 +38,7 @@ public class VisiteManagerDB extends DatabaseManager {
                 while (rs.next()) {
                     int id = rs.getInt("id"); // ID della visita
                     String luogo = rs.getString("luogo");
-                    TipiVisita tipoVisita = TipiVisita.valueOf(rs.getString("tipo_visita"));
+                    List<TipiVisita> tipoVisita = TipiVisita.fromString(rs.getString("tipo_visita")); ;
                     String volontario = rs.getString("volontario");
                     LocalDate data = rs.getDate("data") != null ? rs.getDate("data").toLocalDate() : null; // Converte la data in LocalDate
                     int maxPersone = rs.getInt("max_persone");
@@ -64,7 +64,7 @@ public class VisiteManagerDB extends DatabaseManager {
                  PreparedStatement pstmt = conn.prepareStatement(inserisciSql)) {
     
                 pstmt.setString(1, visita.getLuogo());
-                pstmt.setString(2, visita.getTipoVisitaString());
+                pstmt.setString(2, visita.getTipiVisitaString());
                 pstmt.setString(3, visita.getVolontario());
                 pstmt.setDate(4, visita.getData() != null ? java.sql.Date.valueOf(visita.getData()) : null);
                 pstmt.setString(5, visita.getStato());
@@ -143,7 +143,7 @@ public class VisiteManagerDB extends DatabaseManager {
             try (Connection conn = DatabaseConnection.connect();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
                 pstmt.setString(1, visitaAggiornata.getLuogo());
-                pstmt.setString(2, visitaAggiornata.getTipoVisitaString());
+                pstmt.setString(2, visitaAggiornata.getTipiVisitaString());
                 pstmt.setString(3, visitaAggiornata.getVolontario());
                 pstmt.setDate(4, visitaAggiornata.getData() != null ? java.sql.Date.valueOf(visitaAggiornata.getData()) : null);
                 pstmt.setString(5, visitaAggiornata.getStato());
@@ -280,7 +280,7 @@ public class VisiteManagerDB extends DatabaseManager {
             boolean slotLibero = true;
             
             // Controllo 3: verifica sovrapposizione con visite esistenti
-            Visita visitaTemp = new Visita(0, luogo, TipiVisita.STORICA, "temp", data, 0, "", slotCorrente, durataMinuti);
+            Visita visitaTemp = new Visita(-1, luogo, List.of(), "", data, 0, "", slotCorrente, durataMinuti);
             
             for (Visita visitaEsistente : visiteGiorno) {
                 if (siSovrappongono(visitaTemp, visitaEsistente)) {
@@ -305,6 +305,13 @@ public class VisiteManagerDB extends DatabaseManager {
 
     public ConcurrentHashMap<Integer, Visita> getVisiteMap() {
         return visiteMap;
+    }
+
+    public List<TipiVisita> getTipiVisitaList() {
+        return List.of(visiteMap.values().stream()
+                .flatMap(v -> v.getTipiVisita().stream())
+                .distinct()
+                .toArray(TipiVisita[]::new));
     }
 
     public ConcurrentHashMap<LocalDate, String> getDatePrecluseMap() {

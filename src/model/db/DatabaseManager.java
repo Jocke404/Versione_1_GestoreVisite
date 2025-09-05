@@ -15,7 +15,7 @@ public abstract class DatabaseManager {
         this.consoleView = new ConsoleView();
     }
 
-    protected boolean recordEsiste(String sql, Object... parametri) {
+    public boolean recordEsiste(String sql, Object... parametri) {
         try (Connection conn = DatabaseConnection.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             for (int i = 0; i < parametri.length; i++) {

@@ -262,6 +262,11 @@ public class ModificaUtilita {
             luogoDaModificare.setCollocazione(nuovaCollocazione);
         }
 
+        String nuovaTipologia = InputDati.leggiStringa("Inserisci la nuova tipologia di visite per il luogo (lascia vuoto per mantenere il valore attuale): " + luogoDaModificare.getTipiVisita() + "): ");
+        if (!nuovaTipologia.isEmpty()) {
+            luogoDaModificare.setTipiVisita(TipiVisita.fromString(nuovaTipologia));
+        }
+
         // Modifica il luogo
         luoghiController.aggiornaLuoghi(luogoDaModificare);
     }

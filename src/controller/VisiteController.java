@@ -1,5 +1,6 @@
 package src.controller;
 
+import src.model.TipiVisita;
 import src.model.Visita;
 import src.model.db.VisiteManagerDB;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,6 +14,11 @@ public class VisiteController {
     public VisiteController(VisiteManagerDB visiteManagerDB) {
         this.visiteManagerDB = visiteManagerDB;
     }
+
+    public List<TipiVisita> getTipiVisitaList() {
+        return visiteManagerDB.getTipiVisitaList();
+    }
+
 
     public List<Visita> getVisite() {
         return List.copyOf(visiteManagerDB.getVisiteMap().values());

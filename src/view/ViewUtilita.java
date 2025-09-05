@@ -13,6 +13,7 @@ import lib.InputDati;
 import src.controller.VolontariController;
 import src.model.Luogo;
 import src.model.ModificaUtilita;
+import src.model.TipiVisita;
 import src.model.Visita;
 import src.model.Volontario;
 import src.model.db.VisiteManagerDB;

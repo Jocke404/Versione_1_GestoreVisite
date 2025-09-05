@@ -25,7 +25,7 @@ public class AggiuntaUtilita {
     private final VisiteManagerDB visiteManagerDB;
     ConcurrentHashMap<String, Luogo> luoghiMap;
     ConcurrentHashMap<String, Volontario> volontariMap;
-    ConcurrentHashMap<String, TipiVisita> tipiVisitaMap;
+    ConcurrentHashMap<String, TipiVisita> tipiVisitaMap = TipiVisita.getTipiVisitaMap();
     ConcurrentHashMap<Integer, Visita> visiteMap;
     ConcurrentHashMap<LocalDate, String> datePrecluseMap;
     private final List<Integer> durataList = List.of(30, 60, 90, 120);
@@ -392,7 +392,8 @@ public class AggiuntaUtilita {
 
         Luogo nuovoLuogo = new Luogo(nome, descrizione, collocazione, tipiVisitaSelezionati);
         luoghiMap.putIfAbsent(nome, nuovoLuogo);
-        luoghiManager.aggiungiNuovoLuogo(nuovoLuogo);  
+        consoleView.mostraMessaggio("Luogo già esistente.");
+        luoghiManager.aggiungiNuovoLuogo(nuovoLuogo);
         consoleView.mostraMessaggio("Luogo aggiunto: " + nuovoLuogo);
     }
 
