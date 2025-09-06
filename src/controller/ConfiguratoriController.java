@@ -90,7 +90,7 @@ public class ConfiguratoriController {
     }
 
     public void stampaTipiVisitaPerLuogo(){
-       viewUtilita.stampaTipiVisitaPerLuogo(visiteController);
+       viewUtilita.stampaTipiVisitaPerLuogo(luoghiController);
     }
 
     public void eliminaLuogo() {

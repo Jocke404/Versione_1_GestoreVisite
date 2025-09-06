@@ -47,21 +47,16 @@ public class LuoghiManager extends DatabaseManager {
 
     // Metodo per aggiornare un luogo nel database
     private void aggiornaLuogo(String nome, Luogo luogoAggiornato) {
-        String sql = "UPDATE luoghi SET descrizione = ?, collocazione = ? WHERE nome = ?";
+        String sql = "UPDATE luoghi SET descrizione = ?, collocazione = ?, tipi_di_visita = ? WHERE nome = ?";
         executorService.submit(() -> {
             try (Connection conn = DatabaseConnection.connect();
                     PreparedStatement pstmt = conn.prepareStatement(sql)) {
                 pstmt.setString(1, luogoAggiornato.getDescrizione());
                 pstmt.setString(2, luogoAggiornato.getCollocazione());
-                pstmt.setString(3, nome);
-    
-                int rowsUpdated = pstmt.executeUpdate();
-    
-                if (rowsUpdated > 0) {
-                    consoleView.mostraMessaggio("Luogo aggiornato con successo.");
-                } else {
-                    consoleView.mostraMessaggio("Errore: Nessun luogo trovato con il nome specificato.");
-                }
+                String tipiVisitaStr = String.join(",", luogoAggiornato.getTipiVisita().stream().map(TipiVisita::name).toList());
+                pstmt.setString(3, tipiVisitaStr);
+                pstmt.setString(4, nome);
+                pstmt.executeUpdate();
             } catch (SQLException e) {
                 consoleView.mostraMessaggio("Errore durante l'aggiornamento del luogo: " + e.getMessage());
             }
@@ -70,7 +65,7 @@ public class LuoghiManager extends DatabaseManager {
 
     // Metodo per aggiungere un luogo al database
     private void aggiungiLuogo(Luogo luogo) {
-        String inserisciSql = "INSERT INTO luoghi (nome, descrizione, collocazione) VALUES (?, ?, ?)";
+        String inserisciSql = "INSERT INTO luoghi (nome, descrizione, collocazione, tipi_di_visita) VALUES (?, ?, ?, ?)";
 
             try (Connection conn = DatabaseConnection.connect();
                  PreparedStatement pstmt = conn.prepareStatement(inserisciSql)) {
@@ -78,6 +73,8 @@ public class LuoghiManager extends DatabaseManager {
                 pstmt.setString(1, luogo.getNome());
                 pstmt.setString(2, luogo.getDescrizione());
                 pstmt.setString(3, luogo.getCollocazione());
+                String tipiVisitaStr = String.join(",", luogo.getTipiVisita().stream().map(TipiVisita::name).toList());
+                pstmt.setString(4, tipiVisitaStr);
                 pstmt.executeUpdate();
     
                 consoleView.mostraMessaggio("Luogo aggiunto con successo.");

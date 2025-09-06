@@ -190,44 +190,28 @@ public class ViewUtilita {
     }
 
     //Metodo per visualizzare i tipi di visita per luogo
-    public void stampaTipiVisitaPerLuogo(VisiteController visiteController) {
-        List<Visita> visite = visiteController.getVisite();
-        if (visite.isEmpty()) {
+    public void stampaTipiVisitaPerLuogo(LuoghiController luoghiController) {
+
+        System.out.println ("Tipi di visita per luogo:");
+
+        List<Luogo> luoghi = luoghiController.getLuoghi();
+
+        if (luoghi.isEmpty()) {
             System.out.println("Nessun luogo disponibile.");
             return;
         }
 
-        Map<String, List<Visita>> visitePerLuogo =new HashMap<>();
-        for (Visita visita : visite) {
-            String luogo = visita.getLuogo();
-            visitePerLuogo.computeIfAbsent(luogo, k -> new ArrayList<>()).add(visita);
-        }
-
-        System.out.println ("Tipi di visita per luogo:");
-
-        for (Map.Entry<String, List<Visita>> entry : visitePerLuogo.entrySet()) {
-            String luogo = entry.getKey();
-            List<Visita> visiteNelLuogo = entry.getValue();
-            System.out.println("Luogo: " + luogo);
-            System.out.println("Tipi di Visita:");
-            
-            Set<String> tipiVisitaUnici = new HashSet<>();
-            for (Visita visita : visiteNelLuogo) {
-                String tipoVisita = visita.getTipiVisitaString();
-                tipiVisitaUnici.add(tipoVisita);
-            }
-
-            if (tipiVisitaUnici. isEmpty()) {
+        for (Luogo luogo : luoghi) {
+            System.out.println("Luogo: " + luogo.getNome());
+            List<TipiVisita> tipiVisita = luogo.getTipiVisita();
+            System.out.println("Tipi di visita:");
+            if (tipiVisita == null || tipiVisita.isEmpty()) {
                 System.out.println("  Nessun tipo di visita disponibile.");
             } else {
-                int counter = 1;
-                for (String tipo : tipiVisitaUnici) {
-                    System.out.println("  " + counter + ". " + tipo);
-                    counter++;
+                for (TipiVisita tipo : tipiVisita) {
+                    System.out.println("  - " + tipo.getNome());
                 }
             }
-
-            System.out.println("-------------------------");
         }
     }
 

@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -261,11 +262,56 @@ public class ModificaUtilita {
         if (!nuovaCollocazione.isEmpty()) {
             luogoDaModificare.setCollocazione(nuovaCollocazione);
         }
-
-        String nuovaTipologia = InputDati.leggiStringa("Inserisci la nuova tipologia di visite per il luogo (lascia vuoto per mantenere il valore attuale): " + luogoDaModificare.getTipiVisita() + "): ");
-        if (!nuovaTipologia.isEmpty()) {
-            luogoDaModificare.setTipiVisita(TipiVisita.fromString(nuovaTipologia));
+        consoleView.mostraMessaggio("Tipi di visite attuali: " + luogoDaModificare.getTipiVisita());
+        List<TipiVisita> tipiAttuali = luogoDaModificare.getTipiVisita();
+        if (tipiAttuali == null) {
+            tipiAttuali = new ArrayList<>();
         }
+
+        List<TipiVisita> nuoviTipi = new ArrayList<>(tipiAttuali);
+
+        // FASE 1: Eliminazione tipi di visita
+        if (!nuoviTipi.isEmpty() && InputDati.yesOrNo("Vuoi eliminare uno o più tipi di visita attuali?")) {
+            boolean eliminaAltro;
+            do {
+                consoleView.mostraMessaggio("Tipi di visita attuali:");
+                consoleView.mostraElencoConOggetti(nuoviTipi);
+                int sceltaElimina = InputDati.leggiIntero("Seleziona il numero del tipo di visita da eliminare (oppure 0 per terminare): ", 0, nuoviTipi.size());
+                if (sceltaElimina == 0) {
+                    break;
+                }
+                TipiVisita tipoDaEliminare = nuoviTipi.get(sceltaElimina - 1);
+                nuoviTipi.remove(tipoDaEliminare);
+                eliminaAltro = !nuoviTipi.isEmpty() && InputDati.yesOrNo("Vuoi eliminare un altro tipo di visita?");
+            } while (eliminaAltro);
+        }
+
+        // FASE 2: Aggiunta tipi di visita
+        List<TipiVisita> tipiDisponibili = new ArrayList<>(List.of(TipiVisita.values()));
+        tipiDisponibili.removeAll(nuoviTipi);
+
+        if (!tipiDisponibili.isEmpty() && InputDati.yesOrNo("Vuoi aggiungere nuovi tipi di visita?")) {
+            while (!tipiDisponibili.isEmpty()) {
+                consoleView.mostraMessaggio("Tipi di visita che puoi ancora aggiungere:");
+                consoleView.mostraElencoConOggetti(tipiDisponibili);
+
+                int sceltaTipi = InputDati.leggiIntero("Seleziona il numero del tipo di visita da aggiungere (oppure 0 per terminare): ", 0, tipiDisponibili.size());
+                if (sceltaTipi == 0) {
+                    break;
+                }
+                TipiVisita tipoScelto = tipiDisponibili.get(sceltaTipi - 1);
+                nuoviTipi.add(tipoScelto);
+                tipiDisponibili.remove(tipoScelto);
+
+                if (!tipiDisponibili.isEmpty()) {
+                    if (!InputDati.yesOrNo("Vuoi aggiungere un altro tipo di visita?")) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        luogoDaModificare.setTipiVisita(nuoviTipi);
 
         // Modifica il luogo
         luoghiController.aggiornaLuoghi(luogoDaModificare);
