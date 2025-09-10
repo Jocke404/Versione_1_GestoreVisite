@@ -100,4 +100,8 @@ public class ConfiguratoriController {
     public void modificaLuogo() {
         modificaUtilita.modificaLuogo(luoghiController);
     }
+
+    public void eliminaVolontario() {
+        modificaUtilita.eliminaVolontario(volontariController);
+    }
 }

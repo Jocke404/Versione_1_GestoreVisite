@@ -37,4 +37,8 @@ public class VolontariController {
         MenuVolontario menuVolontario = new MenuVolontario(this);
         menuVolontario.mostraMenu();
     }
+
+    public void eliminaVolontario(Volontario volontarioDaEliminare) {
+        volontariManager.eliminaVolontario(volontarioDaEliminare);
+    }
 }

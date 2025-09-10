@@ -4,7 +4,7 @@ import java.util.List;
 import src.model.Configuratore;
 import src.model.TipiVisita;
 import src.model.Utente;
-import src.model.Visitatore;
+import src.model.Fruitore;
 import src.model.Volontario;
 
 
@@ -12,7 +12,7 @@ public class UserFactory {
     
     public static final String VOLONTARIO = "Volontario";
     public static final String CONFIGURATORE = "Configuratore";
-    public static final String VISITATORE = "Visitatore";
+    public static final String FRUITORE = "Fruitore";
 
     private UserFactory() {
     }
@@ -23,8 +23,8 @@ public class UserFactory {
                 return new Volontario(nome, cognome, email, password, tipodiVisita);
             case CONFIGURATORE:
                 return new Configuratore(nome, cognome, email, password);
-            case VISITATORE:
-                return new Visitatore(nome, cognome, email, password);
+            case FRUITORE:
+                return new Fruitore(nome, cognome, email, password);
             default:
                 throw new IllegalArgumentException("Tipo di utente sconosciuto: " + userType);
         }

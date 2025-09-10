@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -125,6 +124,28 @@ public class VolontariManager extends DatabaseManager {
                 System.err.println("Errore durante l'aggiornamento della password: " + e.getMessage());
             }
         });
+    }    
+    
+    private void eliminaVol(Volontario volontarioDaEliminare) {
+        String sqlVolontari = "DELETE FROM volontari WHERE email = ?";
+        String sqlUtentiUnificati = "DELETE FROM utenti_unificati WHERE email = ?";
+        executorService.submit(() -> {
+            try (Connection conn = DatabaseConnection.connect()) {
+                // Elimina dalla tabella "volontari"
+                try (PreparedStatement pstmt = conn.prepareStatement(sqlVolontari)) {
+                    pstmt.setString(1, volontarioDaEliminare.getEmail());
+                    pstmt.executeUpdate();
+                }
+
+                // Elimina dalla tabella "utenti_unificati"
+                try (PreparedStatement pstmt = conn.prepareStatement(sqlUtentiUnificati)) {
+                    pstmt.setString(1, volontarioDaEliminare.getEmail());
+                    pstmt.executeUpdate();
+                }
+            } catch (SQLException e) {
+                System.err.println("Errore durante l'eliminazione del volontario: " + e.getMessage());
+            }
+        });
     }
 
     public void aggiornaDisponibilitaVolontario(String email, String disponibilita) {
@@ -163,6 +184,13 @@ public class VolontariManager extends DatabaseManager {
     public void setVolontariMap(ConcurrentHashMap<String, Volontario> volontariMap) {
         this.volontariMap = volontariMap;
     }
+
+    public void eliminaVolontario(Volontario volontarioDaEliminare) {
+        eliminaVol(volontarioDaEliminare);
+        volontariMap.remove(volontarioDaEliminare.getEmail());
+    }
+
+
 
 
 }

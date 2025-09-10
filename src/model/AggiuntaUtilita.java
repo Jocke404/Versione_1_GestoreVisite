@@ -17,6 +17,7 @@ import src.model.db.*;
 
 import lib.InputDati;
 import src.view.ConsoleView;
+import src.view.ViewUtilita;
 
 
 
@@ -33,11 +34,13 @@ public class AggiuntaUtilita {
     ConcurrentHashMap<LocalDate, String> datePrecluseMap;
     private final List<Integer> durataList = List.of(30, 60, 90, 120);
     private final ValidatoreVisite validatoreVisite;
+    private final ViewUtilita viewUtilita = ViewUtilita.getInstance();
 
     private final ConsoleView consoleView = new ConsoleView();
     private final Map<String, List<LocalDate>> disponibilitaVolontari = new ConcurrentHashMap<>();
+    private final PrenotazioneManager prenotazioneManager;
 
-    public AggiuntaUtilita(VolontariManager volontariManager, LuoghiManager luoghiManager, VisiteManagerDB visiteManagerDB) {
+    public AggiuntaUtilita(VolontariManager volontariManager, LuoghiManager luoghiManager, VisiteManagerDB visiteManagerDB, PrenotazioneManager prenotazioneManager) {
         this.volontariManager = volontariManager;
         this.luoghiManager = luoghiManager;
         this.visiteManagerDB = visiteManagerDB;
@@ -45,6 +48,7 @@ public class AggiuntaUtilita {
         this.volontariMap = volontariManager.getVolontariMap();
         this.visiteMap = visiteManagerDB.getVisiteMap();
         this.validatoreVisite = new ValidatoreVisite(visiteManagerDB);
+        this.prenotazioneManager = prenotazioneManager;
     }
 
     public void aggiungiVisita() {
@@ -85,7 +89,7 @@ public class AggiuntaUtilita {
 
         int nuovoId = visiteMap.size() + 1;
         Visita nuovaVisita = new Visita(nuovoId, luogoScelto, List.of(tipoScelto), volontario.getNome() + " " + volontario.getCognome(),
-                                        data, visiteManagerDB.getMaxPersone(), "Proposta", orario, durata);
+                                        data, visiteManagerDB.getMaxPersone(), "Proposta", orario, durata, visiteManagerDB.getMaxPersone());
         visiteManagerDB.aggiungiNuovaVisita(nuovaVisita);
         dateDisp.remove(String.valueOf(data.getDayOfMonth()));
         disponibilitaVolontari.put(volontario.getEmail(), dateDisp);
@@ -121,7 +125,7 @@ public class AggiuntaUtilita {
         String stato = "Proposta";
         LocalTime oraInizio = null;
         int durataMinuti = 0;
-        Visita nuovaVisita = new Visita(id, luogoNomeScelto, tipiVisitaScelti, volontarioNomeScelto, dataVisita, maxPersone, stato, oraInizio, durataMinuti);
+        Visita nuovaVisita = new Visita(id, luogoNomeScelto, tipiVisitaScelti, volontarioNomeScelto, dataVisita, maxPersone, stato, oraInizio, durataMinuti, maxPersone);
 
         if (InputDati.yesOrNo("Vuoi scegliere un orario specifico per la visita?")) {
             do {
@@ -860,6 +864,73 @@ public class AggiuntaUtilita {
         }
         
         return disp;
+    }
+
+    // public void prenotaVisita(Fruitore fruitore, PrenotazioneManager prenotazioneManager) {
+    //     // Mostra visite disponibili
+    //     List<Visita> visiteDisponibili = new ArrayList<>();
+    //     for (Visita visita : visiteMap.values()) {
+    //         if ((visita.getStato().equalsIgnoreCase("Proposta") || visita.getStato().equalsIgnoreCase("Confermata"))
+    //             && visita.getPostiDisponibili() > 0) {
+    //             visiteDisponibili.add(visita);
+    //         }
+    //     }
+
+    //     if (visiteDisponibili.isEmpty()) {
+    //         consoleView.mostraMessaggio("Non ci sono visite disponibili per la prenotazione.");
+    //         return;
+    //     }
+
+    //     consoleView.mostraMessaggio("Visite disponibili:");
+    //     consoleView.mostraElencoConOggetti(visiteDisponibili);
+
+    //     int scelta = InputDati.leggiIntero("Seleziona la visita da prenotare (0 per annullare): ", 0, visiteDisponibili.size()) - 1;
+    //     if (scelta == -1) return;
+
+    //     Visita visitaScelta = visiteDisponibili.get(scelta);
+
+    //     int numPersone = InputDati.leggiIntero("Quante persone vuoi prenotare? ", 1, visitaScelta.getPostiDisponibili());
+
+    //     // Crea la prenotazione
+    //     Prenotazione prenotazione = new Prenotazione(
+    //         fruitore.getEmail(), 
+    //         visitaScelta.getId(),
+    //         numPersone
+    //     );
+
+    //     boolean successo = prenotazioneManager.aggiungiPrenotazione(prenotazione);
+
+    //     if (successo) {
+    //         visitaScelta.riduciPostiDisponibili(numPersone);
+    //         consoleView.mostraMessaggio("Prenotazione effettuata con successo!");
+    //     } else {
+    //         consoleView.mostraMessaggio("Errore durante la prenotazione.");
+    //     }
+    // }
+
+    public void prenotaVisita(Fruitore fruitoreCorrente) {
+        if (consoleView.chiediAnnullaOperazione())
+            return;
+        List<Visita> visiteDisponibili = new ArrayList<>();
+        for (Visita visita : visiteMap.values()) {
+            if ((visita.getStato().equalsIgnoreCase("Proposta") || visita.getStato().equalsIgnoreCase("Confermata"))
+                && visita.getPostiDisponibili() > 0) {
+                visiteDisponibili.add(visita);
+            }
+        }
+
+        if (visiteDisponibili.isEmpty()) {
+            consoleView.mostraMessaggio("Non ci sono visite disponibili per la prenotazione.");
+            return;
+        }
+
+        consoleView.mostraElencoConOggetti(visiteDisponibili);
+        int scelta = InputDati.leggiIntero("Seleziona la visita da prenotare: ", 1, visiteDisponibili.size());
+
+        int numPersone = InputDati.leggiIntero("Quante persone vuoi prenotare? ", 1, visiteDisponibili.get(scelta - 1).getPostiDisponibili());
+
+        prenotazioneManager.creaPrenotazione(fruitoreCorrente, visiteDisponibili.get(scelta - 1), numPersone);
+        
     }
 
 }

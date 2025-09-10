@@ -149,7 +149,7 @@ public class ValidatoreVisite {
             boolean slotLibero = true;
             
             // Controllo 3: verifica sovrapposizione con visite esistenti
-            Visita visitaTemp = new Visita(-1, luogo, List.of(), "", data, 0, "", slotCorrente, durataMinuti);
+            Visita visitaTemp = new Visita(-1, luogo, List.of(), "", data, 0, "", slotCorrente, durataMinuti, 0);
             
             for (Visita visitaEsistente : visiteGiorno) {
                 if (siSovrappongono(visitaTemp.getOraInizio(), visitaTemp.getOraInizio().plusMinutes(visitaTemp.getDurataMinuti()),

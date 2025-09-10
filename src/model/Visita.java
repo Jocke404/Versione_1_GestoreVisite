@@ -13,11 +13,12 @@ public class Visita {
     private int maxPersone; 
     private String stato; 
     private LocalTime oraInizio; 
-    private int durataMinuti; 
+    private int durataMinuti;
+    private int postiPrenotati;
 
     // Costruttore completo (inclusi tutti i campi)
     public Visita(int id, String luogo, List<TipiVisita> tipiVisita, String volontario, 
-                LocalDate data, int maxPersone, String stato, LocalTime oraInizio, int durataMinuti) {
+                LocalDate data, int maxPersone, String stato, LocalTime oraInizio, int durataMinuti, int postiPrenotati) {
         this.id = id;
         this.luogo = luogo;
         this.tipiVisita = tipiVisita;
@@ -27,9 +28,28 @@ public class Visita {
         this.stato = stato;
         this.oraInizio = oraInizio;
         this.durataMinuti = durataMinuti;
+        this.postiPrenotati = postiPrenotati;
     }
 
     
+    public int getPostiPrenotati() {
+        return postiPrenotati;
+    }
+
+
+    public void setPostiPrenotati(int postiPrenotati) {
+        this.postiPrenotati = postiPrenotati;
+    }
+
+    public int getPostiDisponibili() {
+        return maxPersone - postiPrenotati;
+    }
+
+    public boolean isDisponibile() {
+        return getPostiDisponibili() > 0;
+    }
+
+
     public LocalTime getOraInizio() {
         return oraInizio;
     }
@@ -96,6 +116,22 @@ public class Visita {
 
     public void setStato(String stato) {
         this.stato = stato;
+    }
+
+
+    public String getDescrizione() {
+        return tipiVisita != null && !tipiVisita.isEmpty() ? tipiVisita.get(0).getDescrizione() : "";
+    }
+
+    @Override
+    public String toString() {
+        return "Tipo di visita: " + getTipiVisitaString() +
+            "\nDescrizione: " + getDescrizione() +
+            "\nLuogo: " + getLuogo() +
+            "\nData: " + getData() +
+            "\nOra: " + getOraInizio() +
+            "\nStato: " + getStato() +
+            "\nPosti disponibili: " + getPostiDisponibili();   
     }
 }
    

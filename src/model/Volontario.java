@@ -18,21 +18,4 @@ public class Volontario extends Utente {
     public List<TipiVisita> getTipiDiVisite() {
         return tipiDiVisite;
     }
-    
-    // public void setEmail(String email) {
-    //     this.email = email;
-    // }
-
-    // public String getPassword() {
-    //     return password;
-    // }
-
-    // public void setPassword(String password) {
-    //     this.password = password;
-    // }
-
-    // @Override
-    // public String toString() {
-    //     return "Volontario [nome=" + nome + ", cognome=" + cognome + ", email=" + email + ", tipiDiVisite=" + tipiDiVisite + "]";
-    // }
 }

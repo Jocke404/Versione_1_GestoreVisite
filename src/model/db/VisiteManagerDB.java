@@ -6,10 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 import src.controller.ThreadPoolController;
 import src.model.TipiVisita;
@@ -28,7 +26,7 @@ public class VisiteManagerDB extends DatabaseManager {
     //Logiche delle visite--------------------------------------------------
     // Metodo per caricare un luogo nel database e memorizzarlo nella HashMap
     protected void caricaVisite() {
-        String sql = "SELECT id, luogo, tipo_visita, volontario, data, stato, max_persone, ora_inizio, durata_minuti FROM visite";
+        String sql = "SELECT id, luogo, tipo_visita, volontario, data, stato, max_persone, ora_inizio, durata_minuti, posti_prenotati FROM visite";
         try (Connection conn = DatabaseConnection.connect();
             PreparedStatement pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery()) {
@@ -45,9 +43,10 @@ public class VisiteManagerDB extends DatabaseManager {
                     String stato = rs.getString("stato");
                     LocalTime oraInizio = rs.getTime("ora_inizio") != null ? rs.getTime("ora_inizio").toLocalTime() : null;
                     int durataMinuti = rs.getInt("durata_minuti");
+                    int postiPrenotati = rs.getInt("posti_prenotati");
 
                     // Usa il costruttore completo di Visite
-                    Visita visita = new Visita(id, luogo, tipoVisita, volontario, data, maxPersone, stato, oraInizio, durataMinuti);
+                    Visita visita = new Visita(id, luogo, tipoVisita, volontario, data, maxPersone, stato, oraInizio, durataMinuti, postiPrenotati);
                     visiteMap.putIfAbsent(id, visita);
                 }
             }

@@ -12,18 +12,22 @@ public class MasterController {
 
     public Volontario volontarioCorrente;
     public Configuratore configuratoreCorrente;
+    public Fruitore fruitoreCorrente;
     public Utente utenteCorrente;
     private ThreadPoolController threadPoolController;
     private VolontariManager volontariManager;
     private ConfiguratoriManager configuratoriManager;
+    private FruitoreManager fruitoreManager;
     private LuoghiManager luoghiManager;
     private VisiteManagerDB visiteManager;
+    private PrenotazioneManager prenotazioneManager;
     private DatabaseUpdater databaseUpdater;
     private AggiuntaUtilita aggiuntaUtilita;
     private ModificaUtilita modificaUtilita;
     private AuthenticationController authenticationController;
     private VolontariController volontariController;
     private ConfiguratoriController configuratoriController;
+    private FruitoreController fruitoreController;
     private LuoghiController luoghiController;
     private VisiteController visiteController;
     private MenuFactory menuFactory = new MenuFactory();
@@ -46,24 +50,24 @@ public class MasterController {
         threadPoolController = ThreadPoolController.getInstance();
         volontariManager = new VolontariManager(threadPoolController);
         configuratoriManager = new ConfiguratoriManager(threadPoolController);
+        fruitoreManager = new FruitoreManager(threadPoolController);
         luoghiManager = new LuoghiManager(threadPoolController);
         visiteManager = new VisiteManagerDB(threadPoolController);
+        prenotazioneManager = new PrenotazioneManager(threadPoolController, visiteManager, fruitoreManager);
         databaseUpdater = new DatabaseUpdater(volontariManager, configuratoriManager, luoghiManager, visiteManager);
-        aggiuntaUtilita = new AggiuntaUtilita(volontariManager, luoghiManager, visiteManager);
+        aggiuntaUtilita = new AggiuntaUtilita(volontariManager, luoghiManager, visiteManager, prenotazioneManager);
         modificaUtilita = new ModificaUtilita(visiteManager);
         viewUtilita = ViewUtilita.getInstance();
         visiteController = new VisiteController(visiteManager);
         luoghiController = new LuoghiController(luoghiManager, aggiuntaUtilita, viewUtilita);
+        
 
         ConsoleView consoleView = new ConsoleView();
         CredentialManager credentialManager = new CredentialManager(
-            databaseUpdater, volontariManager, configuratoriManager
-        );
-        
+            databaseUpdater, volontariManager, configuratoriManager, fruitoreManager);
         
         AuthenticationController authenticationController = new AuthenticationController(
-            credentialManager, consoleView
-        );
+            credentialManager, consoleView);
 
         MasterController masterController = this;
         masterController.authenticationController = authenticationController;
@@ -97,6 +101,7 @@ public class MasterController {
             utenteCorrente = authenticationController.getUtenteCorrente();
             volontariController = new VolontariController(volontariManager, aggiuntaUtilita, viewUtilita, volontarioCorrente);
             configuratoriController = new ConfiguratoriController(aggiuntaUtilita, modificaUtilita, viewUtilita, volontariController, luoghiController, visiteController);
+            fruitoreController = new FruitoreController(fruitoreManager, aggiuntaUtilita, viewUtilita, fruitoreCorrente, visiteController, null);
         } else {
             utenteCorrente = null;
         }
@@ -119,6 +124,11 @@ public class MasterController {
                     modificaUtilita.caricaAmbitoTerritoriale();
                 }
                 menu = menuFactory.creaMenuConfiguratore(configuratoriController);
+            } else if (utenteCorrente instanceof Fruitore){
+                fruitoreController.fruitoreCorrente = (Fruitore) utenteCorrente;
+                menu = menuFactory.creaMenuFruitore(fruitoreController);
+            } else {
+                consoleView.mostraMessaggio("Errore: tipo di utente non riconosciuto.");
             }
         } else {
             consoleView.mostraMessaggio("Accesso negato. Effettua prima l'autenticazione.");

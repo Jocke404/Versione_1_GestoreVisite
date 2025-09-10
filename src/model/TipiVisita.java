@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public enum TipiVisita {
-    STORICA("Visita Storica"),
-    SCIENTIFICA("Visita Scientifica"),
-    ENOGASTRONOMICA("Visita Enogastronomica"),
-    LABBAMBINI("Laboratorio Bambini");
+    STORICA("Visita Storica, Un percorso guidato alla scoperta della storia e dei monumenti principali della città."),
+    SCIENTIFICA("Visita Scientifica, Un'esperienza educativa dedicata alle scienze e alle innovazioni tecnologiche."),
+    ENOGASTRONOMICA("Visita Enogastronomica, Un viaggio tra i sapori tipici locali con degustazioni di prodotti tradizionali."),
+    LABBAMBINI("Laboratorio Bambini, Attività ludico-didattiche pensate per i più piccoli, con laboratori creativi e giochi.");
 
     private final String descrizione;
 

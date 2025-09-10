@@ -20,13 +20,17 @@ public class ConsoleView implements View{
 
     public void mostraElenco(List<String> elementi) {
         for (int i = 0; i < elementi.size(); i++) {
+            System.out.println("----------");
             System.out.printf("%d. %s%n", i + 1, elementi.get(i));
+            System.out.println("----------\n");
         }
     }
 
     public void mostraElencoConOggetti(List<?> oggetti) {
         for (int i = 0; i < oggetti.size(); i++) {
-            System.out.printf("%d. %s%n", i + 1, oggetti.get(i).toString());
+            System.out.println("========================================");
+            System.out.printf("%d.\n%s%n", i + 1, oggetti.get(i).toString());
+            System.out.println("========================================\n");
         }
     }
 }

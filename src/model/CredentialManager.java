@@ -12,16 +12,19 @@ public class CredentialManager {
     private final DatabaseUpdater databaseUpdater;
     private final VolontariManager volontariManager;
     private final ConfiguratoriManager configuratoriManager;
+    private final FruitoreManager fruitoreManager;
 
 
     private Volontario volontarioCorrente = null;
     private Configuratore configuratoreCorrente = null;
+    private Fruitore fruitoreCorrente = null;
     private ConsoleView consoleView = new ConsoleView();
-    
-    public CredentialManager(DatabaseUpdater databaseUpdater, VolontariManager volontariManager, ConfiguratoriManager configuratoriManager) {
+
+    public CredentialManager(DatabaseUpdater databaseUpdater, VolontariManager volontariManager, ConfiguratoriManager configuratoriManager, FruitoreManager fruitoreManager) {
         this.databaseUpdater = databaseUpdater;
         this.volontariManager = volontariManager;
         this.configuratoriManager = configuratoriManager;
+        this.fruitoreManager = fruitoreManager;
     }
 
     public Utente autentica() {
@@ -60,7 +63,7 @@ public class CredentialManager {
             case UserFactory.CONFIGURATORE:
                 if (email.equals("admin@example.com") && password.equals("admin123")) {
                     consoleView.mostraMessaggio("Hai credenziali temporanee. Ti preghiamo di modificarle.");
-                    Configuratore newConfig = salvaNuoveCredenzialiConf();
+                    Configuratore newConfig = (Configuratore) salvaNuoveCredenziali(tipoUtente);
                     nome = newConfig.getNome();
                     cognome = newConfig.getCognome();
                 } else {
@@ -69,7 +72,19 @@ public class CredentialManager {
                     cognome = configuratoreCorrente.getCognome();
                 }
                 break;
-
+            case UserFactory.FRUITORE:
+                if (fruitoreManager.getFruitoriMap().isEmpty() || !fruitoreManager.getFruitoriMap().containsKey(email)) {
+                    consoleView.mostraMessaggio("Benvenuto nuovo fruitore! Devi creare un account.");
+                    Fruitore newFruitore = (Fruitore) salvaNuoveCredenziali(tipoUtente);
+                    fruitoreCorrente = newFruitore;
+                    nome = newFruitore.getNome();
+                    cognome = newFruitore.getCognome();
+                } else {
+                    fruitoreCorrente = fruitoreManager.getFruitoriMap().get(email);
+                    nome = fruitoreCorrente.getNome();
+                    cognome = fruitoreCorrente.getCognome();
+                }
+                break;
             default:
                 consoleView.mostraMessaggio("Ruolo non riconosciuto: " + tipoUtente);
                 return null;
@@ -96,23 +111,26 @@ public class CredentialManager {
         }
     }
 
-    private Configuratore salvaNuoveCredenzialiConf() {
-        // Raccogli i dati del nuovo configuratore        
+    private Utente salvaNuoveCredenziali(String tipoUtente) {
         String name = InputDati.leggiStringaNonVuota("Inserisci il nome: ");
         String surname = InputDati.leggiStringaNonVuota("Inserisci il cognome: ");
         String newEmail = InputDati.leggiStringaNonVuota("Inserisci la nuova email: ");
         String newPassword = InputDati.leggiStringaNonVuota("Inserisci la nuova password: ");
 
-        // Crea un nuovo oggetto Configuratore
-        Configuratore newConfiguratore = (Configuratore) UserFactory.createUser(UserFactory.CONFIGURATORE, newEmail, newPassword, name, surname,null);
+        Utente nuovoUtente = UserFactory.createUser(tipoUtente, newEmail, newPassword, name, surname, null);
 
-        // Aggiorna la HashMap
-        configuratoriManager.getConfiguratoriMap().put(newEmail, newConfiguratore);
+        switch (tipoUtente) {
+            case UserFactory.CONFIGURATORE:
+                configuratoriManager.getConfiguratoriMap().put(newEmail, (Configuratore) nuovoUtente);
+                configuratoriManager.aggiungiNuovoConf((Configuratore) nuovoUtente);
+                break;
+            case UserFactory.FRUITORE:
+                fruitoreManager.getFruitoriMap().put(newEmail, (Fruitore) nuovoUtente);
+                fruitoreManager.aggiungiNuovoFruitore((Fruitore) nuovoUtente);
+                break;
+        }
 
-        // Sincronizza con il database
-        configuratoriManager.aggiungiNuovoConf(newConfiguratore);
-
-        return newConfiguratore;
+        return nuovoUtente;
     }
 
     // Restituisci il tipo_utente dell'utente o null se non autenticato

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import lib.InputDati;
 import src.controller.VolontariController;
@@ -214,6 +215,34 @@ public class ViewUtilita {
             }
         }
     }
+
+public void visualizzaVisiteDisponibili() {
+    System.out.println("Visite disponibili (stato: Proposta/Confermata, posti ancora disponibili):");
+    boolean visiteTrovate = false;
+
+    for (Visita visita : visiteMap.values()) {
+        String stato = visita.getStato();
+        int postiDisponibili = visita.getPostiDisponibili();
+
+        if ((stato.equalsIgnoreCase("Proposta") || stato.equalsIgnoreCase("Confermata")|| stato.equalsIgnoreCase("Cancellata"))
+            && postiDisponibili > 0) {
+            consoleView.mostraMessaggio("ID: " + visita.getId());
+            consoleView.mostraMessaggio("Descrizione: " + visita.getDescrizione());
+            consoleView.mostraMessaggio("Luogo: " + visita.getLuogo());
+            consoleView.mostraMessaggio("Tipi Visita: " + visita.getTipiVisitaString());
+            consoleView.mostraMessaggio("Data: " + (visita.getData() != null ? visita.getData() : "Nessuna data"));
+            consoleView.mostraMessaggio("Orario: " + (visita.getOraInizio() != null ? visita.getOraInizio() : "Nessun orario"));
+            consoleView.mostraMessaggio("Posti disponibili: " + postiDisponibili);
+            consoleView.mostraMessaggio("Stato: " + stato);
+            consoleView.mostraMessaggio("-------------------------");
+            visiteTrovate = true;
+        }
+    }
+
+    if (!visiteTrovate) {
+        System.out.println("Nessuna visita disponibile al momento.");
+    }
+}
 
     
 }

@@ -156,7 +156,7 @@ public class DatabaseUpdater {
         } catch (SQLException e) {
             consoleView.mostraMessaggio("Errore durante la verifica delle credenziali: " + e.getMessage());
         }
-        return tipo_utente; // Restituisce il tipo_utente o null se non trovato
+        return tipo_utente != null ? tipo_utente : "Fruitore"; // Restituisce "Fruitore" se tipo_utente è null
     }
 
     public boolean isPasswordModificata(String email) {
