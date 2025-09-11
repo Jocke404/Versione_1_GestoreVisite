@@ -16,7 +16,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import src.model.db.VisiteManagerDB;
 import src.controller.LuoghiController;
 import src.controller.VolontariController;
-import src.factory.UserFactory;
 import lib.InputDati;
 import src.view.ConsoleView;
 
@@ -343,31 +342,3 @@ public class ModificaUtilita {
     }
 
 }
-
-
-    // public void eliminaLuogo(LuoghiController luoghiController) {
-    //     if (consoleView.chiediAnnullaOperazione())
-    //         return;
-    //     do {
-    //         List<Luogo> luoghi = luoghiController.getLuoghi();
-    //         if (luoghi.isEmpty()) {
-    //             consoleView.mostraMessaggio("Nessun luogo disponibile per la modifica.");
-    //             return;
-    //         }
-        
-    //         consoleView.mostraMessaggio("Luoghi disponibili:");
-    //         consoleView.mostraElencoConOggetti(luoghi);
-    //         int scelta = InputDati.leggiIntero("Seleziona il luogo da eliminare: ", 1, luoghi.size()) - 1;
-    //         Luogo luogoDaEliminare = luoghi.get(scelta);
-            
-    //         if (InputDati.yesOrNo("Sei sicuro di voler eliminare il luogo: " + luogoDaEliminare.getNome() + "?. QUESTA AZIONE ELIMINERA' ANCHE LE VISITE AD ESSO COLLEGATE")) {
-    //             luoghiController.eliminaLuogo(luogoDaEliminare);
-    //         } else {
-    //             consoleView.mostraMessaggio("Operazione annullata.");
-    //         }
-    //         if (luoghiController.getLuoghi().isEmpty()) {
-    //             consoleView.mostraMessaggio("Non ci sono più luoghi disponibili.");
-    //             break;
-    //         }
-    //     } while (InputDati.yesOrNo("Vuoi eliminare un altro luogo? "));
-    // }

@@ -25,9 +25,6 @@ public class PrenotazioneManager extends DatabaseManager {
         caricaPrenotazioni();
     }
 
-    /**
-     * Crea una nuova prenotazione per un fruitore
-     */
     protected boolean addPrenotazione(String emailFruitore, int idVisita,  int numeroPersone) {
         // Verifica disponibilità posti
         Visita visita = visiteManager.getVisiteMap().get(idVisita);
@@ -48,13 +45,11 @@ public class PrenotazioneManager extends DatabaseManager {
             return false;
         }
 
-        // Crea la prenotazione
         Prenotazione prenotazione = new Prenotazione(emailFruitore, idVisita,  numeroPersone);
 
         try (Connection conn = DatabaseConnection.connect()) {
             conn.setAutoCommit(false);
 
-            // Inserisci prenotazione
             String sqlPrenotazione = "INSERT INTO prenotazioni (id_visita, email_fruitore, numero_persone, codice_prenotazione) VALUES (?, ?, ?, ?)";
             try (PreparedStatement pstmt = conn.prepareStatement(sqlPrenotazione, Statement.RETURN_GENERATED_KEYS)) {
                 pstmt.setInt(1, idVisita);
@@ -68,7 +63,6 @@ public class PrenotazioneManager extends DatabaseManager {
                     return false;
                 }
 
-                // Recupera ID generato
                 try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
                         prenotazione.setId(generatedKeys.getInt(1));
@@ -76,7 +70,6 @@ public class PrenotazioneManager extends DatabaseManager {
                 }
             }
 
-            // Aggiorna posti prenotati nella visita
             String sqlAggiornaVisita = "UPDATE visite SET posti_prenotati = posti_prenotati + ? WHERE id = ?";
             try (PreparedStatement pstmt = conn.prepareStatement(sqlAggiornaVisita)) {
                 pstmt.setInt(1, numeroPersone);
@@ -134,27 +127,18 @@ public class PrenotazioneManager extends DatabaseManager {
         }
     }
 
-    /**
-     * Ottieni tutte le prenotazioni di un fruitore
-     */
     public List<Prenotazione> getPrenotazioniFruitore(String emailFruitore) {
         return prenotazioniMap.values().stream()
                 .filter(p -> p.getEmailFruitore().equals(emailFruitore) && "CONFERMATA".equals(p.getStato()))
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Ottieni tutte le prenotazioni di una visita
-     */
     public List<Prenotazione> getPrenotazioniVisita(int idVisita) {
         return prenotazioniMap.values().stream()
                 .filter(p -> p.getIdVisita() == idVisita && "CONFERMATA".equals(p.getStato()))
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Cancella una prenotazione
-     */
     public boolean cancellaPrenotazione(String codicePrenotazione, String emailFruitore) {
         Prenotazione prenotazione = prenotazioniMap.get(codicePrenotazione);
 
@@ -198,13 +182,5 @@ public class PrenotazioneManager extends DatabaseManager {
         // Aggiorna la visita con il numero di posti prenotati
         visita.setPostiPrenotati(visita.getPostiPrenotati() + numeroPersone);
 
-    }
-
-    public boolean rimuoviPrenotazione(Prenotazione prenotazione) {
-        if (prenotazione == null || !prenotazioniMap.containsKey(prenotazione.getCodicePrenotazione())) {
-            return false;
-        }
-        prenotazioniMap.remove(prenotazione.getCodicePrenotazione());
-        return true;
     }
 }
