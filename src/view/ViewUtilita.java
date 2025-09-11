@@ -12,11 +12,14 @@ import java.util.stream.Collectors;
 
 import lib.InputDati;
 import src.controller.VolontariController;
+import src.model.Fruitore;
 import src.model.Luogo;
 import src.model.ModificaUtilita;
+import src.model.Prenotazione;
 import src.model.TipiVisita;
 import src.model.Visita;
 import src.model.Volontario;
+import src.model.db.PrenotazioneManager;
 import src.model.db.VisiteManagerDB;
 import src.controller.VisiteController;
 import src.controller.LuoghiController;
@@ -216,33 +219,39 @@ public class ViewUtilita {
         }
     }
 
-public void visualizzaVisiteDisponibili() {
-    System.out.println("Visite disponibili (stato: Proposta/Confermata, posti ancora disponibili):");
-    boolean visiteTrovate = false;
+    public void visualizzaVisiteDisponibili() {
+        System.out.println("Visite disponibili (stato: Proposta/Confermata, posti ancora disponibili):");
+        boolean visiteTrovate = false;
 
-    for (Visita visita : visiteMap.values()) {
-        String stato = visita.getStato();
-        int postiDisponibili = visita.getPostiDisponibili();
+        for (Visita visita : visiteMap.values()) {
+            String stato = visita.getStato();
+            int postiDisponibili = visita.getPostiDisponibili();
 
-        if ((stato.equalsIgnoreCase("Proposta") || stato.equalsIgnoreCase("Confermata")|| stato.equalsIgnoreCase("Cancellata"))
-            && postiDisponibili > 0) {
-            consoleView.mostraMessaggio("ID: " + visita.getId());
-            consoleView.mostraMessaggio("Descrizione: " + visita.getDescrizione());
-            consoleView.mostraMessaggio("Luogo: " + visita.getLuogo());
-            consoleView.mostraMessaggio("Tipi Visita: " + visita.getTipiVisitaString());
-            consoleView.mostraMessaggio("Data: " + (visita.getData() != null ? visita.getData() : "Nessuna data"));
-            consoleView.mostraMessaggio("Orario: " + (visita.getOraInizio() != null ? visita.getOraInizio() : "Nessun orario"));
-            consoleView.mostraMessaggio("Posti disponibili: " + postiDisponibili);
-            consoleView.mostraMessaggio("Stato: " + stato);
-            consoleView.mostraMessaggio("-------------------------");
-            visiteTrovate = true;
+            if ((stato.equalsIgnoreCase("Proposta") || stato.equalsIgnoreCase("Confermata")|| stato.equalsIgnoreCase("Cancellata"))
+                && postiDisponibili > 0) {
+                consoleView.mostraMessaggio("ID: " + visita.getId());
+                consoleView.mostraMessaggio("Descrizione: " + visita.getDescrizione());
+                consoleView.mostraMessaggio("Luogo: " + visita.getLuogo());
+                consoleView.mostraMessaggio("Tipi Visita: " + visita.getTipiVisitaString());
+                consoleView.mostraMessaggio("Data: " + (visita.getData() != null ? visita.getData() : "Nessuna data"));
+                consoleView.mostraMessaggio("Orario: " + (visita.getOraInizio() != null ? visita.getOraInizio() : "Nessun orario"));
+                consoleView.mostraMessaggio("Posti disponibili: " + postiDisponibili);
+                consoleView.mostraMessaggio("Stato: " + stato);
+                consoleView.mostraMessaggio("-------------------------");
+                visiteTrovate = true;
+            }
+        }
+
+        if (!visiteTrovate) {
+            System.out.println("Nessuna visita disponibile al momento.");
         }
     }
 
-    if (!visiteTrovate) {
-        System.out.println("Nessuna visita disponibile al momento.");
+    public void visualizzaPrenotazioni(Fruitore fruitoreCorrente, PrenotazioneManager prenotazioniManager) {
+        consoleView.mostraMessaggio("Le tue prenotazioni:");
+        List<Prenotazione> visitePrenotate = prenotazioniManager.miePrenotazioni(fruitoreCorrente);
+        consoleView.mostraElencoConOggetti(visitePrenotate);
     }
-}
 
     
 }

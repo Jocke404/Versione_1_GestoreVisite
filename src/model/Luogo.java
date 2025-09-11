@@ -48,16 +48,10 @@ public class Luogo {
     public void setCollocazione(String nuovaCollocazione) {
         this.collocazione = nuovaCollocazione;
     }
-    
-    
-
 
     @Override
     public String toString() {
         return "Luogo [descrizione=" + descrizione + ", nome=" + nome + "]";
     }
-
-
-
 
 }

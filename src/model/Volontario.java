@@ -18,4 +18,6 @@ public class Volontario extends Utente {
     public List<TipiVisita> getTipiDiVisite() {
         return tipiDiVisite;
     }
+
+    
 }

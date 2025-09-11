@@ -13,10 +13,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import src.model.db.PrenotazioneManager;
 import src.model.db.VisiteManagerDB;
 import src.controller.LuoghiController;
 import src.controller.VolontariController;
-import src.factory.UserFactory;
 import lib.InputDati;
 import src.view.ConsoleView;
 
@@ -342,32 +343,30 @@ public class ModificaUtilita {
         } while (InputDati.yesOrNo("Vuoi eliminare un altro volontario? "));
     }
 
+    public void cancellaPrenotazione(Fruitore fruitoreCorrente, PrenotazioneManager prenotazioneManager) {
+        if (consoleView.chiediAnnullaOperazione())
+            return;
+        List<Prenotazione> prenotazioni = prenotazioneManager.miePrenotazioni(fruitoreCorrente);
+        if (prenotazioni.isEmpty()) {
+            consoleView.mostraMessaggio("Non hai prenotazioni da cancellare.");
+            return;
+        }
+
+        consoleView.mostraMessaggio("Le tue prenotazioni:");
+        consoleView.mostraElencoConOggetti(prenotazioni);
+        int scelta = InputDati.leggiIntero("Seleziona la prenotazione da cancellare: ", 1, prenotazioni.size()) - 1;
+        Prenotazione prenotazioneDaCancellare = prenotazioni.get(scelta);
+
+        if (InputDati.yesOrNo("Sei sicuro di voler cancellare la prenotazione con codice: " + prenotazioneDaCancellare.getCodicePrenotazione() + "?")) {
+            boolean successo = prenotazioneManager.rimuoviPrenotazione(prenotazioneDaCancellare);
+            if (successo) {
+                consoleView.mostraMessaggio("Prenotazione cancellata con successo.");
+            } else {
+                consoleView.mostraMessaggio("Errore nella cancellazione della prenotazione.");
+            }
+        } else {
+            consoleView.mostraMessaggio("Operazione annullata.");
+        }
+    }
+
 }
-
-
-    // public void eliminaLuogo(LuoghiController luoghiController) {
-    //     if (consoleView.chiediAnnullaOperazione())
-    //         return;
-    //     do {
-    //         List<Luogo> luoghi = luoghiController.getLuoghi();
-    //         if (luoghi.isEmpty()) {
-    //             consoleView.mostraMessaggio("Nessun luogo disponibile per la modifica.");
-    //             return;
-    //         }
-        
-    //         consoleView.mostraMessaggio("Luoghi disponibili:");
-    //         consoleView.mostraElencoConOggetti(luoghi);
-    //         int scelta = InputDati.leggiIntero("Seleziona il luogo da eliminare: ", 1, luoghi.size()) - 1;
-    //         Luogo luogoDaEliminare = luoghi.get(scelta);
-            
-    //         if (InputDati.yesOrNo("Sei sicuro di voler eliminare il luogo: " + luogoDaEliminare.getNome() + "?. QUESTA AZIONE ELIMINERA' ANCHE LE VISITE AD ESSO COLLEGATE")) {
-    //             luoghiController.eliminaLuogo(luogoDaEliminare);
-    //         } else {
-    //             consoleView.mostraMessaggio("Operazione annullata.");
-    //         }
-    //         if (luoghiController.getLuoghi().isEmpty()) {
-    //             consoleView.mostraMessaggio("Non ci sono più luoghi disponibili.");
-    //             break;
-    //         }
-    //     } while (InputDati.yesOrNo("Vuoi eliminare un altro luogo? "));
-    // }
