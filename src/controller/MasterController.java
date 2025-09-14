@@ -101,7 +101,7 @@ public class MasterController {
             utenteCorrente = authenticationController.getUtenteCorrente();
             volontariController = new VolontariController(volontariManager, aggiuntaUtilita, viewUtilita, volontarioCorrente);
             configuratoriController = new ConfiguratoriController(aggiuntaUtilita, modificaUtilita, viewUtilita, volontariController, luoghiController, visiteController);
-            fruitoreController = new FruitoreController(fruitoreManager, aggiuntaUtilita, viewUtilita, fruitoreCorrente, visiteController, null);
+            fruitoreController = new FruitoreController(fruitoreManager, aggiuntaUtilita, viewUtilita, modificaUtilita, fruitoreCorrente, visiteController, prenotazioneManager);
         } else {
             utenteCorrente = null;
         }

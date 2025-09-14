@@ -6,6 +6,15 @@ public class Fruitore extends Utente {
         super(email, password, nome, cognome);
     }
 
+    @Override
+    public String toString() {
+        return "Fruitore{" +
+                "nome='" + getNome() + '\'' +
+                ", cognome='" + getCognome() + '\'' +
+                ", email='" + getEmail() + '\'' +
+                '}';
+    }
+
     
 
 }

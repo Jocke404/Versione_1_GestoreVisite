@@ -127,7 +127,14 @@ public class PrenotazioneManager extends DatabaseManager {
         }
     }
 
+<<<<<<< HEAD
     public List<Prenotazione> getPrenotazioniFruitore(String emailFruitore) {
+=======
+    /**
+     * Ottieni tutte le prenotazioni di un fruitore
+     */
+    protected List<Prenotazione> getPrenotazioniFruitore(String emailFruitore) {
+>>>>>>> backup-commit
         return prenotazioniMap.values().stream()
                 .filter(p -> p.getEmailFruitore().equals(emailFruitore) && "CONFERMATA".equals(p.getStato()))
                 .collect(Collectors.toList());
@@ -139,7 +146,14 @@ public class PrenotazioneManager extends DatabaseManager {
                 .collect(Collectors.toList());
     }
 
+<<<<<<< HEAD
     public boolean cancellaPrenotazione(String codicePrenotazione, String emailFruitore) {
+=======
+    /**
+     * Cancella una prenotazione
+     */
+    protected boolean cancellaPrenotazione(String codicePrenotazione, String emailFruitore) {
+>>>>>>> backup-commit
         Prenotazione prenotazione = prenotazioniMap.get(codicePrenotazione);
 
         if (prenotazione == null || !prenotazione.getEmailFruitore().equals(emailFruitore)) {
@@ -183,4 +197,16 @@ public class PrenotazioneManager extends DatabaseManager {
         visita.setPostiPrenotati(visita.getPostiPrenotati() + numeroPersone);
 
     }
+<<<<<<< HEAD
+=======
+
+    public boolean rimuoviPrenotazione(Prenotazione prenotazione) {
+        return cancellaPrenotazione(prenotazione.getCodicePrenotazione(), prenotazione.getEmailFruitore());
+    }
+
+    public List<Prenotazione> miePrenotazioni(Fruitore fruitore) {
+        return getPrenotazioniFruitore(fruitore.getEmail());
+    }
+
+>>>>>>> backup-commit
 }

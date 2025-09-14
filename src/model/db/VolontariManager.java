@@ -5,7 +5,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import src.controller.ThreadPoolController;
@@ -175,6 +178,110 @@ public class VolontariManager extends DatabaseManager {
         } else {
             consoleView.mostraMessaggio("Il volontario con email " + nuovoVolontario.getEmail() + " esiste già.");
         }
+    }
+
+        //metodo per aggiornare i tipi di visita di un volontario
+    protected void aggiornaTipiVisitaVolontario(String email, List<TipiVisita> nuoviTipiVisita) {
+        String sql= "UPDATE volontari SET tipi_di_visite = ? WHERE email = ?";
+        executorService.submit(() -> {
+            try (Connection conn = DatabaseConnection.connect();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setString(1, String.join(",", nuoviTipiVisita.stream().map(TipiVisita::name).toArray(String[]::new)));
+                pstmt.setString(2, email);
+                int rowsUpdated = pstmt.executeUpdate();
+                if (rowsUpdated > 0) {
+                    //aggiorna anche nella mappa locale
+                    synchronized (volontariMap) {
+                        Volontario volontario = volontariMap.get(email);
+                        if (volontario != null) {
+                            volontario.setTipiDiVisite(nuoviTipiVisita);
+                        }
+                    }
+                    consoleView.mostraMessaggio("Tipi di visita aggiornati con successo per il volontario " + email);
+                }else {
+                    consoleView.mostraMessaggio("Nessun volontario trovato con l'email " + email);
+                }
+            } catch (SQLException e) {
+                System.err.println("Errore durante l'aggiornamento dei tipi di visita: " + e.getMessage());
+            }
+        });
+    }
+
+    // metodo per aggiungere un tipo di visita a un volontaro
+    public void aggiungiTipoVisitaAVolontari (String email, TipiVisita tipoVisita){
+        synchronized (volontariMap){
+            Volontario volontario = volontariMap.get(email);
+            if (volontario !=null){
+                List<TipiVisita> tipiEsistenti = new ArrayList<>(volontario.getTipiDiVisite());
+                if (!tipiEsistenti.contains(tipoVisita)){
+                    tipiEsistenti.add(tipoVisita);
+                    aggiornaTipiVisitaVolontario(email, tipiEsistenti);
+                } 
+            }
+        }
+    }
+
+    //metodo per rimuovere tipi di visita da un volontario
+    public void rimuoviTipiVisitaVolontario (String email, List<TipiVisita> tipiVisitaDaRimuovere){
+        String sql = "UPDATE volontari SET tipi_visita = ? WHERE email = ?";
+        executorService.submit(() -> {
+            try (Connection conn= DatabaseConnection.connect();
+                PreparedStatement pstmt = conn.prepareStatement(sql)){
+                
+                synchronized (volontariMap) {
+                    Volontario volontario = volontariMap.get(email);
+                    if (volontario != null) {
+                        //rimuovi i tipi di visita dalla lista
+                        List<TipiVisita> nuoviTipiVisita = new ArrayList<>(volontario.getTipiDiVisite());
+                        nuoviTipiVisita.removeAll(tipiVisitaDaRimuovere);
+
+                        pstmt.setString (1, String.join(",", nuoviTipiVisita.stream().map(TipiVisita::name).toArray(String[]::new)));
+                        pstmt.setString(2, email);
+                        int rowsUpdated = pstmt.executeUpdate();
+
+                        if (rowsUpdated > 0) {
+                            //aggiorna anche nella mappa locale
+                            volontario.setTipiDiVisite(nuoviTipiVisita);
+                            consoleView.mostraMessaggio("Tipi di visita rimossi con successo per il volontario " + email);
+                        } else {
+                            consoleView.mostraMessaggio("Nessun volontario trovato con l'email " + email);
+                        }
+                    }
+                }
+                
+            } catch (SQLException e) {
+                System.err.println("Errore durante la rimozione dei tipi di visita: " + e.getMessage());
+            }
+        });
+    }
+
+    //metodo per rimuovere un singolo tipo di visita da un volontario
+    public void rimuoviTipoVisitaDaVolontario (String email, TipiVisita tipoVisita){
+        rimuoviTipiVisitaVolontario(email, Arrays.asList(tipoVisita));
+    }
+
+    //metodo per ottenere tutti i volontaari per un tipo di visita specifico
+    public List<Volontario> getVolontariPerTipoVisita (TipiVisita tipoVisita){
+        List<Volontario> volontariPerTipo = new ArrayList<>();
+        synchronized (volontariMap) {
+            for (Volontario volontario : volontariMap.values()) {
+                if (volontario.getTipiDiVisite().contains(tipoVisita)) {
+                    volontariPerTipo.add(volontario);
+                }
+            }
+        } return volontariPerTipo;
+    }
+
+    //metodo per ottenere tutti i tipi di visita con i relativi volontari
+    public Map<TipiVisita, List<Volontario>> getVolontariPerTipoVisita(){
+        Map<TipiVisita, List<Volontario>> volontariPerTipo = new HashMap<>();
+        synchronized (volontariMap) {
+            for (Volontario volontario : volontariMap.values()) {
+                for (TipiVisita tipoVisita : volontario.getTipiDiVisite()) {
+                    volontariPerTipo.computeIfAbsent(tipoVisita, k -> new ArrayList<>()).add(volontario);
+                }
+            }
+        } return volontariPerTipo;
     }
 
     public ConcurrentHashMap<String, Volontario> getVolontariMap() {

@@ -1,23 +1,24 @@
 package src.view;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
+
 
 import lib.InputDati;
 import src.controller.VolontariController;
+import src.model.Fruitore;
 import src.model.Luogo;
 import src.model.ModificaUtilita;
+import src.model.Prenotazione;
 import src.model.TipiVisita;
 import src.model.Visita;
 import src.model.Volontario;
+import src.model.db.PrenotazioneManager;
 import src.model.db.VisiteManagerDB;
+import src.model.db.VolontariManager;
 import src.controller.VisiteController;
 import src.controller.LuoghiController;
 import src.controller.ThreadPoolController;
@@ -26,6 +27,7 @@ public class ViewUtilita {
 
     private ConcurrentHashMap<Integer, Visita> visiteMap = new VisiteManagerDB(ThreadPoolController.getInstance()).getVisiteMap();
     private final ConsoleView consoleView = new ConsoleView();
+    private List<TipiVisita> tipiVisitaList = new VisiteManagerDB(ThreadPoolController.getInstance()).getTipiVisitaList();
     
     private static ViewUtilita instance;
 
@@ -216,33 +218,109 @@ public class ViewUtilita {
         }
     }
 
-public void visualizzaVisiteDisponibili() {
-    System.out.println("Visite disponibili (stato: Proposta/Confermata, posti ancora disponibili):");
-    boolean visiteTrovate = false;
+    public void visualizzaVisiteDisponibili() {
+        System.out.println("Visite disponibili (stato: Proposta/Confermata, posti ancora disponibili):");
+        boolean visiteTrovate = false;
 
-    for (Visita visita : visiteMap.values()) {
-        String stato = visita.getStato();
-        int postiDisponibili = visita.getPostiDisponibili();
+        for (Visita visita : visiteMap.values()) {
+            String stato = visita.getStato();
+            int postiDisponibili = visita.getPostiDisponibili();
 
-        if ((stato.equalsIgnoreCase("Proposta") || stato.equalsIgnoreCase("Confermata")|| stato.equalsIgnoreCase("Cancellata"))
-            && postiDisponibili > 0) {
-            consoleView.mostraMessaggio("ID: " + visita.getId());
-            consoleView.mostraMessaggio("Descrizione: " + visita.getDescrizione());
-            consoleView.mostraMessaggio("Luogo: " + visita.getLuogo());
-            consoleView.mostraMessaggio("Tipi Visita: " + visita.getTipiVisitaString());
-            consoleView.mostraMessaggio("Data: " + (visita.getData() != null ? visita.getData() : "Nessuna data"));
-            consoleView.mostraMessaggio("Orario: " + (visita.getOraInizio() != null ? visita.getOraInizio() : "Nessun orario"));
-            consoleView.mostraMessaggio("Posti disponibili: " + postiDisponibili);
-            consoleView.mostraMessaggio("Stato: " + stato);
-            consoleView.mostraMessaggio("-------------------------");
-            visiteTrovate = true;
+            if ((stato.equalsIgnoreCase("Proposta") || stato.equalsIgnoreCase("Confermata")|| stato.equalsIgnoreCase("Cancellata"))
+                && postiDisponibili > 0) {
+                consoleView.mostraMessaggio("ID: " + visita.getId());
+                consoleView.mostraMessaggio("Descrizione: " + visita.getDescrizione());
+                consoleView.mostraMessaggio("Luogo: " + visita.getLuogo());
+                consoleView.mostraMessaggio("Tipi Visita: " + visita.getTipiVisitaString());
+                consoleView.mostraMessaggio("Data: " + (visita.getData() != null ? visita.getData() : "Nessuna data"));
+                consoleView.mostraMessaggio("Orario: " + (visita.getOraInizio() != null ? visita.getOraInizio() : "Nessun orario"));
+                consoleView.mostraMessaggio("Posti disponibili: " + postiDisponibili);
+                consoleView.mostraMessaggio("Stato: " + stato);
+                consoleView.mostraMessaggio("-------------------------");
+                visiteTrovate = true;
+            }
+        }
+
+        if (!visiteTrovate) {
+            System.out.println("Nessuna visita disponibile al momento.");
         }
     }
 
-    if (!visiteTrovate) {
-        System.out.println("Nessuna visita disponibile al momento.");
+    public void visualizzaPrenotazioni(Fruitore fruitoreCorrente, PrenotazioneManager prenotazioniManager) {
+        consoleView.mostraMessaggio("Le tue prenotazioni:");
+        List<Prenotazione> visitePrenotate = prenotazioniManager.miePrenotazioni(fruitoreCorrente);
+        consoleView.mostraElencoConOggetti(visitePrenotate);
     }
-}
+
+        //metodo per visualizzare i volontari per ogni tipo di visita
+    public void visualizzaVolontariPerTipoVisita(VolontariManager volontariManager){
+
+        if (tipiVisitaList.isEmpty()) {
+            consoleView.mostraMessaggio("Nessun tipo di visita disponibile.");
+            return;
+        }
+
+        consoleView.mostraMessaggio ("VOLONTARI PER TIPO DI VISITA");
+
+        for (TipiVisita tipovisita : tipiVisitaList){
+            List<Volontario> volontari = volontariManager.getVolontariPerTipoVisita(tipovisita);
+            consoleView.mostraMessaggio("\nTipo di visita: " + tipovisita);
+            consoleView.mostraMessaggio ("Numero volontari assegnati: " + volontari.size());
+            
+            if (volontari.isEmpty()){
+                consoleView.mostraMessaggio("Nessun volontario assegnato a questo tipo di visita.");
+            }else{
+                consoleView.mostraMessaggio ("Volontari assegnati:");
+                for (int i=0; i<volontari.size();i++){
+                    Volontario v = volontari.get(i);
+                    consoleView.mostraMessaggio((i+1) + ". " + v.getNome() + " " + v.getCognome()); 
+                }
+            }
+        }
+
+    }
+
+    //metodo alternativo per visualizzazione dettagliata di un tipo specifico
+    public void visualizzaVolontariPerTipoVisitaSpecifico(VisiteManagerDB visiteManagerDB, VolontariManager volontariManager){
+        //mostra i tipi di visita disponibili
+        List <TipiVisita> tipiVisitaDisponibili = visiteManagerDB.getTipiVisitaList();
+
+        if (tipiVisitaDisponibili.isEmpty()) {
+            consoleView.mostraMessaggio("Nessun tipo di visita disponibile.");
+            return ;
+        }
+
+        consoleView.mostraMessaggio ("Seleziona il tipo di visita da visualizzare:");
+        consoleView.mostraElencoConOggetti(tipiVisitaDisponibili);
+        int tipoIndex = InputDati.leggiIntero ("Seleziona il numero del tipo di visita: ", 1, tipiVisitaDisponibili.size()) -1;
+        TipiVisita tipoVisitaScelto = tipiVisitaDisponibili.get(tipoIndex);
+        
+
+        List<Volontario> volontari = volontariManager.getVolontariPerTipoVisita(tipoVisitaScelto);
+        consoleView.mostraMessaggio("\nTipo di visita: " + tipoVisitaScelto);
+        consoleView.mostraMessaggio ("Numero volontari assegnati: " + volontari.size());
+        
+        if (volontari.isEmpty()){
+            consoleView.mostraMessaggio("Nessun volontario assegnato a questo tipo di visita.");
+        }else{
+            consoleView.mostraMessaggio ("Volontari assegnati:");
+            consoleView.mostraElencoConOggetti(volontari);
+
+            //mostra anche gli altri tipi di visita del volontario
+            for (Volontario v : volontari) {
+                if (!v.getTipiDiVisite().isEmpty()) {
+                    consoleView.mostraMessaggio("   Altri tipi di visita assegnati:");
+                    for (TipiVisita altroTipo : v.getTipiDiVisite()) {
+                        if (!altroTipo.equals(tipoVisitaScelto)) {
+                            consoleView.mostraMessaggio("   - " + altroTipo);
+                        } else {
+                            consoleView.mostraMessaggio("   Nessun altro tipo di visita assegnato.");
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     
 }

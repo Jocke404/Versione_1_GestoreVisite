@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import src.model.db.PrenotazioneManager;
 import src.model.db.VisiteManagerDB;
 import src.controller.LuoghiController;
 import src.controller.VolontariController;
@@ -339,6 +341,32 @@ public class ModificaUtilita {
                 break;
             }
         } while (InputDati.yesOrNo("Vuoi eliminare un altro volontario? "));
+    }
+
+    public void cancellaPrenotazione(Fruitore fruitoreCorrente, PrenotazioneManager prenotazioneManager) {
+        if (consoleView.chiediAnnullaOperazione())
+            return;
+        List<Prenotazione> prenotazioni = prenotazioneManager.miePrenotazioni(fruitoreCorrente);
+        if (prenotazioni.isEmpty()) {
+            consoleView.mostraMessaggio("Non hai prenotazioni da cancellare.");
+            return;
+        }
+
+        consoleView.mostraMessaggio("Le tue prenotazioni:");
+        consoleView.mostraElencoConOggetti(prenotazioni);
+        int scelta = InputDati.leggiIntero("Seleziona la prenotazione da cancellare: ", 1, prenotazioni.size()) - 1;
+        Prenotazione prenotazioneDaCancellare = prenotazioni.get(scelta);
+
+        if (InputDati.yesOrNo("Sei sicuro di voler cancellare la prenotazione con codice: " + prenotazioneDaCancellare.getCodicePrenotazione() + "?")) {
+            boolean successo = prenotazioneManager.rimuoviPrenotazione(prenotazioneDaCancellare);
+            if (successo) {
+                consoleView.mostraMessaggio("Prenotazione cancellata con successo.");
+            } else {
+                consoleView.mostraMessaggio("Errore nella cancellazione della prenotazione.");
+            }
+        } else {
+            consoleView.mostraMessaggio("Operazione annullata.");
+        }
     }
 
 }
