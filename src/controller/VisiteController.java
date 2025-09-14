@@ -3,6 +3,8 @@ package src.controller;
 import src.model.TipiVisita;
 import src.model.Visita;
 import src.model.db.VisiteManagerDB;
+import src.model.db.VolontariManager;
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.time.LocalDate;
 import java.util.List;

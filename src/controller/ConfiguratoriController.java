@@ -2,6 +2,8 @@ package src.controller;
 
 import src.model.AggiuntaUtilita;
 import src.model.ModificaUtilita;
+import src.model.db.VisiteManagerDB;
+import src.model.db.VolontariManager;
 import src.view.ViewUtilita;
 
 public class ConfiguratoriController {
@@ -12,6 +14,8 @@ public class ConfiguratoriController {
     private final VolontariController volontariController;
     private final LuoghiController luoghiController;
     private final VisiteController visiteController;
+    private final VisiteManagerDB visiteManagerDB = new VisiteManagerDB(ThreadPoolController.getInstance());
+    private final VolontariManager volontariManager = new VolontariManager(ThreadPoolController.getInstance());
 
     public ConfiguratoriController(
         AggiuntaUtilita addUtilita, 
@@ -103,5 +107,17 @@ public class ConfiguratoriController {
 
     public void eliminaVolontario() {
         modificaUtilita.eliminaVolontario(volontariController);
+    }
+
+    public void aggiungiVolontariATipoVisita(){
+        addUtilita.aggiungiVolontariATipoVisita();
+    }
+
+    public void rimuoviVolontariDaTipoVisita(){
+        addUtilita.rimuoviVolontariDaTipoVisita();
+    }
+
+    public void visualizzaVolontariPerTipoVisita(){
+        viewUtilita.visualizzaVolontariPerTipoVisita(volontariManager);
     }
 }

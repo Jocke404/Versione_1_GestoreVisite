@@ -41,4 +41,9 @@ public class VolontariController {
     public void eliminaVolontario(Volontario volontarioDaEliminare) {
         volontariManager.eliminaVolontario(volontarioDaEliminare);
     }
+
+    public Object getVolontariManager() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getVolontariManager'");
+    }
 }
