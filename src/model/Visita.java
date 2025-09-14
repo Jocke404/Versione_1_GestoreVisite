@@ -131,6 +131,8 @@ public class Visita {
             "\nData: " + getData() +
             "\nOra: " + getOraInizio() +
             "\nStato: " + getStato() +
+            "\nDurata: " + getDurataMinuti() + " minuti" +
+            "\nNumero massimo di persone: " + getMaxPersone() +
             "\nPosti disponibili: " + getPostiDisponibili();   
     }
 }

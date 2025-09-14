@@ -36,6 +36,8 @@ public class AggiuntaUtilita {
     private final List<Integer> durataList = List.of(30, 60, 90, 120);
     private final ValidatoreVisite validatoreVisite;
     private final ViewUtilita viewUtilita = ViewUtilita.getInstance();
+    private final ModificaUtilita modificaUtilita;
+    
 
     private final ConsoleView consoleView = new ConsoleView();
     private final Map<String, List<LocalDate>> disponibilitaVolontari = new ConcurrentHashMap<>();
@@ -51,6 +53,7 @@ public class AggiuntaUtilita {
         this.tipiVisitaList = visiteManagerDB.getTipiVisitaList();
         this.validatoreVisite = new ValidatoreVisite(visiteManagerDB);
         this.prenotazioneManager = prenotazioneManager;
+        this.modificaUtilita = new ModificaUtilita(visiteManagerDB);
     }
 
     public void aggiungiVisita() {
@@ -323,10 +326,12 @@ public class AggiuntaUtilita {
     public void aggiungiLuogo() {
         if (consoleView.chiediAnnullaOperazione())
             return;
-        
+        consoleView.mostraElencoConOggetti(luoghiMap.values().stream().toList());
         String nome = InputDati.leggiStringaNonVuota("inserire il nome del luogo: ");
         String descrizione = InputDati.leggiStringaNonVuota("inserire la descrizione del luogo: ");
-        String collocazione = InputDati.leggiStringaNonVuota("inserire la collocazione del luogo: ");
+        consoleView.mostraElencoConOggetti(modificaUtilita.getAmbitoTerritoriale());
+        int luogoIndex = InputDati.leggiIntero("inserire la collocazione del luogo: ", 1, modificaUtilita.getAmbitoTerritoriale().size()) - 1;
+        String collocazione = modificaUtilita.getAmbitoTerritoriale().get(luogoIndex);
         consoleView.mostraElencoConOggetti(tipiVisitaMap.values().stream().toList());
         List<TipiVisita> tipiVisitaSelezionati = new ArrayList<>();
         boolean aggiungiAltri = true;

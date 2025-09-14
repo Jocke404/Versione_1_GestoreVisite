@@ -17,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import src.model.db.PrenotazioneManager;
 import src.model.db.VisiteManagerDB;
 import src.controller.LuoghiController;
+import src.controller.VisiteController;
 import src.controller.VolontariController;
 import lib.InputDati;
 import src.view.ConsoleView;
@@ -201,11 +202,11 @@ public class ModificaUtilita {
     }
 
     // Metodo pubblico per ottenere l'ambito territoriale
-    public Set<String> getAmbitoTerritoriale() {
+    public List<String> getAmbitoTerritoriale() {
         if (ambitoTerritoriale.isEmpty()) {
             caricaAmbitoTerritoriale();
         }
-        return new HashSet<>(ambitoTerritoriale);
+        return new ArrayList<>(ambitoTerritoriale);
     }
 
     public void eliminaLuogo(LuoghiController luoghiController) {
@@ -367,6 +368,36 @@ public class ModificaUtilita {
         } else {
             consoleView.mostraMessaggio("Operazione annullata.");
         }
+    }
+
+    public void eliminaVisita(VisiteController visiteController) {
+        if (consoleView.chiediAnnullaOperazione())
+            return;
+
+        ConcurrentHashMap<Integer, Visita> visiteMap = visiteController.getVisiteMap();
+
+        if (visiteMap.isEmpty()) {
+            consoleView.mostraMessaggio("Non ci sono visite disponibili da eliminare.");
+            return;
+        }
+
+        consoleView.mostraMessaggio("Visite disponibili:");
+        consoleView.mostraElencoConOggetti(visiteMap.values().stream().toList());
+
+        int visitaSelect = InputDati.leggiIntero("Seleziona la visita da eliminare: ", 1, visiteMap.size()) - 1;
+        Visita visitaSelezionata = visiteMap.values().stream().toList().get(visitaSelect);
+
+        if (InputDati.yesOrNo("Sei sicuro di voler eliminare la visita con ID: " + visitaSelezionata.getId() + "? Questa azione non può essere annullata.")) {
+            visiteManagerDB.eliminaVisita(visitaSelezionata);
+        }
+    }
+
+    public void modificaNumeroPersoneIscivibili() {
+        if (consoleView.chiediAnnullaOperazione())
+            return;
+        int numeroMax = InputDati.leggiInteroConMinimo("Inserisci il numero massimo di persone iscrivibili per visita: ", 1);
+        visiteManagerDB.aggiornaNumeroPersoneIscivibili(numeroMax);
+        consoleView.mostraMessaggio("Numero massimo di persone iscrivibili per visita aggiornato a: " + numeroMax);
     }
 
 }

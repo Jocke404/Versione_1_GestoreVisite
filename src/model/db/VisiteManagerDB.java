@@ -212,6 +212,27 @@ public class VisiteManagerDB extends DatabaseManager {
             System.err.println("Errore durante il recupero del numero massimo di persone: " + e.getMessage());
         }
         return 10;
+    }    
+    
+    protected boolean eliminaVisitaDB(int visitaId){
+        String sql = "DELETE FROM visite WHERE id = ?";
+        try (Connection conn = DatabaseConnection.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, visitaId);
+            int rowsAffected = pstmt.executeUpdate();
+
+            if (rowsAffected > 0) {
+                visiteMap.remove(visitaId);
+                consoleView.mostraMessaggio("Visita eliminata con successo.");
+                return true;
+            } else {
+                consoleView.mostraMessaggio("Nessuna visita trovata da eliminare.");
+                return false;
+            }
+        } catch (SQLException e) {
+            System.err.println("Errore durante l'eliminazione della visita: " + e.getMessage());
+            return false;
+        }
     }
 
     public int getMaxPersone() {
@@ -244,6 +265,12 @@ public class VisiteManagerDB extends DatabaseManager {
     public void aggiornaMaxPersone(int numeroMax) {
         aggiornaMaxPersonePerVisita(numeroMax);
     }
+    
+    public void eliminaVisita(Visita visita){
+        eliminaVisitaDB(visita.getId());
+    }
+
+
 
 
 }

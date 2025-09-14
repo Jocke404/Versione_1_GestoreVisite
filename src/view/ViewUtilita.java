@@ -78,14 +78,7 @@ public class ViewUtilita {
         }
 
         System.out.println("Visite:");
-        for (Visita visita : visite) {
-            System.out.println("Luogo: " + visita.getLuogo());
-            System.out.println("Tipi Visita: " + visita.getTipiVisita());
-            System.out.println("Volontario: " + visita.getVolontario());
-            System.out.println("Data: " + (visita.getData() != null ? visita.getData() : "Nessuna data"));
-            System.out.println("Stato: " + visita.getStato());
-            System.out.println("-------------------------");
-        }
+        consoleView.mostraElencoConOggetti(visite);
     }
 
     // Metodo per visualizzare le visite per stato
@@ -181,7 +174,7 @@ public class ViewUtilita {
 
   // Metodo per visualizzare l'ambito territoriale
     public void stampaAmbitoTerritoriale(ModificaUtilita modificaUtilita) {
-        Set<String> ambito = modificaUtilita.getAmbitoTerritoriale();
+        List<String> ambito = modificaUtilita.getAmbitoTerritoriale();
         if (ambito.isEmpty()) {
             System.out.println("Ambito territoriale non configurato.");
         } else {

@@ -120,4 +120,12 @@ public class ConfiguratoriController {
     public void visualizzaVolontariPerTipoVisita(){
         viewUtilita.visualizzaVolontariPerTipoVisita(volontariManager);
     }
+
+    public void eliminaVisita() {
+        modificaUtilita.eliminaVisita(visiteController);
+    }
+
+    public void modificaNumeroPersoneIscivibili() {
+        modificaUtilita.modificaNumeroPersoneIscivibili();
+    }
 }
