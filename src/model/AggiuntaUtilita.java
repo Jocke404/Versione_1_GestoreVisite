@@ -372,10 +372,6 @@ public class AggiuntaUtilita {
         salvaDisponibilita(volontario, dateDisponibili);
     }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> backup-commit
     private List<Integer> trovaGiorniDisponibili(Volontario volontario, LocalDate meseProssimo, YearMonth ym) {
         List<Integer> giorniDisponibili = new ArrayList<>();
         List<TipiVisita> tipiVisitaVolontario = volontario.getTipiDiVisite();
@@ -592,8 +588,6 @@ public class AggiuntaUtilita {
         return disp;
     }
 
-<<<<<<< HEAD
-=======
     public void prenotaVisita(Fruitore fruitoreCorrente) {
         if (consoleView.chiediAnnullaOperazione())
             return;
@@ -723,5 +717,4 @@ public class AggiuntaUtilita {
         consoleView.mostraMessaggio("Tipo di visita " + tipoVisitaScelto + " rimosso da " + volontariSelezionati.size() + " volontari.");
     }
 
->>>>>>> backup-commit
 }
