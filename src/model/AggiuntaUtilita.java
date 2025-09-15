@@ -37,6 +37,7 @@ public class AggiuntaUtilita {
     private final ValidatoreVisite validatoreVisite;
     private final ViewUtilita viewUtilita = ViewUtilita.getInstance();
     private final ModificaUtilita modificaUtilita;
+    private int maxPersoneIscrivibili;
     
 
     private final ConsoleView consoleView = new ConsoleView();
@@ -596,6 +597,7 @@ public class AggiuntaUtilita {
     public void prenotaVisita(Fruitore fruitoreCorrente) {
         if (consoleView.chiediAnnullaOperazione())
             return;
+
         List<Visita> visiteDisponibili = new ArrayList<>();
         for (Visita visita : visiteMap.values()) {
             if ((visita.getStato().equalsIgnoreCase("Proposta") || visita.getStato().equalsIgnoreCase("Confermata"))
@@ -612,7 +614,8 @@ public class AggiuntaUtilita {
         consoleView.mostraElencoConOggetti(visiteDisponibili);
         int scelta = InputDati.leggiIntero("Seleziona la visita da prenotare: ", 1, visiteDisponibili.size());
 
-        int numPersone = InputDati.leggiIntero("Quante persone vuoi prenotare? ", 1, visiteDisponibili.get(scelta - 1).getPostiDisponibili());
+        maxPersoneIscrivibili = modificaUtilita.caricaNumeroPersoneIscrivibili();
+        int numPersone = InputDati.leggiIntero("Quante persone vuoi prenotare? ", 1, Math.min(visiteDisponibili.get(scelta - 1).getPostiDisponibili(), maxPersoneIscrivibili));
 
         prenotazioneManager.creaPrenotazione(fruitoreCorrente, visiteDisponibili.get(scelta - 1), numPersone);
         

@@ -27,6 +27,7 @@ public class ModificaUtilita {
     private final VisiteManagerDB visiteManagerDB;
     private final ConsoleView consoleView = new ConsoleView();
     private static final String AMBITO_FILE = "src/utility/ambito_territoriale.config";
+    private static final String NUMERO_PERSONE_FILE = "src/utility/max_persone_iscrivibili.config";
     private Set<String> ambitoTerritoriale = new HashSet<>();
 
     public ModificaUtilita(VisiteManagerDB visiteManagerDB) {
@@ -392,12 +393,36 @@ public class ModificaUtilita {
         }
     }
 
-    public void modificaNumeroPersoneIscivibili() {
+    // Leggi il valore dal file (chiamalo all'avvio)
+    public int caricaNumeroPersoneIscrivibili() {
+        try (BufferedReader reader = new BufferedReader(new FileReader(NUMERO_PERSONE_FILE))) {
+            String line = reader.readLine();
+            if (line != null && !line.isEmpty()) {
+                return Integer.parseInt(line.trim());
+            }
+        } catch (IOException | NumberFormatException e) {
+            // Se il file non esiste o c'è errore, ritorna un valore di default
+            return 10;
+        }
+        return 10;
+    }    
+    
+    // Metodo per modificare il numero massimo
+    public void modificaNumeroPersoneIscrivibili() {
         if (consoleView.chiediAnnullaOperazione())
             return;
         int numeroMax = InputDati.leggiInteroConMinimo("Inserisci il numero massimo di persone iscrivibili per visita: ", 1);
-        visiteManagerDB.aggiornaNumeroPersoneIscivibili(numeroMax);
+        salvaNumeroPersoneIscrivibili(numeroMax);
         consoleView.mostraMessaggio("Numero massimo di persone iscrivibili per visita aggiornato a: " + numeroMax);
+    }
+
+    // Salva il valore nel file
+    private void salvaNumeroPersoneIscrivibili(int numero) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(NUMERO_PERSONE_FILE))) {
+            writer.write(String.valueOf(numero));
+        } catch (IOException e) {
+            consoleView.mostraMessaggio("Errore nel salvataggio del numero massimo di persone iscrivibili.");
+        }
     }
 
 }

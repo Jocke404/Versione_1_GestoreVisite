@@ -125,7 +125,7 @@ public class ConfiguratoriController {
         modificaUtilita.eliminaVisita(visiteController);
     }
 
-    public void modificaNumeroPersoneIscivibili() {
-        modificaUtilita.modificaNumeroPersoneIscivibili();
+    public void modificaNumeroPersoneIscrivibili() {
+        modificaUtilita.modificaNumeroPersoneIscrivibili();
     }
 }

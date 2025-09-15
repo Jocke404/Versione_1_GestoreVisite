@@ -14,7 +14,7 @@ public class MenuConfiguratore implements Menu {
     private static final String [] SOTTOMENU_CONFIGURAZIONI={
         "Aggiungi date precluse", "Visualizza date precluse", 
         "Visualizza ambito territoriale", "Modifica numero massimo persone per visita",
-        "Elimina date precluse"
+        "Modifica numero persone iscrivibili da un fruitore", "Elimina date precluse"
     };
     
     private static final String [] SOTTOMENU_VOLONTARI={
@@ -73,8 +73,8 @@ public class MenuConfiguratore implements Menu {
                 case 2 -> configuratoriController.mostraDatePrecluse();
                 case 3 -> configuratoriController.mostraAmbitoTerritoriale();
                 case 4 -> configuratoriController.modificaNumeroMaxPersonePerVisita();
-                case 5 -> configuratoriController.modificaNumeroPersoneIscivibili();
-                case 5 -> configuratoriController.eliminaDatePrecluse();
+                case 5 -> configuratoriController.modificaNumeroPersoneIscrivibili();
+                case 6 -> configuratoriController.eliminaDatePrecluse();
 
                 case 0 -> tornaIndietro = true;
                 default -> System.out.println("Opzione non valida.");

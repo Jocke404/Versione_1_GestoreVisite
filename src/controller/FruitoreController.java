@@ -10,24 +10,20 @@ import src.view.ViewUtilita;
 
 
 public class FruitoreController {
-    private final FruitoreManager fruitoreManager;
     private final AggiuntaUtilita addUtilita;
     private final ViewUtilita viewUtilita;
     private final ModificaUtilita modificaUtilita;
     Fruitore fruitoreCorrente;
-    private final VisiteController visiteController;
     private final PrenotazioneManager prenotazioneManager;
 
-
+    
 
     public FruitoreController(FruitoreManager fruitoreManager, AggiuntaUtilita addUtilita, ViewUtilita viewUtilita, ModificaUtilita modificaUtilita,
-                            Fruitore fruitoreCorrente, VisiteController visiteController, PrenotazioneManager prenotazioneManager) {
+                            Fruitore fruitoreCorrente, PrenotazioneManager prenotazioneManager) {
         this.modificaUtilita = modificaUtilita;
-        this.fruitoreManager = fruitoreManager;
         this.addUtilita = addUtilita;
         this.viewUtilita = viewUtilita;
         this.fruitoreCorrente = fruitoreCorrente;
-        this.visiteController = visiteController;
         this.prenotazioneManager = prenotazioneManager;
     }
 
