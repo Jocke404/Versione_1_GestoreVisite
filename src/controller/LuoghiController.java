@@ -11,11 +11,7 @@ public class LuoghiController {
     private final LuoghiManager luoghiManager;
     private final AggiuntaUtilita addUtilita;
     private final ViewUtilita viewUtilita;
-    // private static final LuoghiManager luoghiManager = LuoghiManager.getInstance();
-    // private final AggiuntaUtilita addUtilita = AggiuntaUtilita.getInstance(); // Utilità per l'aggiunta di dati
-    // private final ViewUtilita viewUtilita = ViewUtilita.getInstance();
 
-    // public LuoghiController() {}
     public LuoghiController(LuoghiManager luoghiManager, AggiuntaUtilita addUtilita, ViewUtilita viewUtilita) {
         this.luoghiManager = luoghiManager;
         this.addUtilita = addUtilita;

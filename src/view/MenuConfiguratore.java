@@ -72,7 +72,7 @@ public class MenuConfiguratore implements Menu {
                 case 1 -> configuratoriController.aggiungiDatePrecluse();
                 case 2 -> configuratoriController.mostraDatePrecluse();
                 case 3 -> configuratoriController.mostraAmbitoTerritoriale();
-                case 4 -> configuratoriController.modificaNumeroMaxPersonePerVisita();
+                case 4 -> configuratoriController.modificaMaxPersone();
                 case 5 -> configuratoriController.modificaNumeroPersoneIscrivibili();
                 case 6 -> configuratoriController.eliminaDatePrecluse();
 

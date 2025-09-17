@@ -3,7 +3,6 @@ package src.controller;
 import src.model.TipiVisita;
 import src.model.Visita;
 import src.model.db.VisiteManagerDB;
-import src.model.db.VolontariManager;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.time.LocalDate;
@@ -32,5 +31,9 @@ public class VisiteController {
 
     public List<Map.Entry<LocalDate, String>> getDatePrecluse() {
         return List.copyOf(visiteManagerDB.getDatePrecluseMap().entrySet());
+    }
+
+    public void eliminaVisita(Visita visita) {
+        visiteManagerDB.eliminaVisita(visita);
     }
 }
