@@ -1,21 +1,29 @@
 package src.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import src.model.AggiuntaUtilita;
 import src.model.ModificaUtilita;
+import src.model.Visita;
 import src.model.db.VisiteManagerDB;
 import src.model.db.VolontariManager;
 import src.view.ViewUtilita;
+import src.model.AmbitoTerritoriale;
+import src.view.ConsoleView;
 
 public class ConfiguratoriController {
     private final AggiuntaUtilita addUtilita;
     private final ModificaUtilita modificaUtilita;
     private final ViewUtilita viewUtilita;
+    private final AmbitoTerritoriale ambitoTerritoriale = new AmbitoTerritoriale();
 
     private final VolontariController volontariController;
     private final LuoghiController luoghiController;
     private final VisiteController visiteController;
     private final VisiteManagerDB visiteManagerDB = new VisiteManagerDB(ThreadPoolController.getInstance());
     private final VolontariManager volontariManager = new VolontariManager(ThreadPoolController.getInstance());
+    private ConsoleView consoleView = new ConsoleView();
 
     public ConfiguratoriController(
         AggiuntaUtilita addUtilita, 
@@ -69,8 +77,35 @@ public class ConfiguratoriController {
         addUtilita.aggiungiVisita();
     }
 
+    // public void modificaStatoVisita() {
+    //     modificaUtilita.modificaStatoVisita();
+    // }
+
     public void modificaStatoVisita() {
-        modificaUtilita.modificaStatoVisita();
+        List<Visita> visite = new ArrayList<>(visiteManagerDB.getVisiteMap().values());
+        if (visite.isEmpty()) {
+            consoleView.mostraMessaggio("Non ci sono visite disponibili da modificare.");
+            return;
+        }
+        consoleView.mostraVisiteDisponibili(visite);
+
+        int scelta = consoleView.chiediSelezioneVisita(visite.size());
+        Visita visitaSelezionata = visite.get(scelta - 1);
+
+        String statoOriginale = visitaSelezionata.getStato();
+        String[] stati = {"Proposta", "Completa", "Confermata", "Cancellata", "Effettuata"};
+        String nuovoStato = consoleView.chiediNuovoStato(stati);
+
+        if (consoleView.chiediConfermaModifica(statoOriginale, nuovoStato)) {
+            boolean successo = modificaUtilita.aggiornaStatoVisita(visitaSelezionata.getId(), nuovoStato);
+            if (successo) {
+                consoleView.mostraMessaggio("Stato della visita aggiornato con successo.");
+            } else {
+                consoleView.mostraMessaggio("Errore nell'aggiornamento dello stato.");
+            }
+        } else {
+            consoleView.mostraMessaggio("Modifica annullata. Nessun cambiamento effettuato.");
+        }
     }
 
     public void visualizzaArchivioStorico() {
@@ -90,7 +125,7 @@ public class ConfiguratoriController {
     }
 
     public void mostraAmbitoTerritoriale() {
-        viewUtilita.stampaAmbitoTerritoriale(modificaUtilita);
+        viewUtilita.stampaAmbitoTerritoriale(ambitoTerritoriale);
     }
 
     public void stampaTipiVisitaPerLuogo(){

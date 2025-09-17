@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import lib.InputDati;
 import src.controller.VolontariController;
+import src.model.AmbitoTerritoriale;
 import src.model.Fruitore;
 import src.model.Luogo;
 import src.model.ModificaUtilita;
@@ -173,8 +174,8 @@ public class ViewUtilita {
     }
 
   // Metodo per visualizzare l'ambito territoriale
-    public void stampaAmbitoTerritoriale(ModificaUtilita modificaUtilita) {
-        List<String> ambito = modificaUtilita.getAmbitoTerritoriale();
+    public void stampaAmbitoTerritoriale(AmbitoTerritoriale ambitoTerritoriale) {
+        List<String> ambito = ambitoTerritoriale.getAmbitoTerritoriale();
         if (ambito.isEmpty()) {
             System.out.println("Ambito territoriale non configurato.");
         } else {
@@ -314,6 +315,5 @@ public class ViewUtilita {
             }
         }
     }
-
     
 }

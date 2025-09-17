@@ -30,6 +30,7 @@ public class MasterController {
     private FruitoreController fruitoreController;
     private LuoghiController luoghiController;
     private VisiteController visiteController;
+    private AmbitoTerritoriale ambitoTerritoriale = new AmbitoTerritoriale();
     private MenuFactory menuFactory = new MenuFactory();
     private ConsoleView consoleView = new ConsoleView();
 
@@ -111,17 +112,15 @@ public class MasterController {
     private void showMenu() {
         Menu menu = null;
         if (isAuth) {
-            //utenteCorrente = authenticationController.getUtenteCorrente();
             System.out.println("Buongiorno " + utenteCorrente.getNome() + "!");
             if (utenteCorrente instanceof Volontario){
                 volontariController.volontarioCorrente = (Volontario) utenteCorrente;  
                 menu = menuFactory.creaMenuVolontario(volontariController);
             } else if (utenteCorrente instanceof Configuratore){
-                if(!modificaUtilita.isAmbitoConfigurato()){
-                    modificaUtilita.scegliAmbitoTerritoriale();
-                    modificaUtilita.salvaAmbitoTerritoriale();
+                if(!ambitoTerritoriale.isAmbitoConfigurato()){
+                    ambitoTerritoriale.scegliAmbitoTerritoriale();
                 } else {
-                    modificaUtilita.caricaAmbitoTerritoriale();
+                    ambitoTerritoriale.caricaAmbitoTerritoriale();
                 }
                 menu = menuFactory.creaMenuConfiguratore(configuratoriController);
             } else if (utenteCorrente instanceof Fruitore){
