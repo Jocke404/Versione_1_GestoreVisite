@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import src.controller.ThreadPoolController;
 import src.model.Luogo;
@@ -28,16 +29,30 @@ public class LuoghiManager extends DatabaseManager {
                 luoghiMap.clear();
                 while (rs.next()) {
                     String nome = rs.getString("nome");
+                    String tipiVisitaStr = rs.getString("tipi_di_visita");
+                    List<TipiVisita> tipiVisitaList = new java.util.ArrayList<>();
+                    if (tipiVisitaStr != null && !tipiVisitaStr.trim().isEmpty()) {
+                        tipiVisitaList = Arrays.stream(tipiVisitaStr.split(","))
+                            .map(String::trim)
+                            .filter(s -> !s.isEmpty())
+                            .map(s -> {
+                                try {
+                                    return TipiVisita.valueOf(s.toUpperCase());
+                                } catch (IllegalArgumentException e) {
+                                    System.err.println("Tipo visita non valido: " + s);
+                                    return null;
+                                }
+                            })
+                            .filter(t -> t != null)
+                            .toList();
+                    }
                     Luogo luogo = new Luogo(
-                            nome,
-                            rs.getString("descrizione"),
-                            rs.getString("collocazione"),
-                            rs.getString("tipi_di_visita") != null ? Arrays.stream(rs.getString("tipi_di_visita").split(","))
-                                    .map(String::trim)
-                                    .map(s -> TipiVisita.valueOf(s.toUpperCase()))
-                                    .toList() : null
+                        nome,
+                        rs.getString("descrizione"),
+                        rs.getString("collocazione"),
+                        tipiVisitaList
                     );
-                    luoghiMap.putIfAbsent(nome, luogo);
+                luoghiMap.putIfAbsent(nome, luogo);
                 }
             }
         } catch (SQLException e) {

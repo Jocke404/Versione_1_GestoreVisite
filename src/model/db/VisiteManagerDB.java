@@ -23,6 +23,10 @@ public class VisiteManagerDB extends DatabaseManager {
         caricaDatePrecluse();
     }
 
+    public static VisiteManagerDB getInstance() {
+        return new VisiteManagerDB(ThreadPoolController.getInstance());
+    }
+
     //Logiche delle visite--------------------------------------------------
     // Metodo per caricare un luogo nel database e memorizzarlo nella HashMap
     protected void caricaVisite() {

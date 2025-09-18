@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import lib.InputDati;
 import src.model.AggiuntaUtilita;
@@ -11,6 +12,7 @@ import src.model.ModificaUtilita;
 import src.model.TipiVisita;
 import src.model.Visita;
 import src.model.Volontario;
+import src.model.db.LuoghiManager;
 import src.model.db.VisiteManagerDB;
 import src.model.db.VolontariManager;
 import src.view.ViewUtilita;
@@ -29,6 +31,7 @@ public class ConfiguratoriController {
     private final VisiteController visiteController;
     private final VisiteManagerDB visiteManagerDB = new VisiteManagerDB(ThreadPoolController.getInstance());
     private final VolontariManager volontariManager = new VolontariManager(ThreadPoolController.getInstance());
+    private final LuoghiManager luoghiManager = new LuoghiManager(ThreadPoolController.getInstance());
     private ConsoleView consoleView = new ConsoleView();
 
     public ConfiguratoriController(
@@ -47,16 +50,34 @@ public class ConfiguratoriController {
         this.visiteController = visiteController;
     }
 
+    // public void aggiungiVolontario() {
+    //     addUtilita.aggiungiVolontario();
+    // }
     public void aggiungiVolontario() {
-        addUtilita.aggiungiVolontario();
+        // Ottieni i dati tramite la View
+        Volontario nuovoVolontario = consoleView.chiediDatiNuovoVolontario();
+        if (nuovoVolontario != null && InputDati.yesOrNo("Vuoi confermare e aggiungere il volontario?")) {
+            addUtilita.aggiungiVolontario(nuovoVolontario);
+        } else {
+            consoleView.mostraMessaggio("Operazione annullata.");
+        }
     }
 
     public void mostraVolontari() {
         viewUtilita.stampaVolontari(volontariController);
     }
 
+    // public void aggiungiLuogo() {
+    //     addUtilita.aggiungiLuogo();
+    // }
     public void aggiungiLuogo() {
-        addUtilita.aggiungiLuogo();
+        // Ottieni i dati tramite la View
+        Luogo nuovoLuogo = consoleView.chiediDatiNuovoLuogo(ambitoTerritoriale);
+        if (nuovoLuogo != null && InputDati.yesOrNo("Vuoi confermare e aggiungere il luogo?")) {
+            addUtilita.aggiungiLuogo(nuovoLuogo);
+        } else {
+            consoleView.mostraMessaggio("Operazione annullata.");
+        }
     }
 
     public void mostraLuoghi() {
@@ -105,8 +126,38 @@ public class ConfiguratoriController {
         }
     }
 
+    // public void aggiungiVisita() {
+    //     addUtilita.aggiungiVisita();
+    // }
+
     public void aggiungiVisita() {
-        addUtilita.aggiungiVisita();
+        // List<Luogo> luoghi = new ArrayList<>(luoghiManager.getLuoghiMap().values());
+        // List<TipiVisita> tipiVisita = visiteManagerDB.getTipiVisitaList();
+        // List<Volontario> volontari = new ArrayList<>(volontariManager.getVolontariMap().values());
+        // int maxPersone = visiteManagerDB.getMaxPersone();
+
+        // Visita nuovaVisita = consoleView.chiediDatiNuovaVisita(luoghi, tipiVisita, volontari, maxPersone);
+        Visita nuovaVisita = null;
+        if (consoleView.chiediAnnullaOperazione())
+            return;
+
+        if (InputDati.yesOrNo("Vuoi pianificare la visita usando le disponibilità dei volontari? (s/n)")) {
+            nuovaVisita = consoleView.pianificazioneGuidata(visiteManagerDB, volontariManager, luoghiManager);
+        } else {
+            nuovaVisita = consoleView.pianificazioneLibera(visiteManagerDB, volontariManager, luoghiManager);
+        }
+
+
+        if (nuovaVisita != null && InputDati.yesOrNo("Vuoi confermare e aggiungere la visita?")) {
+            boolean successo = addUtilita.aggiungiVisita(nuovaVisita);
+            if (successo) {
+                consoleView.mostraMessaggio("Visita aggiunta con successo!");
+            } else {
+                consoleView.mostraMessaggio("Errore nell'aggiunta della visita.");
+            }
+        } else {
+            consoleView.mostraMessaggio("Operazione annullata.");
+        }
     }
 
     // public void modificaStatoVisita() {

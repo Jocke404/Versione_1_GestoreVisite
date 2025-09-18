@@ -30,6 +30,7 @@ public class MasterController {
     private FruitoreController fruitoreController;
     private LuoghiController luoghiController;
     private VisiteController visiteController;
+    private ValidatoreVisite validatore;
     private AmbitoTerritoriale ambitoTerritoriale = new AmbitoTerritoriale();
     private MenuFactory menuFactory = new MenuFactory();
     private ConsoleView consoleView = new ConsoleView();
@@ -60,7 +61,7 @@ public class MasterController {
         modificaUtilita = new ModificaUtilita(visiteManager);
         viewUtilita = ViewUtilita.getInstance();
         visiteController = new VisiteController(visiteManager);
-        luoghiController = new LuoghiController(luoghiManager, aggiuntaUtilita, viewUtilita);
+        luoghiController = new LuoghiController(luoghiManager, viewUtilita);
         
 
         ConsoleView consoleView = new ConsoleView();
@@ -74,6 +75,7 @@ public class MasterController {
         masterController.authenticationController = authenticationController;
         masterController.volontariController = volontariController;
         masterController.configuratoriController = configuratoriController;
+        masterController.validatore = validatore;
         return masterController;
     }
 
@@ -100,7 +102,7 @@ public class MasterController {
         isAuth = authenticationController.autentica();
         if (isAuth) {
             utenteCorrente = authenticationController.getUtenteCorrente();
-            volontariController = new VolontariController(volontariManager, aggiuntaUtilita, viewUtilita, volontarioCorrente);
+            volontariController = new VolontariController(volontariManager, aggiuntaUtilita, consoleView, volontarioCorrente, validatore, viewUtilita);
             configuratoriController = new ConfiguratoriController(aggiuntaUtilita, modificaUtilita, viewUtilita, volontariController, luoghiController, visiteController);
             fruitoreController = new FruitoreController(fruitoreManager, aggiuntaUtilita, viewUtilita, modificaUtilita, fruitoreCorrente, prenotazioneManager);
         } else {

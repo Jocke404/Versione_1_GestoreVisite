@@ -51,7 +51,7 @@ public class Luogo {
 
     @Override
     public String toString() {
-        return "Luogo [descrizione=" + descrizione + ", nome=" + nome + "]";
+        return "Luogo [nome=" + nome + ", descrizione=" + descrizione + ", collocazione=" + collocazione + ", tipiVisita=" + tipiVisita + "]";
     }
 
 }

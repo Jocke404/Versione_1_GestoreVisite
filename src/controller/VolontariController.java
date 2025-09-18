@@ -1,9 +1,16 @@
 package src.controller;
 
+import java.io.Console;
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.List;
 
 import src.model.AggiuntaUtilita;
+import src.model.Disponibilita;
+import src.model.ValidatoreVisite;
 import src.model.Volontario;
+import src.view.ConsoleView;
 import src.view.MenuVolontario;
 import src.view.ViewUtilita;
 import src.model.db.VolontariManager;
@@ -11,18 +18,35 @@ import src.model.db.VolontariManager;
 public class VolontariController {
     private final VolontariManager volontariManager;
     private final AggiuntaUtilita addUtilita;
-    private final ViewUtilita viewUtilita;
+    private final ConsoleView consoleView;
+    private final Disponibilita disponibilitaManager = new Disponibilita();
     Volontario volontarioCorrente;
+    private final ValidatoreVisite validatore;
+    private final ViewUtilita viewUtilita;
 
-    public VolontariController(VolontariManager volontariManager, AggiuntaUtilita addUtilita, ViewUtilita viewUtilita, Volontario volontarioCorrente) {
+    public VolontariController(VolontariManager volontariManager, AggiuntaUtilita addUtilita, 
+                                ConsoleView consoleView, Volontario volontarioCorrente, ValidatoreVisite validatore, 
+                                ViewUtilita viewUtilita) {
         this.volontariManager = volontariManager;
         this.addUtilita = addUtilita;
-        this.viewUtilita = viewUtilita;
+        this.consoleView = consoleView;
         this.volontarioCorrente = volontarioCorrente;
+        this.validatore = validatore;
+        this.viewUtilita = viewUtilita;
     }
 
-    public void inserisciDisponibilitaVolontario() {
-        addUtilita.inserisciDisponibilitaVolontario(volontarioCorrente);
+    public void raccogliDisponibilitaVolontario() {
+        YearMonth ym = YearMonth.now().plusMonths(1);
+        List<Integer> giorniDisponibili = validatore.trovaGiorniDisponibili(volontarioCorrente, ym);
+        if (giorniDisponibili.isEmpty()) {
+            consoleView.mostraMessaggio("Non ci sono giorni disponibili per dichiarare la disponibilità.");
+            return;
+        }
+        consoleView.mostraCalendarioMese(ym, giorniDisponibili);
+        List<Integer> giorniSelezionati = consoleView.chiediGiorniDisponibili(ym, new ArrayList<>(giorniDisponibili));
+        List<LocalDate> dateDisponibili = validatore.filtraDateDisponibili(giorniSelezionati, ym);
+        disponibilitaManager.salvaDisponibilita(volontarioCorrente.getEmail(), dateDisponibili);
+        // Passa dateDisponibili al Model per il salvataggio
     }
     
     public void visualizzaVisiteVolontario(){
@@ -42,8 +66,4 @@ public class VolontariController {
         volontariManager.eliminaVolontario(volontarioDaEliminare);
     }
 
-    public Object getVolontariManager() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getVolontariManager'");
-    }
 }

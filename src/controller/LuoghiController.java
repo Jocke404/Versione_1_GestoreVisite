@@ -9,17 +9,11 @@ import java.util.List;
 
 public class LuoghiController {
     private final LuoghiManager luoghiManager;
-    private final AggiuntaUtilita addUtilita;
     private final ViewUtilita viewUtilita;
 
-    public LuoghiController(LuoghiManager luoghiManager, AggiuntaUtilita addUtilita, ViewUtilita viewUtilita) {
+    public LuoghiController(LuoghiManager luoghiManager, ViewUtilita viewUtilita) {
         this.luoghiManager = luoghiManager;
-        this.addUtilita = addUtilita;
         this.viewUtilita = viewUtilita;
-    }
-
-    public void aggiungiLuogo() {
-        addUtilita.aggiungiLuogo();
     }
 
     public void mostraLuoghi() {

@@ -3,7 +3,6 @@ package src.view;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -12,7 +11,6 @@ import src.controller.VolontariController;
 import src.model.AmbitoTerritoriale;
 import src.model.Fruitore;
 import src.model.Luogo;
-import src.model.ModificaUtilita;
 import src.model.Prenotazione;
 import src.model.TipiVisita;
 import src.model.Visita;
