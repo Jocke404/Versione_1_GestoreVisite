@@ -138,7 +138,7 @@ public class DatabaseUpdater {
 
 //Getters e Setters--------------------------------------------------
     public String getTipoUtente(String email, String password){
-        String tipo_utente = null; // Inizializza a null per evitare NullPointerException
+        String tipo_utente = null;
         String sql = "SELECT tipo_utente FROM utenti_unificati WHERE email = ? AND password = ?";
     
         try (Connection conn = DatabaseConnection.connect();
@@ -190,5 +190,10 @@ public class DatabaseUpdater {
     public void startDatabaseSync() {
         // Avvia la sincronizzazione periodica
         avviaSincronizzazioneConSleep();
+    }
+
+    public boolean isEmailPresente(String email) {
+        String sql = "SELECT 1 FROM utenti_unificati WHERE email = ?";
+        return recordEsiste(sql, email);
     }
 }

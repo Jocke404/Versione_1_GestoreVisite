@@ -83,7 +83,7 @@ public class VolontariManager extends DatabaseManager {
             consoleView.mostraMessaggio("Volontario aggiunto con successo nella tabella 'volontari'.");
     
             // Aggiungi anche nella tabella 'utenti_unificati'
-            aggiungiUtenteUnificato(volontario);
+            aggiungiUtenteUnificato(volontario, false);
         } catch (SQLException e) {
             System.err.println("Errore durante l'aggiunta del volontario: " + e.getMessage());
         }
@@ -296,8 +296,4 @@ public class VolontariManager extends DatabaseManager {
         eliminaVol(volontarioDaEliminare);
         volontariMap.remove(volontarioDaEliminare.getEmail());
     }
-
-
-
-
 }

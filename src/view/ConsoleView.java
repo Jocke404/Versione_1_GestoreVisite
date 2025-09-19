@@ -17,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import lib.InputDati;
 import src.model.AmbitoTerritoriale;
+import src.model.CredentialManager;
 import src.model.Luogo;
 import src.model.Prenotazione;
 import src.model.TipiVisita;
@@ -64,6 +65,47 @@ public class ConsoleView implements View{
         for (Visita visita : visite) {
             mostraMessaggio(visita.toString());
         }
+    }
+
+    public String chiediEmail() {
+        return InputDati.leggiStringaNonVuota("email: ");
+    }
+
+    public String chiediPassword() {
+        return InputDati.leggiStringaNonVuota("password: ");
+    }
+
+    public String chiediNome() {
+        return InputDati.leggiStringaNonVuota("Inserisci il nome: ");
+    }
+
+    public String chiediCognome() {
+        return InputDati.leggiStringaNonVuota("Inserisci il cognome: ");
+    }
+
+    public String chiediNuovaEmail(CredentialManager credentialManager) {
+        String email;
+        do {
+            email = InputDati.leggiStringaNonVuota("Inserisci la nuova email: ");
+            if (!isEmailValida(email)) {
+                mostraMessaggio("Formato email non valido. Riprova.");
+                continue;
+            }
+            if (credentialManager.isEmailPresente(email)) {
+                mostraMessaggio("Questa email è già registrata. Inseriscine una diversa.");
+                continue;
+            }
+            break;
+        } while (true);
+        return email;
+    }
+
+    private boolean isEmailValida(String email) {
+        return email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
+    }
+
+    public boolean chiediConfermaEmail(String email) {
+        return InputDati.yesOrNo("La tua email registrata è: " + email + ". Vuoi mantenerla?");
     }
 
     //VISITE---------------------------------------------------------------------------------------------------------------

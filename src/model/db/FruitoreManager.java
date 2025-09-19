@@ -81,8 +81,7 @@ public class FruitoreManager extends DatabaseManager {
     }  
 
     protected void aggiungiFruitore(Fruitore fruitore) {
-        String inserisciSqlFruitore = "INSERT INTO fruitori (nome, cognome, email, password) VALUES (?, ?, ?, ?)";
-        String inserisciSqlUtentiUnificati = "INSERT INTO utenti_unificati (nome, cognome, email, password, tipo_utente) VALUES (?, ?, ?, ?, 'Fruitore')";
+        String inserisciSqlFruitore = "INSERT INTO fruitori (nome, cognome, email, password, password_modificata) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseConnection.connect();
              PreparedStatement pstmt = conn.prepareStatement(inserisciSqlFruitore)) {
@@ -90,22 +89,9 @@ public class FruitoreManager extends DatabaseManager {
             pstmt.setString(2, fruitore.getCognome());
             pstmt.setString(3, fruitore.getEmail());
             pstmt.setString(4, fruitore.getPassword());
+            pstmt.setBoolean(5, true);
             pstmt.executeUpdate();
-            consoleView.mostraMessaggio("Fruitore aggiunto con successo nella tabella 'fruitori'.");
-            aggiungiUtenteUnificato(fruitore);
-        } catch (SQLException e) {
-            System.err.println("Errore durante l'aggiunta del fruitore: " + e.getMessage());
-        }
-
-        try (Connection conn = DatabaseConnection.connect();
-             PreparedStatement pstmt = conn.prepareStatement(inserisciSqlUtentiUnificati)) {
-            pstmt.setString(1, fruitore.getNome());
-            pstmt.setString(2, fruitore.getCognome());
-            pstmt.setString(3, fruitore.getEmail());
-            pstmt.setString(4, fruitore.getPassword());
-            pstmt.executeUpdate();
-            consoleView.mostraMessaggio("Fruitore aggiunto con successo nella tabella 'fruitori'.");
-            aggiungiUtenteUnificato(fruitore);
+            aggiungiUtenteUnificato(fruitore, true);
         } catch (SQLException e) {
             System.err.println("Errore durante l'aggiunta del fruitore: " + e.getMessage());
         }
@@ -115,7 +101,6 @@ public class FruitoreManager extends DatabaseManager {
         String verificaSql = "SELECT 1 FROM fruitori WHERE email = ?";
         if(!recordEsiste(verificaSql, nuovoFruitore.getEmail())){
             aggiungiFruitore(nuovoFruitore);
-            consoleView.mostraMessaggio("Fruitore aggiunto con successo.");
         } else {
             consoleView.mostraMessaggio("Il fruitore con email " + nuovoFruitore.getEmail() + " esiste già.");
         }

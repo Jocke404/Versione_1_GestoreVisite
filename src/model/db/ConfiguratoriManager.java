@@ -64,7 +64,7 @@ public class ConfiguratoriManager extends DatabaseManager {
             consoleView.mostraMessaggio("Configuratore aggiunto con successo nella tabella 'configuratori'.");
     
             // Aggiungi anche nella tabella 'utenti_unificati'
-            aggiungiUtenteUnificato(configuratore);
+            aggiungiUtenteUnificato(configuratore, true);
         } catch (SQLException e) {
             System.err.println("Errore durante l'aggiunta del configuratore: " + e.getMessage());
         }
@@ -186,8 +186,5 @@ public class ConfiguratoriManager extends DatabaseManager {
     public void setConfiguratoriMap(ConcurrentHashMap<String, Configuratore> configuratoriMap) {
         this.configuratoriMap = configuratoriMap;
     }
-    // public static ConfiguratoriManager getInstance() {
-    //     return new ConfiguratoriManager(ThreadPoolController.getInstance());
-    // }
 
 }
