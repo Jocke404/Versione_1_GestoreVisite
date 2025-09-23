@@ -53,6 +53,7 @@ public class ConfiguratoriController {
     //     addUtilita.aggiungiVolontario();
     // }
     public void aggiungiVolontario() {
+        consoleView.mostraElencoConOggetti(volontariManager.getVolontariMap().values().stream().toList());
         // Ottieni i dati tramite la View
         Volontario nuovoVolontario = consoleView.chiediDatiNuovoVolontario();
         if (nuovoVolontario != null && InputDati.yesOrNo("Vuoi confermare e aggiungere il volontario?")) {
@@ -70,6 +71,7 @@ public class ConfiguratoriController {
     //     addUtilita.aggiungiLuogo();
     // }
     public void aggiungiLuogo() {
+        consoleView.mostraElencoConOggetti(luoghiManager.getLuoghiMap().values().stream().toList());
         // Ottieni i dati tramite la View
         Luogo nuovoLuogo = consoleView.chiediDatiNuovoLuogo(ambitoTerritoriale);
         if (nuovoLuogo != null && InputDati.yesOrNo("Vuoi confermare e aggiungere il luogo?")) {
@@ -130,12 +132,7 @@ public class ConfiguratoriController {
     // }
 
     public void aggiungiVisita() {
-        // List<Luogo> luoghi = new ArrayList<>(luoghiManager.getLuoghiMap().values());
-        // List<TipiVisita> tipiVisita = visiteManagerDB.getTipiVisitaList();
-        // List<Volontario> volontari = new ArrayList<>(volontariManager.getVolontariMap().values());
-        // int maxPersone = visiteManagerDB.getMaxPersone();
-
-        // Visita nuovaVisita = consoleView.chiediDatiNuovaVisita(luoghi, tipiVisita, volontari, maxPersone);
+        consoleView.mostraElencoConOggetti(visiteManagerDB.getVisiteMap().values().stream().toList());
         Visita nuovaVisita = null;
         if (consoleView.chiediAnnullaOperazione())
             return;
@@ -194,8 +191,24 @@ public class ConfiguratoriController {
         viewUtilita.stampaArchivioStorico(visiteController);
     }
 
+    // public void aggiungiDatePrecluse() {
+    //     addUtilita.aggiungiDatePrecluse();
+    // }
+
     public void aggiungiDatePrecluse() {
-        addUtilita.aggiungiDatePrecluse();
+        consoleView.mostraElencoConOggetti(visiteManagerDB.getDatePrecluseMap().entrySet().stream().toList());
+        boolean continua = true;
+        do {
+            if (consoleView.chiediAnnullaOperazione()) {
+                break;
+            }
+            LocalDate data = consoleView.chiediDataPreclusa();
+            if (data != null) {
+                String motivo = consoleView.chiediMotivoPreclusione(data);
+                addUtilita.aggiungiDataPreclusa(data, motivo);
+                consoleView.mostraMessaggio("Data preclusa aggiunta con successo.");
+            }
+        } while (continua);
     }
 
     public void mostraDatePrecluse() {
@@ -286,21 +299,72 @@ public class ConfiguratoriController {
             consoleView.mostraMessaggio("Nessun volontario disponibile per la modifica.");
             return;
         }
-        int scelta = consoleView.chiediSelezioneVolontario(volontari);
-        Volontario volontarioDaEliminare = volontari.get(scelta);
-        if (consoleView.chiediConfermaEliminazioneVolontario(volontarioDaEliminare)) {
-            modificaUtilita.eliminaVolontario(volontarioDaEliminare, volontariController);
-        } else {
-            consoleView.mostraMessaggio("Operazione annullata.");
+        List<Volontario> selezionati = consoleView.chiediVolontariMultipli(volontari);
+        for (Volontario volontarioDaEliminare : selezionati) {
+            if (consoleView.chiediConfermaEliminazioneVolontario(volontarioDaEliminare)) {
+                modificaUtilita.eliminaVolontario(volontarioDaEliminare, volontariController);
+            } else {
+                consoleView.mostraMessaggio("Operazione annullata.");
+            }
         }
     }
 
-    public void aggiungiVolontariATipoVisita(){
-        addUtilita.aggiungiVolontariATipoVisita();
+    // public void aggiungiVolontariATipoVisita(){
+    //     addUtilita.aggiungiVolontariATipoVisita();
+    // }
+
+    public void aggiungiVolontariATipoVisita() {
+        if (consoleView.chiediAnnullaOperazione()) return;
+
+        Map<String, Volontario> volontariMap = volontariManager.getVolontariMap();
+        List<TipiVisita> tipiVisitaList = visiteManagerDB.getTipiVisitaList();
+
+        if (tipiVisitaList.isEmpty()) {
+            consoleView.mostraMessaggio("Nessun tipo di visita disponibile.");
+            return;
+        }
+        TipiVisita tipoVisitaScelto = consoleView.chiediTipoVisita(tipiVisitaList);
+
+        if (volontariMap.isEmpty()) {
+            consoleView.mostraMessaggio("Nessun volontario disponibile.");
+            return;
+        }
+        List<Volontario> volontariDisponibili = new ArrayList<>(volontariMap.values());
+        List<Volontario> volontariSelezionati = consoleView.chiediVolontariMultipli(volontariDisponibili);
+
+        addUtilita.assegnaTipoVisitaAVolontari(volontariSelezionati, tipoVisitaScelto);
+        consoleView.mostraMessaggio("Tipo di visita " + tipoVisitaScelto + " assegnato a " + volontariSelezionati.size() + " volontari.");
     }
 
-    public void rimuoviVolontariDaTipoVisita(){
-        addUtilita.rimuoviVolontariDaTipoVisita();
+
+
+    // public void rimuoviVolontariDaTipoVisita(){
+    //     addUtilita.rimuoviVolontariDaTipoVisita();
+    // }
+    public void rimuoviVolontariDaTipoVisita() {
+        if (consoleView.chiediAnnullaOperazione()) return;
+
+        Map<String, Volontario> volontariMap = volontariManager.getVolontariMap();
+        List<TipiVisita> tipiVisitaList = visiteManagerDB.getTipiVisitaList();
+
+        if (tipiVisitaList.isEmpty()) {
+            consoleView.mostraMessaggio("Nessun tipo di visita disponibile.");
+            return;
+        }
+        TipiVisita tipoVisitaScelto = consoleView.chiediTipoVisita(tipiVisitaList);
+
+        List<Volontario> volontariConTipoVisita = volontariMap.values().stream()
+            .filter(v -> v.getTipiDiVisite().contains(tipoVisitaScelto))
+            .toList();
+
+        if (volontariConTipoVisita.isEmpty()) {
+            consoleView.mostraMessaggio("Nessun volontario ha questo tipo di visita assegnato.");
+            return;
+        }
+        List<Volontario> volontariSelezionati = consoleView.chiediVolontariMultipli(volontariConTipoVisita);
+
+        addUtilita.rimuoviTipoVisitaDaVolontari(volontariSelezionati, tipoVisitaScelto);
+        consoleView.mostraMessaggio("Tipo di visita " + tipoVisitaScelto + " rimosso da " + volontariSelezionati.size() + " volontari.");
     }
 
     public void visualizzaVolontariPerTipoVisita(){

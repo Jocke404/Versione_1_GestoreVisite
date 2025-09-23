@@ -4,6 +4,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "AllTestsRunner",
+            "request": "launch",
+            "mainClass": "src.test.java.AllTestsRunner",
+            "projectName": "MVC-GestoreVisite_dcead439"
+        },
+        {
+            "type": "java",
             "name": "MainVisite",
             "request": "launch",
             "mainClass": "src.MainVisite",

@@ -1,8 +1,5 @@
 package src.view;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -120,6 +117,14 @@ public class ConsoleView implements View{
         }
         int scelta = InputDati.leggiIntero("Seleziona il nuovo stato: ", 1, stati.length) - 1;
         return stati[scelta];
+    }
+
+    // Selezione di un tipo di visita
+    public TipiVisita chiediTipoVisita(List<TipiVisita> tipiVisitaList) {
+        mostraMessaggio("Seleziona il tipo di visita:");
+        mostraElencoConOggetti(tipiVisitaList);
+        int tipoIndex = InputDati.leggiIntero("Seleziona il numero del tipo di visita: ", 1, tipiVisitaList.size()) - 1;
+        return tipiVisitaList.get(tipoIndex);
     }
 
     // public Visita chiediDatiNuovaVisita(List<Luogo> luoghi, List<TipiVisita> tipiVisita, List<Volontario> volontari, int maxPersone) {
@@ -463,6 +468,14 @@ public class ConsoleView implements View{
         }
     }
 
+    public LocalDate chiediDataPreclusa() {
+        return InputDati.leggiData("Inserisci la data da aggiungere alle date precluse: ");
+    }
+
+    public String chiediMotivoPreclusione(LocalDate data) {
+        return InputDati.leggiStringa("Inserisci il motivo della preclusione per la data " + data + ": ");
+    }
+
     //LUOGHI---------------------------------------------------------------------------------------------------------------
     public int chiediSelezioneLuogo(List<Luogo> luoghi) {
         mostraMessaggio("Luoghi disponibili:");
@@ -551,11 +564,11 @@ public class ConsoleView implements View{
     }
 
     //VOLONTARI---------------------------------------------------------------------------------------------------------------
-    public int chiediSelezioneVolontario(List<Volontario> volontari) {
-        mostraMessaggio("Volontari disponibili:");
-        mostraElencoConOggetti(volontari);
-        return InputDati.leggiIntero("Seleziona il volontario da eliminare: ", 1, volontari.size()) - 1;
-    }
+    // public int chiediSelezioneVolontario(List<Volontario> volontari) {
+    //     mostraMessaggio("Volontari disponibili:");
+    //     mostraElencoConOggetti(volontari);
+    //     return InputDati.leggiIntero("Seleziona il volontario da eliminare: ", 1, volontari.size()) - 1;
+    // }
 
     public boolean chiediConfermaEliminazioneVolontario(Volontario volontario) {
         return InputDati.yesOrNo("Sei sicuro di voler eliminare il volontario: " + volontario.getNome() + "?");
@@ -568,6 +581,27 @@ public class ConsoleView implements View{
         String password = InputDati.leggiStringaNonVuota("Inserisci la password: ");
         List<TipiVisita> tipiVisita = chiediNuoviTipiVisita(new ArrayList<>());
         return new Volontario(nome, cognome, email, password, tipiVisita);
+    }
+
+    
+    // Selezione multipla di volontari
+    public List<Volontario> chiediVolontariMultipli(List<Volontario> volontariDisponibili) {
+        mostraMessaggio("Seleziona i volontari (inserisci i numeri separati da virgola, es. 1,3,5):");
+        mostraElencoConOggetti(volontariDisponibili);
+        String input = InputDati.leggiStringaNonVuota("Volontari selezionati:");
+        String[] numeri = input.split(",");
+        List<Volontario> selezionati = new ArrayList<>();
+        for (String numero : numeri) {
+            try {
+                int index = Integer.parseInt(numero.trim()) - 1;
+                if (index >= 0 && index < volontariDisponibili.size()) {
+                    selezionati.add(volontariDisponibili.get(index));
+                }
+            } catch (NumberFormatException e) {
+                mostraMessaggio("Input non valido: " + numero);
+            }
+        }
+        return selezionati;
     }
 
 
