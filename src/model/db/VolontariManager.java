@@ -30,7 +30,7 @@ public class VolontariManager extends DatabaseManager {
             aggiungiVolontario(volontario);
             aggiornaPswVolontario(volontario.getEmail(), volontario.getPassword());
         }
-        consoleView.mostraMessaggio("Sincronizzazione dei volontari completata.");
+        consoleIO.mostraMessaggio("Sincronizzazione dei volontari completata.");
     }
 
     //Logiche dei volontari--------------------------------------------------
@@ -80,7 +80,7 @@ public class VolontariManager extends DatabaseManager {
             pstmt.setString(5, String.join(",", volontario.getTipiDiVisite().stream().map(TipiVisita::name).toArray(String[]::new)));
             pstmt.setBoolean(6, false);
             pstmt.executeUpdate();
-            consoleView.mostraMessaggio("Volontario aggiunto con successo nella tabella 'volontari'.");
+            consoleIO.mostraMessaggio("Volontario aggiunto con successo nella tabella 'volontari'.");
     
             // Aggiungi anche nella tabella 'utenti_unificati'
             aggiungiUtenteUnificato(volontario, false);
@@ -174,9 +174,9 @@ public class VolontariManager extends DatabaseManager {
         String verificaSql = "SELECT 1 FROM volontari WHERE email = ?";
         if(!recordEsiste(verificaSql, nuovoVolontario.getEmail())){
             aggiungiVolontario(nuovoVolontario);
-            consoleView.mostraMessaggio("Volontario aggiunto con successo.");
+            consoleIO.mostraMessaggio("Volontario aggiunto con successo.");
         } else {
-            consoleView.mostraMessaggio("Il volontario con email " + nuovoVolontario.getEmail() + " esiste già.");
+            consoleIO.mostraMessaggio("Il volontario con email " + nuovoVolontario.getEmail() + " esiste già.");
         }
     }
 
@@ -197,9 +197,9 @@ public class VolontariManager extends DatabaseManager {
                             volontario.setTipiDiVisite(nuoviTipiVisita);
                         }
                     }
-                    consoleView.mostraMessaggio("Tipi di visita aggiornati con successo per il volontario " + email);
+                    consoleIO.mostraMessaggio("Tipi di visita aggiornati con successo per il volontario " + email);
                 }else {
-                    consoleView.mostraMessaggio("Nessun volontario trovato con l'email " + email);
+                    consoleIO.mostraMessaggio("Nessun volontario trovato con l'email " + email);
                 }
             } catch (SQLException e) {
                 System.err.println("Errore durante l'aggiornamento dei tipi di visita: " + e.getMessage());
@@ -242,9 +242,9 @@ public class VolontariManager extends DatabaseManager {
                         if (rowsUpdated > 0) {
                             //aggiorna anche nella mappa locale
                             volontario.setTipiDiVisite(nuoviTipiVisita);
-                            consoleView.mostraMessaggio("Tipi di visita rimossi con successo per il volontario " + email);
+                            consoleIO.mostraMessaggio("Tipi di visita rimossi con successo per il volontario " + email);
                         } else {
-                            consoleView.mostraMessaggio("Nessun volontario trovato con l'email " + email);
+                            consoleIO.mostraMessaggio("Nessun volontario trovato con l'email " + email);
                         }
                     }
                 }

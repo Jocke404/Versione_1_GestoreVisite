@@ -6,38 +6,38 @@ import src.model.*;
 
 public class AuthenticationController {
     private final CredentialManager credentialManager;
-    private final ConsoleView consoleView;    
+    private final ConsoleIO consoleIO;    
     private Utente utenteLoggato;
 
     public AuthenticationController(
         CredentialManager credentialManager,
-        ConsoleView consoleView
+        ConsoleIO consoleIO
     ) {
         this.credentialManager = credentialManager;
-        this.consoleView = consoleView;
+        this.consoleIO = consoleIO;
     }
 
     public boolean autentica() {
-        String email = consoleView.chiediEmail();
+        String email = consoleIO.chiediEmail();
         boolean emailPresente = credentialManager.isEmailPresente(email);
-        String password = consoleView.chiediPassword();
+        String password = consoleIO.chiediPassword();
 
         if (emailPresente) {
             Utente utente = credentialManager.autentica(email, password);
 
             if (utente == null) {
-                consoleView.mostraMessaggio("Credenziali non valide.");
+                consoleIO.mostraMessaggio("Credenziali non valide.");
                 return false;
             }
 
             // Gestione password temporanea
             if (!credentialManager.isPasswordModificata(email)) {
-                consoleView.mostraMessaggio("Hai credenziali temporanee. Ti preghiamo di modificarle.");
-                boolean emailCorretta = consoleView.chiediConfermaEmail(email);
+                consoleIO.mostraMessaggio("Hai credenziali temporanee. Ti preghiamo di modificarle.");
+                boolean emailCorretta = consoleIO.chiediConfermaEmail(email);
                 if (!emailCorretta) {
-                    String nuovaEmail = consoleView.chiediNuovaEmail(credentialManager);
+                    String nuovaEmail = consoleIO.chiediNuovaEmail(credentialManager);
                     credentialManager.aggiornaEmailUtente(utente, nuovaEmail);
-                    consoleView.mostraMessaggio("Email aggiornata con successo.");
+                    consoleIO.mostraMessaggio("Email aggiornata con successo.");
                 }
                 modificaPasswordUtente(utente);
             }
@@ -45,7 +45,7 @@ public class AuthenticationController {
             this.utenteLoggato = utente;
             return true;
         } else {
-            consoleView.mostraMessaggio("Email non registrata. Procedi con la creazione di un nuovo account.");
+            consoleIO.mostraMessaggio("Email non registrata. Procedi con la creazione di un nuovo account.");
             String tipoUtente = credentialManager.estraiTipoUtente(email, password);
             Utente nuovoUtente = creaNuovoUtente(tipoUtente);
             this.utenteLoggato = nuovoUtente;
@@ -54,16 +54,16 @@ public class AuthenticationController {
     }
 
     public void modificaPasswordUtente(Utente utente) {
-        String nuovaPassword = consoleView.chiediPassword();
+        String nuovaPassword = consoleIO.chiediPassword();
         credentialManager.aggiornaPasswordUtente(utente, nuovaPassword);
-        consoleView.mostraMessaggio("Password aggiornata con successo.");
+        consoleIO.mostraMessaggio("Password aggiornata con successo.");
     }
 
     public Utente creaNuovoUtente(String tipoUtente) {
-        String name = consoleView.chiediNome();
-        String surname = consoleView.chiediCognome();
-        String newEmail = consoleView.chiediNuovaEmail(credentialManager);
-        String newPassword = consoleView.chiediPassword();
+        String name = consoleIO.chiediNome();
+        String surname = consoleIO.chiediCognome();
+        String newEmail = consoleIO.chiediNuovaEmail(credentialManager);
+        String newPassword = consoleIO.chiediPassword();
         Utente nuovoUtente = credentialManager.creaNuoveCredenziali(tipoUtente, name, surname, newEmail, newPassword);
         return nuovoUtente;
     }

@@ -9,7 +9,7 @@ import src.model.Prenotazione;
 import src.model.db.FruitoreManager;
 import src.model.db.PrenotazioneManager;
 import src.view.ViewUtilita;
-import src.view.ConsoleView;
+import src.view.ConsoleIO;
 
 
 
@@ -19,7 +19,7 @@ public class FruitoreController {
     private final ModificaUtilita modificaUtilita;
     Fruitore fruitoreCorrente;
     private final PrenotazioneManager prenotazioneManager;
-    private final ConsoleView consoleView = new ConsoleView();
+    private final ConsoleIO consoleIO = new ConsoleIO();
 
     
 
@@ -51,16 +51,16 @@ public class FruitoreController {
     public void cancellaPrenotazione() {
         List<Prenotazione> prenotazioni = prenotazioneManager.miePrenotazioni(fruitoreCorrente);
         if (prenotazioni.isEmpty()) {
-            consoleView.mostraMessaggio("Non hai prenotazioni da cancellare.");
+            consoleIO.mostraMessaggio("Non hai prenotazioni da cancellare.");
             return;
         }
-        int scelta = consoleView.chiediSelezionePrenotazione(prenotazioni);
+        int scelta = consoleIO.chiediSelezionePrenotazione(prenotazioni);
         Prenotazione prenotazioneDaCancellare = prenotazioni.get(scelta);
-        if (consoleView.chiediConfermaCancellazionePrenotazione(prenotazioneDaCancellare)) {
+        if (consoleIO.chiediConfermaCancellazionePrenotazione(prenotazioneDaCancellare)) {
             boolean successo = modificaUtilita.cancellaPrenotazione(prenotazioneDaCancellare, prenotazioneManager);
-            consoleView.mostraRisultatoCancellazionePrenotazione(successo);
+            consoleIO.mostraRisultatoCancellazionePrenotazione(successo);
         } else {
-            consoleView.mostraMessaggio("Operazione annullata.");
+            consoleIO.mostraMessaggio("Operazione annullata.");
         }
     }
 

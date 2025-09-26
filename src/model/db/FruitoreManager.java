@@ -25,7 +25,7 @@ public class FruitoreManager extends DatabaseManager {
             aggiungiFruitore(fruitore);
             aggiornaPswFruitore(fruitore.getEmail(), fruitore.getPassword());
         }
-        consoleView.mostraMessaggio("Sincronizzazione dei fruitori completata.");
+        consoleIO.mostraMessaggio("Sincronizzazione dei fruitori completata.");
     }
 
     // Logiche dei fruitori--------------------------------------------------
@@ -49,7 +49,7 @@ public class FruitoreManager extends DatabaseManager {
                 }
             }
         } catch (Exception e) {
-            consoleView.mostraErrore("Errore caricamento fruitori: " + e.getMessage());
+            consoleIO.mostraErrore("Errore caricamento fruitori: " + e.getMessage());
         }
     }
 
@@ -102,7 +102,7 @@ public class FruitoreManager extends DatabaseManager {
         if(!recordEsiste(verificaSql, nuovoFruitore.getEmail())){
             aggiungiFruitore(nuovoFruitore);
         } else {
-            consoleView.mostraMessaggio("Il fruitore con email " + nuovoFruitore.getEmail() + " esiste già.");
+            consoleIO.mostraMessaggio("Il fruitore con email " + nuovoFruitore.getEmail() + " esiste già.");
         }
     }
 

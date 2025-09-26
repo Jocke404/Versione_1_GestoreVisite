@@ -2,7 +2,7 @@ package src.model.db;
 
 import src.controller.ThreadPoolController;
 import src.model.TemporaryCredential;
-import src.view.ConsoleView;
+import src.view.ConsoleIO;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -19,7 +19,7 @@ public class DatabaseUpdater {
     // private ConcurrentHashMap<String, Luogo> luoghiMap = LuoghiManager.getInstance().getLuoghiMap();
     // private ConcurrentHashMap<Integer, Visite> visiteMap = VisiteManagerDB.getInstance().getVisiteMap();
     private ConcurrentHashMap<String, TemporaryCredential> temporaryCredentials = new ConcurrentHashMap<>();
-    private ConsoleView consoleView = new ConsoleView();
+    private ConsoleIO consoleIO = new ConsoleIO();
     
     private final VolontariManager volontariManager;
     private final ConfiguratoriManager configuratoriManager;
@@ -127,9 +127,9 @@ public class DatabaseUpdater {
                 temporaryCredentials.put(username, new TemporaryCredential(username, password));
             }
     
-            consoleView.mostraMessaggio("Credenziali temporanee caricate con successo.");
+            consoleIO.mostraMessaggio("Credenziali temporanee caricate con successo.");
         } catch (SQLException e) {
-            consoleView.mostraMessaggio("Errore durante il caricamento delle credenziali temporanee: " + e.getMessage());
+            consoleIO.mostraMessaggio("Errore durante il caricamento delle credenziali temporanee: " + e.getMessage());
         }
     }
 
@@ -154,7 +154,7 @@ public class DatabaseUpdater {
                 }
             }
         } catch (SQLException e) {
-            consoleView.mostraMessaggio("Errore durante la verifica delle credenziali: " + e.getMessage());
+            consoleIO.mostraMessaggio("Errore durante la verifica delle credenziali: " + e.getMessage());
         }
         return tipo_utente != null ? tipo_utente : "Fruitore"; // Restituisce "Fruitore" se tipo_utente è null
     }
@@ -173,11 +173,11 @@ public class DatabaseUpdater {
                 if (rs.next()) {
                     passwordModificata = rs.getBoolean("password_modificata"); // Recupera il valore del campo password_modificata
                 } else {
-                    consoleView.mostraMessaggio("Nessun record trovato per l'email: " + email);
+                    consoleIO.mostraMessaggio("Nessun record trovato per l'email: " + email);
                 }
             }
         } catch (SQLException e) {
-            consoleView.mostraMessaggio("Errore durante la verifica del campo password_modificata: " + e.getMessage());
+            consoleIO.mostraMessaggio("Errore durante la verifica del campo password_modificata: " + e.getMessage());
         }
     
         return passwordModificata;

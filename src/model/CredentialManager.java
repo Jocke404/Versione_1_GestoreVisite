@@ -79,7 +79,7 @@ public class CredentialManager {
     //     String tipoUtente = estraiTipoUtente(email, password);
 
     //     if (tipoUtente == null) {
-    //         consoleView.mostraMessaggio("Credenziali non valide.");
+    //         consoleIO.mostraMessaggio("Credenziali non valide.");
     //         return null;
     //     }
 
@@ -92,7 +92,7 @@ public class CredentialManager {
     //         case UserFactory.VOLONTARIO:
     //             volontarioCorrente = volontariManager.getVolontariMap().get(email);
     //             if (volontarioCorrente == null) {
-    //                 consoleView.mostraMessaggio("Errore: volontario non trovato.");
+    //                 consoleIO.mostraMessaggio("Errore: volontario non trovato.");
     //                 return null;
     //             }
     //             nome = volontarioCorrente.getNome();
@@ -101,14 +101,14 @@ public class CredentialManager {
 
     //             // Controlla se la password è temporanea
     //             if (!isPasswordModificata(email)) {
-    //                 consoleView.mostraMessaggio("Hai credenziali temporanee. Ti preghiamo di modificarle.");
+    //                 consoleIO.mostraMessaggio("Hai credenziali temporanee. Ti preghiamo di modificarle.");
     //                 salvaNuovaPassword(volontarioCorrente);
     //             }
     //             break;
 
     //         case UserFactory.CONFIGURATORE:
     //             if (email.equals("admin@example.com") && password.equals("admin123")) {
-    //                 consoleView.mostraMessaggio("Hai credenziali temporanee. Ti preghiamo di modificarle.");
+    //                 consoleIO.mostraMessaggio("Hai credenziali temporanee. Ti preghiamo di modificarle.");
     //                 Configuratore newConfig = (Configuratore) salvaNuoveCredenziali(tipoUtente);
     //                 nome = newConfig.getNome();
     //                 cognome = newConfig.getCognome();
@@ -120,7 +120,7 @@ public class CredentialManager {
     //             break;
     //         case UserFactory.FRUITORE:
     //             if (fruitoreManager.getFruitoriMap().isEmpty() || !fruitoreManager.getFruitoriMap().containsKey(email)) {
-    //                 consoleView.mostraMessaggio("Benvenuto nuovo fruitore! Devi creare un account.");
+    //                 consoleIO.mostraMessaggio("Benvenuto nuovo fruitore! Devi creare un account.");
     //                 Fruitore newFruitore = (Fruitore) salvaNuoveCredenziali(tipoUtente);
     //                 fruitoreCorrente = newFruitore;
     //                 nome = newFruitore.getNome();
@@ -132,7 +132,7 @@ public class CredentialManager {
     //             }
     //             break;
     //         default:
-    //             consoleView.mostraMessaggio("Ruolo non riconosciuto: " + tipoUtente);
+    //             consoleIO.mostraMessaggio("Ruolo non riconosciuto: " + tipoUtente);
     //             return null;
     //     }
 

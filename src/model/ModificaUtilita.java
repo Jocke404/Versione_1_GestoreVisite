@@ -20,12 +20,12 @@ import src.controller.LuoghiController;
 import src.controller.VisiteController;
 import src.controller.VolontariController;
 import lib.InputDati;
-import src.view.ConsoleView;
+import src.view.ConsoleIO;
 
 public class ModificaUtilita {
 
     private final VisiteManagerDB visiteManagerDB;
-    private final ConsoleView consoleView = new ConsoleView();
+    private final ConsoleIO consoleIO = new ConsoleIO();
     private static final String NUMERO_PERSONE_FILE = "src/utility/max_persone_iscrivibili.config";
 
 
@@ -42,23 +42,23 @@ public class ModificaUtilita {
     }
 
     // public void modificaStatoVisita() {
-    //     if (consoleView.chiediAnnullaOperazione())
+    //     if (consoleIO.chiediAnnullaOperazione())
     //         return;
 
     //     ConcurrentHashMap<Integer, Visita> visiteMap = visiteManagerDB.getVisiteMap();
 
     //     if (visiteMap.isEmpty()) {
-    //         consoleView.mostraMessaggio("Non ci sono visite disponibili da modificare.");
+    //         consoleIO.mostraMessaggio("Non ci sono visite disponibili da modificare.");
     //         return;
     //     }
 
     //     List<Map.Entry<Integer, Visita>> visiteList = visiteMap.entrySet().stream().toList();
 
-    //     consoleView.mostraMessaggio("Visite disponibili:");
+    //     consoleIO.mostraMessaggio("Visite disponibili:");
     //     for (int i = 0; i < visiteList.size(); i++) {
     //         Map.Entry<Integer, Visita> entry = visiteList.get(i);
     //         Visita visita = entry.getValue();
-    //         consoleView.mostraMessaggio(visita.toString());
+    //         consoleIO.mostraMessaggio(visita.toString());
     //     }
 
     //     int sceltaVisita = InputDati.leggiIntero("Seleziona la visita da modificare: ", 1, visiteList.size());
@@ -68,7 +68,7 @@ public class ModificaUtilita {
     //     String statoOriginale = visitaSelezionata.getStato();
 
     //     String[] stati = {"Proposta", "Completa", "Confermata", "Cancellata", "Effettuata"};
-    //     consoleView.mostraMessaggio("Stati disponibili:");
+    //     consoleIO.mostraMessaggio("Stati disponibili:");
     //     for (int i = 0; i < stati.length; i++) {
     //         System.out.printf("%d. %s%n", i + 1, stati[i]);
     //     }
@@ -77,15 +77,15 @@ public class ModificaUtilita {
     //     String nuovoStato = stati[sceltaStato];
 
     //     // Mostra confronto tra prima e dopo
-    //     consoleView.mostraMessaggio("\n--- CONFRONTO MODIFICHE ---");
-    //     consoleView.mostraMessaggio("Stato: " + statoOriginale + " -> " + nuovoStato);
+    //     consoleIO.mostraMessaggio("\n--- CONFRONTO MODIFICHE ---");
+    //     consoleIO.mostraMessaggio("Stato: " + statoOriginale + " -> " + nuovoStato);
 
     //     if (InputDati.yesOrNo("Vuoi confermare e salvare la modifica dello stato?")) {
     //         visitaSelezionata.setStato(nuovoStato);
     //         visiteManagerDB.aggiornaVisita(visitaId, visitaSelezionata);
-    //         consoleView.mostraMessaggio("Stato della visita aggiornato con successo.");
+    //         consoleIO.mostraMessaggio("Stato della visita aggiornato con successo.");
     //     } else {
-    //         consoleView.mostraMessaggio("Modifica annullata. Nessun cambiamento effettuato.");
+    //         consoleIO.mostraMessaggio("Modifica annullata. Nessun cambiamento effettuato.");
     //     }
     // }
 
@@ -101,19 +101,19 @@ public class ModificaUtilita {
     //     ConcurrentHashMap<Integer, Visita> visiteMap = visiteManagerDB.getVisiteMap();
 
     //     if (visiteMap.isEmpty()) {
-    //         consoleView.mostraMessaggio("Non ci sono visite disponibili da modificare.");
+    //         consoleIO.mostraMessaggio("Non ci sono visite disponibili da modificare.");
     //         return;
     //     }
 
-    //     consoleView.mostraMessaggio("Visite disponibili:");
+    //     consoleIO.mostraMessaggio("Visite disponibili:");
     //     for (Map.Entry<Integer, Visita> entry : visiteMap.entrySet()) {
     //         Visita visita = entry.getValue();
-    //         consoleView.mostraMessaggio(visita.toString());
+    //         consoleIO.mostraMessaggio(visita.toString());
     //     }
 
     //     int visitaId = InputDati.leggiIntero("Seleziona l'ID della visita da modificare: ");
     //     if (!visiteMap.containsKey(visitaId)) {
-    //         consoleView.mostraMessaggio("ID visita non valido.");
+    //         consoleIO.mostraMessaggio("ID visita non valido.");
     //         return;
     //     }
 
@@ -126,15 +126,15 @@ public class ModificaUtilita {
     //     LocalDate nuovaData = LocalDate.of(anno, mese, giorno);
 
     //     // Mostra confronto tra prima e dopo
-    //     consoleView.mostraMessaggio("\n--- CONFRONTO MODIFICHE ---");
-    //     consoleView.mostraMessaggio("Data: " + (dataOriginale != null ? dataOriginale : "Nessuna data") + " -> " + nuovaData);
+    //     consoleIO.mostraMessaggio("\n--- CONFRONTO MODIFICHE ---");
+    //     consoleIO.mostraMessaggio("Data: " + (dataOriginale != null ? dataOriginale : "Nessuna data") + " -> " + nuovaData);
 
     //     if (InputDati.yesOrNo("Vuoi confermare e salvare la modifica della data?")) {
     //         visitaSelezionata.setData(nuovaData);
     //         visiteManagerDB.aggiornaVisita(visitaId, visitaSelezionata);
-    //         consoleView.mostraMessaggio("Data della visita aggiornata con successo.");
+    //         consoleIO.mostraMessaggio("Data della visita aggiornata con successo.");
     //     } else {
-    //         consoleView.mostraMessaggio("Modifica annullata. Nessun cambiamento effettuato.");
+    //         consoleIO.mostraMessaggio("Modifica annullata. Nessun cambiamento effettuato.");
     //     }
     // }
 
@@ -143,11 +143,11 @@ public class ModificaUtilita {
     //     ConcurrentHashMap<Integer, Visita> visiteMap = visiteManagerDB.getVisiteMap();
 
     //     if (visiteMap.isEmpty()) {
-    //         consoleView.mostraMessaggio("Non ci sono visite disponibili da modificare.");
+    //         consoleIO.mostraMessaggio("Non ci sono visite disponibili da modificare.");
     //         return;
     //     }
 
-    //     consoleView.mostraMessaggio("Visite disponibili:");
+    //     consoleIO.mostraMessaggio("Visite disponibili:");
     //     for (Map.Entry<Integer, Visita> entry : visiteMap.entrySet()) {
     //         Visita visita = entry.getValue();
     //         System.out.printf("%d. Luogo: %s, Tipi Visita: %s, Volontario: %s, Data: %s%n",
@@ -157,7 +157,7 @@ public class ModificaUtilita {
 
     //     int visitaId = InputDati.leggiIntero("Seleziona l'ID della visita da modificare: ");
     //     if (!visiteMap.containsKey(visitaId)) {
-    //         consoleView.mostraMessaggio("ID visita non valido.");
+    //         consoleIO.mostraMessaggio("ID visita non valido.");
     //         return;
     //     }
 
@@ -170,25 +170,25 @@ public class ModificaUtilita {
     //     visitaAggiornata.setData(nuovaData);
 
     //     visiteManagerDB.aggiornaVisita(visitaId, visitaAggiornata);
-    //     consoleView.mostraMessaggio("Data della visita aggiornata con successo.");
+    //     consoleIO.mostraMessaggio("Data della visita aggiornata con successo.");
     // }
 
     // // Metodo per visualizzare le visite in base allo stato
     // public void modificaStatoVisita() {
-    //     if (consoleView.chiediAnnullaOperazione())
+    //     if (consoleIO.chiediAnnullaOperazione())
     //         return;
 
     //     ConcurrentHashMap<Integer, Visita> visiteMap = visiteManagerDB.getVisiteMap();
     
     //     if (visiteMap.isEmpty()) {
-    //         consoleView.mostraMessaggio("Non ci sono visite disponibili da modificare.");
+    //         consoleIO.mostraMessaggio("Non ci sono visite disponibili da modificare.");
     //         return;
     //     }
     
     //     // Converti le voci della mappa in una lista per avere un ordine stabile e un accesso tramite indice
     //     List<Map.Entry<Integer, Visita>> visiteList = visiteMap.entrySet().stream().toList();
 
-    //     consoleView.mostraMessaggio("Visite disponibili:");
+    //     consoleIO.mostraMessaggio("Visite disponibili:");
     //     for (int i = 0; i < visiteList.size(); i++) {
     //         Map.Entry<Integer, Visita> entry = visiteList.get(i);
     //         Visita visita = entry.getValue();
@@ -205,7 +205,7 @@ public class ModificaUtilita {
     //     int visitaId = visiteList.get(sceltaVisita - 1).getKey();
     
     //     String[] stati = {"Proposta", "Completa", "Confermata", "Cancellata", "Effettuata"};
-    //     consoleView.mostraMessaggio("Stati disponibili:");
+    //     consoleIO.mostraMessaggio("Stati disponibili:");
     //     for (int i = 0; i < stati.length; i++) {
     //         System.out.printf("%d. %s%n", i + 1, stati[i]);
     //     }
@@ -218,7 +218,7 @@ public class ModificaUtilita {
     
     //     // Aggiorna la visita nel database
     //     visiteManagerDB.aggiornaVisita(visitaId, visitaAggiornata);
-    //     consoleView.mostraMessaggio("Stato della visita aggiornato con successo.");
+    //     consoleIO.mostraMessaggio("Stato della visita aggiornato con successo.");
     // }
 
 
@@ -232,14 +232,14 @@ public class ModificaUtilita {
     }
 
     // public void modificaMaxPersone() {
-    //     if (consoleView.chiediAnnullaOperazione())
+    //     if (consoleIO.chiediAnnullaOperazione())
     //         return;
     //     int numeroMax = InputDati.leggiInteroConMinimo("Inserisci il numero massimo di persone per visita: ", 2);
     //     if(InputDati.yesOrNo("Sei sicuro di voler impostare il numero massimo di persone per visita a " + numeroMax + "?")) {
     //         visiteManagerDB.aggiornaMaxPersone(numeroMax);
-    //         consoleView.mostraMessaggio("Numero massimo di persone per visita aggiornato a: " + numeroMax);
+    //         consoleIO.mostraMessaggio("Numero massimo di persone per visita aggiornato a: " + numeroMax);
     //     } else {
-    //         consoleView.mostraMessaggio("Operazione annullata.");
+    //         consoleIO.mostraMessaggio("Operazione annullata.");
     //     }
     // }
 
@@ -249,17 +249,17 @@ public class ModificaUtilita {
     }
 
     // public void eliminaDatePrecluse() {
-    //     if (consoleView.chiediAnnullaOperazione())
+    //     if (consoleIO.chiediAnnullaOperazione())
     //         return;
 
     //     List<Map.Entry<LocalDate, String>> datePrecluse = visiteManagerDB.getDatePrecluseMap().entrySet().stream().toList();
 
     //     if (datePrecluse.isEmpty()) {
-    //         consoleView.mostraMessaggio("Non ci sono date precluse da eliminare.");
+    //         consoleIO.mostraMessaggio("Non ci sono date precluse da eliminare.");
     //         return;
     //     }
     
-    //     consoleView.mostraMessaggio("Date precluse disponibili:");
+    //     consoleIO.mostraMessaggio("Date precluse disponibili:");
 
     //     for (int i = 0; i < datePrecluse.size(); i++) {
     //         Map.Entry<LocalDate, String> entry = datePrecluse.get(i);
@@ -270,9 +270,9 @@ public class ModificaUtilita {
     //     LocalDate dataDaEliminare = datePrecluse.get(scelta).getKey();
     //     if (InputDati.yesOrNo("Sei sicuro di voler eliminare la data preclusa: " + dataDaEliminare + "?")) {
     //         visiteManagerDB.eliminaData(dataDaEliminare);
-    //         consoleView.mostraMessaggio("Data preclusa eliminata con successo.");
+    //         consoleIO.mostraMessaggio("Data preclusa eliminata con successo.");
     //     } else {
-    //         consoleView.mostraMessaggio("Operazione annullata.");
+    //         consoleIO.mostraMessaggio("Operazione annullata.");
     //     }
     // }
 
@@ -281,27 +281,27 @@ public class ModificaUtilita {
     }
 
     // public void eliminaLuogo(LuoghiController luoghiController) {
-    //     if (consoleView.chiediAnnullaOperazione())
+    //     if (consoleIO.chiediAnnullaOperazione())
     //         return;
     //     do {
     //         List<Luogo> luoghi = luoghiController.getLuoghi();
     //         if (luoghi.isEmpty()) {
-    //             consoleView.mostraMessaggio("Nessun luogo disponibile per la modifica.");
+    //             consoleIO.mostraMessaggio("Nessun luogo disponibile per la modifica.");
     //             return;
     //         }
         
-    //         consoleView.mostraMessaggio("Luoghi disponibili:");
-    //         consoleView.mostraElencoConOggetti(luoghi);
+    //         consoleIO.mostraMessaggio("Luoghi disponibili:");
+    //         consoleIO.mostraElencoConOggetti(luoghi);
     //         int scelta = InputDati.leggiIntero("Seleziona il luogo da eliminare: ", 1, luoghi.size()) - 1;
     //         Luogo luogoDaEliminare = luoghi.get(scelta);
             
     //         if (InputDati.yesOrNo("Sei sicuro di voler eliminare il luogo: " + luogoDaEliminare.getNome() + "?. QUESTA AZIONE ELIMINERA' ANCHE LE VISITE AD ESSO COLLEGATE")) {
     //             luoghiController.eliminaLuogo(luogoDaEliminare);
     //         } else {
-    //             consoleView.mostraMessaggio("Operazione annullata.");
+    //             consoleIO.mostraMessaggio("Operazione annullata.");
     //         }
     //         if (luoghiController.getLuoghi().isEmpty()) {
-    //             consoleView.mostraMessaggio("Non ci sono più luoghi disponibili.");
+    //             consoleIO.mostraMessaggio("Non ci sono più luoghi disponibili.");
     //             break;
     //         }
     //     } while (InputDati.yesOrNo("Vuoi eliminare un altro luogo? "));
@@ -317,17 +317,17 @@ public class ModificaUtilita {
     }
 
     // public void modificaLuogo(LuoghiController luoghiController) {
-    //     if (consoleView.chiediAnnullaOperazione())
+    //     if (consoleIO.chiediAnnullaOperazione())
     //         return;
 
     //     List<Luogo> luoghi = luoghiController.getLuoghi();
     //     if (luoghi.isEmpty()) {
-    //         consoleView.mostraMessaggio("Nessun luogo disponibile per la modifica.");
+    //         consoleIO.mostraMessaggio("Nessun luogo disponibile per la modifica.");
     //         return;
     //     }
 
-    //     consoleView.mostraMessaggio("Luoghi disponibili:");
-    //     consoleView.mostraElencoConOggetti(luoghi);
+    //     consoleIO.mostraMessaggio("Luoghi disponibili:");
+    //     consoleIO.mostraElencoConOggetti(luoghi);
     //     int scelta = InputDati.leggiIntero("Seleziona il luogo da modificare: ", 1, luoghi.size()) - 1;
     //     Luogo luogoDaModificare = luoghi.get(scelta);
 
@@ -348,8 +348,8 @@ public class ModificaUtilita {
     //     if (!nuoviTipi.isEmpty() && InputDati.yesOrNo("Vuoi eliminare uno o più tipi di visita attuali?")) {
     //         boolean eliminaAltro;
     //         do {
-    //             consoleView.mostraMessaggio("Tipi di visita attuali:");
-    //             consoleView.mostraElencoConOggetti(nuoviTipi);
+    //             consoleIO.mostraMessaggio("Tipi di visita attuali:");
+    //             consoleIO.mostraElencoConOggetti(nuoviTipi);
     //             int sceltaElimina = InputDati.leggiIntero("Seleziona il numero del tipo di visita da eliminare (oppure 0 per terminare): ", 0, nuoviTipi.size());
     //             if (sceltaElimina == 0) {
     //                 break;
@@ -366,8 +366,8 @@ public class ModificaUtilita {
 
     //     if (!tipiDisponibili.isEmpty() && InputDati.yesOrNo("Vuoi aggiungere nuovi tipi di visita?")) {
     //         while (!tipiDisponibili.isEmpty()) {
-    //             consoleView.mostraMessaggio("Tipi di visita che puoi ancora aggiungere:");
-    //             consoleView.mostraElencoConOggetti(tipiDisponibili);
+    //             consoleIO.mostraMessaggio("Tipi di visita che puoi ancora aggiungere:");
+    //             consoleIO.mostraElencoConOggetti(tipiDisponibili);
 
     //             int sceltaTipi = InputDati.leggiIntero("Seleziona il numero del tipo di visita da aggiungere (oppure 0 per terminare): ", 0, tipiDisponibili.size());
     //             if (sceltaTipi == 0) {
@@ -386,11 +386,11 @@ public class ModificaUtilita {
     //     }
 
     //     // Mostra confronto tra prima e dopo
-    //     consoleView.mostraMessaggio("\n--- CONFRONTO MODIFICHE ---");
-    //     consoleView.mostraMessaggio("Nome: " + nomeOriginale + " -> " + (nuovoNome.isEmpty() ? nomeOriginale : nuovoNome));
-    //     consoleView.mostraMessaggio("Descrizione: " + descrizioneOriginale + " -> " + (nuovaDescrizione.isEmpty() ? descrizioneOriginale : nuovaDescrizione));
-    //     consoleView.mostraMessaggio("Collocazione: " + collocazioneOriginale + " -> " + (nuovaCollocazione.isEmpty() ? collocazioneOriginale : nuovaCollocazione));
-    //     consoleView.mostraMessaggio("Tipi di visita: " + tipiOriginali + " -> " + nuoviTipi);
+    //     consoleIO.mostraMessaggio("\n--- CONFRONTO MODIFICHE ---");
+    //     consoleIO.mostraMessaggio("Nome: " + nomeOriginale + " -> " + (nuovoNome.isEmpty() ? nomeOriginale : nuovoNome));
+    //     consoleIO.mostraMessaggio("Descrizione: " + descrizioneOriginale + " -> " + (nuovaDescrizione.isEmpty() ? descrizioneOriginale : nuovaDescrizione));
+    //     consoleIO.mostraMessaggio("Collocazione: " + collocazioneOriginale + " -> " + (nuovaCollocazione.isEmpty() ? collocazioneOriginale : nuovaCollocazione));
+    //     consoleIO.mostraMessaggio("Tipi di visita: " + tipiOriginali + " -> " + nuoviTipi);
 
     //     // Conferma finale
     //     if (InputDati.yesOrNo("Vuoi confermare e salvare le modifiche?")) {
@@ -405,24 +405,24 @@ public class ModificaUtilita {
     //         }
     //         luogoDaModificare.setTipiVisita(nuoviTipi);
     //         luoghiController.aggiornaLuoghi(luogoDaModificare);
-    //         consoleView.mostraMessaggio("Modifiche salvate con successo.");
+    //         consoleIO.mostraMessaggio("Modifiche salvate con successo.");
     //     } else {
-    //         consoleView.mostraMessaggio("Modifiche annullate. Nessun cambiamento effettuato.");
+    //         consoleIO.mostraMessaggio("Modifiche annullate. Nessun cambiamento effettuato.");
     //     }
     // }
 
     // public void modificaLuogo(LuoghiController luoghiController) {
-    //     if (consoleView.chiediAnnullaOperazione())
+    //     if (consoleIO.chiediAnnullaOperazione())
     //         return;
 
     //     List<Luogo> luoghi = luoghiController.getLuoghi();
     //     if (luoghi.isEmpty()) {
-    //         consoleView.mostraMessaggio("Nessun luogo disponibile per la modifica.");
+    //         consoleIO.mostraMessaggio("Nessun luogo disponibile per la modifica.");
     //         return;
     //     }
 
-    //     consoleView.mostraMessaggio("Luoghi disponibili:");
-    //     consoleView.mostraElencoConOggetti(luoghi);
+    //     consoleIO.mostraMessaggio("Luoghi disponibili:");
+    //     consoleIO.mostraElencoConOggetti(luoghi);
     //     int scelta = InputDati.leggiIntero("Seleziona il luogo da modificare: ", 1, luoghi.size()) - 1;
     //     Luogo luogoDaModificare = luoghi.get(scelta);
         
@@ -440,7 +440,7 @@ public class ModificaUtilita {
     //     if (!nuovaCollocazione.isEmpty()) {
     //         luogoDaModificare.setCollocazione(nuovaCollocazione);
     //     }
-    //     consoleView.mostraMessaggio("Tipi di visite attuali: " + luogoDaModificare.getTipiVisita());
+    //     consoleIO.mostraMessaggio("Tipi di visite attuali: " + luogoDaModificare.getTipiVisita());
     //     List<TipiVisita> tipiAttuali = luogoDaModificare.getTipiVisita();
     //     if (tipiAttuali == null) {
     //         tipiAttuali = new ArrayList<>();
@@ -452,8 +452,8 @@ public class ModificaUtilita {
     //     if (!nuoviTipi.isEmpty() && InputDati.yesOrNo("Vuoi eliminare uno o più tipi di visita attuali?")) {
     //         boolean eliminaAltro;
     //         do {
-    //             consoleView.mostraMessaggio("Tipi di visita attuali:");
-    //             consoleView.mostraElencoConOggetti(nuoviTipi);
+    //             consoleIO.mostraMessaggio("Tipi di visita attuali:");
+    //             consoleIO.mostraElencoConOggetti(nuoviTipi);
     //             int sceltaElimina = InputDati.leggiIntero("Seleziona il numero del tipo di visita da eliminare (oppure 0 per terminare): ", 0, nuoviTipi.size());
     //             if (sceltaElimina == 0) {
     //                 break;
@@ -470,8 +470,8 @@ public class ModificaUtilita {
 
     //     if (!tipiDisponibili.isEmpty() && InputDati.yesOrNo("Vuoi aggiungere nuovi tipi di visita?")) {
     //         while (!tipiDisponibili.isEmpty()) {
-    //             consoleView.mostraMessaggio("Tipi di visita che puoi ancora aggiungere:");
-    //             consoleView.mostraElencoConOggetti(tipiDisponibili);
+    //             consoleIO.mostraMessaggio("Tipi di visita che puoi ancora aggiungere:");
+    //             consoleIO.mostraElencoConOggetti(tipiDisponibili);
 
     //             int sceltaTipi = InputDati.leggiIntero("Seleziona il numero del tipo di visita da aggiungere (oppure 0 per terminare): ", 0, tipiDisponibili.size());
     //             if (sceltaTipi == 0) {
@@ -500,16 +500,16 @@ public class ModificaUtilita {
     }
 
     // public void eliminaVolontario(VolontariController volontariController) {
-    //     if (consoleView.chiediAnnullaOperazione())
+    //     if (consoleIO.chiediAnnullaOperazione())
     //         return;
     //     do {
     //         List<Volontario> volontari = volontariController.getVolontari();
     //         if (volontari.isEmpty()) {
-    //             consoleView.mostraMessaggio("Nessun volontario disponibile per la modifica.");
+    //             consoleIO.mostraMessaggio("Nessun volontario disponibile per la modifica.");
     //             return;
     //         }
-    //         consoleView.mostraMessaggio("Volontari disponibili:");
-    //         consoleView.mostraElencoConOggetti(volontari);
+    //         consoleIO.mostraMessaggio("Volontari disponibili:");
+    //         consoleIO.mostraElencoConOggetti(volontari);
     //         int scelta = InputDati.leggiIntero("Seleziona il volontario da eliminare: ", 1, volontari.size()) - 1;
     //         Volontario volontarioDaEliminare = volontari.get(scelta);
 
@@ -517,7 +517,7 @@ public class ModificaUtilita {
     //             volontariController.eliminaVolontario(volontarioDaEliminare);
     //         }
     //         if (volontariController.getVolontari().isEmpty()) {
-    //             consoleView.mostraMessaggio("Non ci sono più volontari disponibili.");
+    //             consoleIO.mostraMessaggio("Non ci sono più volontari disponibili.");
     //             break;
     //         }
     //     } while (InputDati.yesOrNo("Vuoi eliminare un altro volontario? "));
@@ -528,28 +528,28 @@ public class ModificaUtilita {
     }
 
     // public void cancellaPrenotazione(Fruitore fruitoreCorrente, PrenotazioneManager prenotazioneManager) {
-    //     if (consoleView.chiediAnnullaOperazione())
+    //     if (consoleIO.chiediAnnullaOperazione())
     //         return;
     //     List<Prenotazione> prenotazioni = prenotazioneManager.miePrenotazioni(fruitoreCorrente);
     //     if (prenotazioni.isEmpty()) {
-    //         consoleView.mostraMessaggio("Non hai prenotazioni da cancellare.");
+    //         consoleIO.mostraMessaggio("Non hai prenotazioni da cancellare.");
     //         return;
     //     }
 
-    //     consoleView.mostraMessaggio("Le tue prenotazioni:");
-    //     consoleView.mostraElencoConOggetti(prenotazioni);
+    //     consoleIO.mostraMessaggio("Le tue prenotazioni:");
+    //     consoleIO.mostraElencoConOggetti(prenotazioni);
     //     int scelta = InputDati.leggiIntero("Seleziona la prenotazione da cancellare: ", 1, prenotazioni.size()) - 1;
     //     Prenotazione prenotazioneDaCancellare = prenotazioni.get(scelta);
 
     //     if (InputDati.yesOrNo("Sei sicuro di voler cancellare la prenotazione con codice: " + prenotazioneDaCancellare.getCodicePrenotazione() + "?")) {
     //         boolean successo = prenotazioneManager.rimuoviPrenotazione(prenotazioneDaCancellare);
     //         if (successo) {
-    //             consoleView.mostraMessaggio("Prenotazione cancellata con successo.");
+    //             consoleIO.mostraMessaggio("Prenotazione cancellata con successo.");
     //         } else {
-    //             consoleView.mostraMessaggio("Errore nella cancellazione della prenotazione.");
+    //             consoleIO.mostraMessaggio("Errore nella cancellazione della prenotazione.");
     //         }
     //     } else {
-    //         consoleView.mostraMessaggio("Operazione annullata.");
+    //         consoleIO.mostraMessaggio("Operazione annullata.");
     //     }
     // }
 
@@ -559,18 +559,18 @@ public class ModificaUtilita {
     }
 
     // public void eliminaVisita(VisiteController visiteController) {
-    //     if (consoleView.chiediAnnullaOperazione())
+    //     if (consoleIO.chiediAnnullaOperazione())
     //         return;
 
     //     ConcurrentHashMap<Integer, Visita> visiteMap = visiteController.getVisiteMap();
 
     //     if (visiteMap.isEmpty()) {
-    //         consoleView.mostraMessaggio("Non ci sono visite disponibili da eliminare.");
+    //         consoleIO.mostraMessaggio("Non ci sono visite disponibili da eliminare.");
     //         return;
     //     }
 
-    //     consoleView.mostraMessaggio("Visite disponibili:");
-    //     consoleView.mostraElencoConOggetti(visiteMap.values().stream().toList());
+    //     consoleIO.mostraMessaggio("Visite disponibili:");
+    //     consoleIO.mostraElencoConOggetti(visiteMap.values().stream().toList());
 
     //     int visitaSelect = InputDati.leggiIntero("Seleziona la visita da eliminare: ", 1, visiteMap.size()) - 1;
     //     Visita visitaSelezionata = visiteMap.values().stream().toList().get(visitaSelect);
@@ -596,11 +596,11 @@ public class ModificaUtilita {
     
     // Metodo per modificare il numero massimo
     public void modificaNumeroPersoneIscrivibili() {
-        if (consoleView.chiediAnnullaOperazione())
+        if (consoleIO.chiediAnnullaOperazione())
             return;
         int numeroMax = InputDati.leggiInteroConMinimo("Inserisci il numero massimo di persone iscrivibili per visita: ", 1);
         aggiornaNumeroPersoneIscrivibili(numeroMax);
-        consoleView.mostraMessaggio("Numero massimo di persone iscrivibili per visita aggiornato a: " + numeroMax);
+        consoleIO.mostraMessaggio("Numero massimo di persone iscrivibili per visita aggiornato a: " + numeroMax);
     }
 
     public boolean aggiornaNumeroPersoneIscrivibili(int numeroMax) {

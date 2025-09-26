@@ -16,7 +16,7 @@ import java.time.format.TextStyle;
 import src.model.db.*;
 
 import lib.InputDati;
-import src.view.ConsoleView;
+import src.view.ConsoleIO;
 import src.view.ViewUtilita;
 
 
@@ -40,7 +40,7 @@ public class AggiuntaUtilita {
     private AmbitoTerritoriale ambitoTerritoriale = new AmbitoTerritoriale();
     
 
-    private final ConsoleView consoleView = new ConsoleView();
+    private final ConsoleIO consoleIO = new ConsoleIO();
     private final Map<String, List<LocalDate>> disponibilitaVolontari = new ConcurrentHashMap<>();
     private final PrenotazioneManager prenotazioneManager;
 
@@ -64,7 +64,7 @@ public class AggiuntaUtilita {
     }
 
     // public void aggiungiVisita() {
-    //     if (consoleView.chiediAnnullaOperazione())
+    //     if (consoleIO.chiediAnnullaOperazione())
     //         return;
 
     //     if (InputDati.yesOrNo("Vuoi pianificare la visita usando le disponibilità dei volontari? (s/n)")) {
@@ -81,13 +81,13 @@ public class AggiuntaUtilita {
 
     // // Metodo per aggiungere un volontario
     // public void aggiungiVolontario() {
-    //     if (consoleView.chiediAnnullaOperazione())
+    //     if (consoleIO.chiediAnnullaOperazione())
     //         return;
     //     String nome = InputDati.leggiStringaNonVuota("inserire il nome del volontario: ");
     //     String cognome = InputDati.leggiStringaNonVuota("inserire il cognome del volontario: ");
     //     String email = InputDati.leggiStringaNonVuota("inserire l'email del volontario: ");
     //     String password = InputDati.leggiStringaNonVuota("inserire la password: ");
-    //     consoleView.mostraElencoConOggetti(tipiVisitaMap.values().stream().toList());
+    //     consoleIO.mostraElencoConOggetti(tipiVisitaMap.values().stream().toList());
     //     List<TipiVisita> tipiVisitaSelezionati = new ArrayList<>();
     //     boolean aggiungiAltri = true;
 
@@ -114,15 +114,15 @@ public class AggiuntaUtilita {
 
     // // Metodo per aggiungere un luogo
     // public void aggiungiLuogo() {
-    //     if (consoleView.chiediAnnullaOperazione())
+    //     if (consoleIO.chiediAnnullaOperazione())
     //         return;
-    //     consoleView.mostraElencoConOggetti(luoghiMap.values().stream().toList());
+    //     consoleIO.mostraElencoConOggetti(luoghiMap.values().stream().toList());
     //     String nome = InputDati.leggiStringaNonVuota("inserire il nome del luogo: ");
     //     String descrizione = InputDati.leggiStringaNonVuota("inserire la descrizione del luogo: ");
-    //     consoleView.mostraElencoConOggetti(ambitoTerritoriale.getAmbitoTerritoriale());
+    //     consoleIO.mostraElencoConOggetti(ambitoTerritoriale.getAmbitoTerritoriale());
     //     int luogoIndex = InputDati.leggiIntero("inserire la collocazione del luogo: ", 1, ambitoTerritoriale.getAmbitoTerritoriale().size()) - 1;
     //     String collocazione = ambitoTerritoriale.getAmbitoTerritoriale().get(luogoIndex);
-    //     consoleView.mostraElencoConOggetti(tipiVisitaMap.values().stream().toList());
+    //     consoleIO.mostraElencoConOggetti(tipiVisitaMap.values().stream().toList());
     //     List<TipiVisita> tipiVisitaSelezionati = new ArrayList<>();
     //     boolean aggiungiAltri = true;
 
@@ -136,9 +136,9 @@ public class AggiuntaUtilita {
 
     //     Luogo nuovoLuogo = new Luogo(nome, descrizione, collocazione, tipiVisitaSelezionati);
     //     luoghiMap.putIfAbsent(nome, nuovoLuogo);
-    //     consoleView.mostraMessaggio("Luogo già esistente.");
+    //     consoleIO.mostraMessaggio("Luogo già esistente.");
     //     luoghiManager.aggiungiNuovoLuogo(nuovoLuogo);
-    //     consoleView.mostraMessaggio("Luogo aggiunto: " + nuovoLuogo);
+    //     consoleIO.mostraMessaggio("Luogo aggiunto: " + nuovoLuogo);
     // }
 
 
@@ -148,7 +148,7 @@ public class AggiuntaUtilita {
     // public void aggiungiDatePrecluse() {
     //     boolean continua = true;
     //     do {
-    //         if (consoleView.chiediAnnullaOperazione()){
+    //         if (consoleIO.chiediAnnullaOperazione()){
     //             continua = false;
     //             break;
     //         }
@@ -163,7 +163,7 @@ public class AggiuntaUtilita {
 
 
     public void prenotaVisita(Fruitore fruitoreCorrente) {
-        if (consoleView.chiediAnnullaOperazione())
+        if (consoleIO.chiediAnnullaOperazione())
             return;
 
         List<Visita> visiteDisponibili = new ArrayList<>();
@@ -175,11 +175,11 @@ public class AggiuntaUtilita {
         }
 
         if (visiteDisponibili.isEmpty()) {
-            consoleView.mostraMessaggio("Non ci sono visite disponibili per la prenotazione.");
+            consoleIO.mostraMessaggio("Non ci sono visite disponibili per la prenotazione.");
             return;
         }
 
-        consoleView.mostraElencoConOggetti(visiteDisponibili);
+        consoleIO.mostraElencoConOggetti(visiteDisponibili);
         int scelta = InputDati.leggiIntero("Seleziona la visita da prenotare: ", 1, visiteDisponibili.size());
 
         maxPersoneIscrivibili = modificaUtilita.caricaNumeroPersoneIscrivibili();
@@ -196,31 +196,31 @@ public class AggiuntaUtilita {
         }
     }
     // public void aggiungiVolontariATipoVisita(){
-    //     if (consoleView.chiediAnnullaOperazione())
+    //     if (consoleIO.chiediAnnullaOperazione())
     //         return;
 
     //         if (tipiVisitaList.isEmpty()) {
-    //             consoleView.mostraMessaggio("Nessun tipo di visita disponibile.");
+    //             consoleIO.mostraMessaggio("Nessun tipo di visita disponibile.");
     //             return ;
     //         }
 
-    //         consoleView.mostraMessaggio ("Seleziona il tipo di visita");
-    //         consoleView.mostraElencoConOggetti(tipiVisitaList);
+    //         consoleIO.mostraMessaggio ("Seleziona il tipo di visita");
+    //         consoleIO.mostraElencoConOggetti(tipiVisitaList);
     //         int tipoIndex = InputDati.leggiIntero ("Seleziona il numero del tipo di visita: ", 1, tipiVisitaList.size()) -1;
     //         TipiVisita tipoVisitaScelto = tipiVisitaList.get(tipoIndex);
 
     //         //mostra i volontari disponbili
     //         if (volontariMap.isEmpty()) {
-    //             consoleView.mostraMessaggio("Nessun volontario disponibile.");
+    //             consoleIO.mostraMessaggio("Nessun volontario disponibile.");
     //             return;
     //         }
 
-    //         consoleView.mostraMessaggio ("Seleziona i volontari da assegnare a questo tipo di visita:");
-    //         consoleView.mostraElencoConOggetti(volontariMap.values().stream().toList());
+    //         consoleIO.mostraMessaggio ("Seleziona i volontari da assegnare a questo tipo di visita:");
+    //         consoleIO.mostraElencoConOggetti(volontariMap.values().stream().toList());
     //         List<Volontario> volontariDisponibili = new ArrayList<>(volontariMap.values());
 
     //         //permette selezione multipla
-    //         consoleView.mostraMessaggio("Inserisci i numeri dei volontari separati da virgola (es. 1,3,5):");
+    //         consoleIO.mostraMessaggio("Inserisci i numeri dei volontari separati da virgola (es. 1,3,5):");
     //         String input = InputDati.leggiStringaNonVuota("Volontari selezionati:");
     //         String[] numeri = input.split(",");
     //         List<Volontario> volontariSelezionati = new ArrayList<>();
@@ -231,7 +231,7 @@ public class AggiuntaUtilita {
     //                     volontariSelezionati.add(volontariDisponibili.get(index));
     //                 }
     //             } catch (NumberFormatException e){
-    //                 consoleView.mostraMessaggio("Input non valido: " + numero);
+    //                 consoleIO.mostraMessaggio("Input non valido: " + numero);
     //             }
     //         }
 
@@ -240,7 +240,7 @@ public class AggiuntaUtilita {
     //             volontariManager.aggiungiTipoVisitaAVolontari(volontario.getEmail(), tipoVisitaScelto);
     //         }
 
-    //     consoleView.mostraMessaggio("Tipo di visita " + tipoVisitaScelto + " assegnato a " + volontariSelezionati.size() + " volontari.");
+    //     consoleIO.mostraMessaggio("Tipo di visita " + tipoVisitaScelto + " assegnato a " + volontariSelezionati.size() + " volontari.");
     // }
 
 
@@ -251,16 +251,16 @@ public class AggiuntaUtilita {
     }
 //    // Metodo per rimuovere volontari da un tipo di visita
 //     public void rimuoviVolontariDaTipoVisita() {
-//         if (consoleView.chiediAnnullaOperazione())
+//         if (consoleIO.chiediAnnullaOperazione())
 //             return;
 
 //         if (tipiVisitaList.isEmpty()) {
-//             consoleView.mostraMessaggio("Nessun tipo di visita disponibile.");
+//             consoleIO.mostraMessaggio("Nessun tipo di visita disponibile.");
 //             return;
 //         }
 
-//         consoleView.mostraMessaggio("Seleziona il tipo di visita da cui rimuovere volontari:");
-//         consoleView.mostraElencoConOggetti(tipiVisitaList);
+//         consoleIO.mostraMessaggio("Seleziona il tipo di visita da cui rimuovere volontari:");
+//         consoleIO.mostraElencoConOggetti(tipiVisitaList);
 //         int tipoIndex = InputDati.leggiIntero("Seleziona il numero del tipo di visita: ", 1, tipiVisitaList.size()) - 1;
 //         TipiVisita tipoVisitaScelto = tipiVisitaList.get(tipoIndex);
 
@@ -273,15 +273,15 @@ public class AggiuntaUtilita {
 //         }
 
 //         if (volontariConTipoVisita.isEmpty()) {
-//             consoleView.mostraMessaggio("Nessun volontario ha questo tipo di visita assegnato.");
+//             consoleIO.mostraMessaggio("Nessun volontario ha questo tipo di visita assegnato.");
 //             return;
 //         }
 
-//         consoleView.mostraMessaggio("Volontari con il tipo di visita " + tipoVisitaScelto + ":");
-//         consoleView.mostraElencoConOggetti(volontariConTipoVisita);
+//         consoleIO.mostraMessaggio("Volontari con il tipo di visita " + tipoVisitaScelto + ":");
+//         consoleIO.mostraElencoConOggetti(volontariConTipoVisita);
 
 //         // Permette selezione multipla
-//         consoleView.mostraMessaggio("Inserisci i numeri dei volontari da rimuovere separati da virgola (es. 1,3,5):");
+//         consoleIO.mostraMessaggio("Inserisci i numeri dei volontari da rimuovere separati da virgola (es. 1,3,5):");
 //         String input = InputDati.leggiStringaNonVuota("Volontari selezionati:");
 //         String[] numeri = input.split(",");
 //         List<Volontario> volontariSelezionati = new ArrayList<>();
@@ -293,7 +293,7 @@ public class AggiuntaUtilita {
 //                     volontariSelezionati.add(volontariConTipoVisita.get(index));
 //                 }
 //             } catch (NumberFormatException e) {
-//                 consoleView.mostraMessaggio("Input non valido: " + numero);
+//                 consoleIO.mostraMessaggio("Input non valido: " + numero);
 //             }
 //         }
 
@@ -302,7 +302,7 @@ public class AggiuntaUtilita {
 //             volontariManager.rimuoviTipoVisitaDaVolontario(volontario.getEmail(), tipoVisitaScelto);
 //         }
 
-//         consoleView.mostraMessaggio("Tipo di visita " + tipoVisitaScelto + " rimosso da " + volontariSelezionati.size() + " volontari.");
+//         consoleIO.mostraMessaggio("Tipo di visita " + tipoVisitaScelto + " rimosso da " + volontariSelezionati.size() + " volontari.");
 //     }
 
 }

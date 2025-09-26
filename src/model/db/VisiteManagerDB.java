@@ -76,7 +76,7 @@ public class VisiteManagerDB extends DatabaseManager {
                 pstmt.setInt(8, visita.getDurataMinuti());
                 pstmt.executeUpdate();
     
-                consoleView.mostraMessaggio("Visita aggiunta con successo.");
+                consoleIO.mostraMessaggio("Visita aggiunta con successo.");
             } catch (SQLException e) {
                 System.err.println("Errore durante l'aggiunta della visita: " + e.getMessage());
             }
@@ -184,10 +184,10 @@ public class VisiteManagerDB extends DatabaseManager {
     public void aggiungiNuovaVisita(Visita nuovaVisita) {
         String verificaSql = "SELECT 1 FROM visite WHERE luogo = ? AND data = ? AND volontario = ? AND ora_inizio = ?";
         if(!recordEsiste(verificaSql, nuovaVisita.getLuogo(), nuovaVisita.getData(), nuovaVisita.getVolontario(), nuovaVisita.getOraInizio())){
-            consoleView.mostraMessaggio("La visita non esiste. Procedo con l'aggiunta.");
+            consoleIO.mostraMessaggio("La visita non esiste. Procedo con l'aggiunta.");
             aggiungiVisita(nuovaVisita);
         } else {
-            consoleView.mostraMessaggio("La visita esiste già. Non posso aggiungerla.");
+            consoleIO.mostraMessaggio("La visita esiste già. Non posso aggiungerla.");
             return;
         }
     }
@@ -197,7 +197,7 @@ public class VisiteManagerDB extends DatabaseManager {
         if(!recordEsiste(verificaSql, data)){
             aggiungiDataPreclusa(data, motivo);
         } else {
-            consoleView.mostraMessaggio("La data preclusa esiste già. Non posso aggiungerla.");
+            consoleIO.mostraMessaggio("La data preclusa esiste già. Non posso aggiungerla.");
             return;
         }
     }
@@ -227,10 +227,10 @@ public class VisiteManagerDB extends DatabaseManager {
 
             if (rowsAffected > 0) {
                 visiteMap.remove(visitaId);
-                consoleView.mostraMessaggio("Visita eliminata con successo.");
+                consoleIO.mostraMessaggio("Visita eliminata con successo.");
                 return true;
             } else {
-                consoleView.mostraMessaggio("Nessuna visita trovata da eliminare.");
+                consoleIO.mostraMessaggio("Nessuna visita trovata da eliminare.");
                 return false;
             }
         } catch (SQLException e) {
@@ -260,6 +260,7 @@ public class VisiteManagerDB extends DatabaseManager {
 
     public void eliminaData(LocalDate data){
         eliminaDataPreclusa(data);
+        datePrecluseMap.remove(data);
     }
 
     public void aggiornaVisita(int visitaId, Visita visitaAggiornata){

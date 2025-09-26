@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import lib.InputDati;
 import src.model.AggiuntaUtilita;
@@ -17,7 +18,7 @@ import src.model.db.VolontariManager;
 import src.view.ViewUtilita;
 import src.model.AmbitoTerritoriale;
 import src.model.Luogo;
-import src.view.ConsoleView;
+import src.view.ConsoleIO;
 
 public class ConfiguratoriController {
     private final AggiuntaUtilita addUtilita;
@@ -28,10 +29,12 @@ public class ConfiguratoriController {
     private final VolontariController volontariController;
     private final LuoghiController luoghiController;
     private final VisiteController visiteController;
-    private final VisiteManagerDB visiteManagerDB = new VisiteManagerDB(ThreadPoolController.getInstance());
-    private final VolontariManager volontariManager = new VolontariManager(ThreadPoolController.getInstance());
-    private final LuoghiManager luoghiManager = new LuoghiManager(ThreadPoolController.getInstance());
-    private ConsoleView consoleView = new ConsoleView();
+    private ConsoleIO consoleIO = new ConsoleIO();
+
+    private VolontariManager volontariManager;
+    private LuoghiManager luoghiManager;
+    private VisiteManagerDB visiteManagerDB;
+
 
     public ConfiguratoriController(
         AggiuntaUtilita addUtilita, 
@@ -39,7 +42,10 @@ public class ConfiguratoriController {
         ViewUtilita viewUtilita, 
         VolontariController volontariController,
         LuoghiController luoghiController,
-        VisiteController visiteController
+        VisiteController visiteController,
+        VisiteManagerDB visiteManagerDB,
+        VolontariManager volontariManager,
+        LuoghiManager luoghiManager
     ) {
         this.addUtilita = addUtilita;
         this.modificaUtilita = modificaUtilita;
@@ -47,19 +53,22 @@ public class ConfiguratoriController {
         this.volontariController = volontariController;
         this.luoghiController = luoghiController;
         this.visiteController = visiteController;
+        this.visiteManagerDB = visiteManagerDB;
+        this.volontariManager = volontariManager;   
+        this.luoghiManager = luoghiManager;
     }
 
     // public void aggiungiVolontario() {
     //     addUtilita.aggiungiVolontario();
     // }
     public void aggiungiVolontario() {
-        consoleView.mostraElencoConOggetti(volontariManager.getVolontariMap().values().stream().toList());
+        consoleIO.mostraElencoConOggetti(volontariManager.getVolontariMap().values().stream().toList());
         // Ottieni i dati tramite la View
-        Volontario nuovoVolontario = consoleView.chiediDatiNuovoVolontario();
+        Volontario nuovoVolontario = consoleIO.chiediDatiNuovoVolontario();
         if (nuovoVolontario != null && InputDati.yesOrNo("Vuoi confermare e aggiungere il volontario?")) {
             addUtilita.aggiungiVolontario(nuovoVolontario);
         } else {
-            consoleView.mostraMessaggio("Operazione annullata.");
+            consoleIO.mostraMessaggio("Operazione annullata.");
         }
     }
 
@@ -71,13 +80,13 @@ public class ConfiguratoriController {
     //     addUtilita.aggiungiLuogo();
     // }
     public void aggiungiLuogo() {
-        consoleView.mostraElencoConOggetti(luoghiManager.getLuoghiMap().values().stream().toList());
+        consoleIO.mostraElencoConOggetti(luoghiManager.getLuoghiMap().values().stream().toList());
         // Ottieni i dati tramite la View
-        Luogo nuovoLuogo = consoleView.chiediDatiNuovoLuogo(ambitoTerritoriale);
+        Luogo nuovoLuogo = consoleIO.chiediDatiNuovoLuogo(ambitoTerritoriale);
         if (nuovoLuogo != null && InputDati.yesOrNo("Vuoi confermare e aggiungere il luogo?")) {
             addUtilita.aggiungiLuogo(nuovoLuogo);
         } else {
-            consoleView.mostraMessaggio("Operazione annullata.");
+            consoleIO.mostraMessaggio("Operazione annullata.");
         }
     }
 
@@ -97,12 +106,12 @@ public class ConfiguratoriController {
     //     modificaUtilita.modificaMaxPersone();
     // }
     public void modificaMaxPersone() {
-        int numeroMax = consoleView.chiediNumeroMaxPersone();
-        if (consoleView.chiediConfermaNumeroMax(numeroMax)) {
+        int numeroMax = consoleIO.chiediNumeroMaxPersone();
+        if (consoleIO.chiediConfermaNumeroMax(numeroMax)) {
             boolean successo = modificaUtilita.aggiornaMaxPersone(numeroMax);
-            consoleView.mostraRisultatoAggiornamentoMaxPersone(successo, numeroMax);
+            consoleIO.mostraRisultatoAggiornamentoMaxPersone(successo, numeroMax);
         } else {
-            consoleView.mostraMessaggio("Operazione annullata.");
+            consoleIO.mostraMessaggio("Operazione annullata.");
         }
     }
 
@@ -112,18 +121,18 @@ public class ConfiguratoriController {
     public void modificaDataVisita() {
         List<Visita> visite = new ArrayList<>(visiteManagerDB.getVisiteMap().values());
         if (visite.isEmpty()) {
-            consoleView.mostraMessaggio("Non ci sono visite disponibili da modificare.");
+            consoleIO.mostraMessaggio("Non ci sono visite disponibili da modificare.");
             return;
         }
-        int scelta = consoleView.chiediSelezioneVisita(visite);
+        int scelta = consoleIO.chiediSelezioneVisita(visite);
         Visita visitaSelezionata = visite.get(scelta);
         LocalDate dataOriginale = visitaSelezionata.getData();
-        LocalDate nuovaData = consoleView.chiediNuovaDataVisita(dataOriginale);
-        if (consoleView.chiediConfermaModificaData(dataOriginale, nuovaData)) {
+        LocalDate nuovaData = consoleIO.chiediNuovaDataVisita(dataOriginale);
+        if (consoleIO.chiediConfermaModificaData(dataOriginale, nuovaData)) {
             boolean successo = modificaUtilita.aggiornaDataVisita(visitaSelezionata.getId(), nuovaData);
-            consoleView.mostraRisultatoModificaData(successo);
+            consoleIO.mostraRisultatoModificaData(successo);
         } else {
-            consoleView.mostraMessaggio("Modifica annullata. Nessun cambiamento effettuato.");
+            consoleIO.mostraMessaggio("Modifica annullata. Nessun cambiamento effettuato.");
         }
     }
 
@@ -132,27 +141,27 @@ public class ConfiguratoriController {
     // }
 
     public void aggiungiVisita() {
-        consoleView.mostraElencoConOggetti(visiteManagerDB.getVisiteMap().values().stream().toList());
+        consoleIO.mostraElencoConOggetti(visiteManagerDB.getVisiteMap().values().stream().toList());
         Visita nuovaVisita = null;
-        if (consoleView.chiediAnnullaOperazione())
+        if (consoleIO.chiediAnnullaOperazione())
             return;
 
         if (InputDati.yesOrNo("Vuoi pianificare la visita usando le disponibilità dei volontari? (s/n)")) {
-            nuovaVisita = consoleView.pianificazioneGuidata(visiteManagerDB, volontariManager, luoghiManager);
+            nuovaVisita = consoleIO.pianificazioneGuidata(visiteManagerDB, volontariManager, luoghiManager);
         } else {
-            nuovaVisita = consoleView.pianificazioneLibera(visiteManagerDB, volontariManager, luoghiManager);
+            nuovaVisita = consoleIO.pianificazioneLibera(visiteManagerDB, volontariManager, luoghiManager);
         }
 
 
         if (nuovaVisita != null && InputDati.yesOrNo("Vuoi confermare e aggiungere la visita?")) {
             boolean successo = addUtilita.aggiungiVisita(nuovaVisita);
             if (successo) {
-                consoleView.mostraMessaggio("Visita aggiunta con successo!");
+                consoleIO.mostraMessaggio("Visita aggiunta con successo!");
             } else {
-                consoleView.mostraMessaggio("Errore nell'aggiunta della visita.");
+                consoleIO.mostraMessaggio("Errore nell'aggiunta della visita.");
             }
         } else {
-            consoleView.mostraMessaggio("Operazione annullata.");
+            consoleIO.mostraMessaggio("Operazione annullata.");
         }
     }
 
@@ -163,27 +172,27 @@ public class ConfiguratoriController {
     public void modificaStatoVisita() {
         List<Visita> visite = new ArrayList<>(visiteManagerDB.getVisiteMap().values());
         if (visite.isEmpty()) {
-            consoleView.mostraMessaggio("Non ci sono visite disponibili da modificare.");
+            consoleIO.mostraMessaggio("Non ci sono visite disponibili da modificare.");
             return;
         }
-        consoleView.mostraVisiteDisponibili(visite);
+        consoleIO.mostraVisiteDisponibili(visite);
 
-        int scelta = consoleView.chiediSelezioneVisita(visite.size());
+        int scelta = consoleIO.chiediSelezioneVisita(visite.size());
         Visita visitaSelezionata = visite.get(scelta - 1);
 
         String statoOriginale = visitaSelezionata.getStato();
         String[] stati = {"Proposta", "Completa", "Confermata", "Cancellata", "Effettuata"};
-        String nuovoStato = consoleView.chiediNuovoStato(stati);
+        String nuovoStato = consoleIO.chiediNuovoStato(stati);
 
-        if (consoleView.chiediConfermaModifica(statoOriginale, nuovoStato)) {
+        if (consoleIO.chiediConfermaModifica(statoOriginale, nuovoStato)) {
             boolean successo = modificaUtilita.aggiornaStatoVisita(visitaSelezionata.getId(), nuovoStato);
             if (successo) {
-                consoleView.mostraMessaggio("Stato della visita aggiornato con successo.");
+                consoleIO.mostraMessaggio("Stato della visita aggiornato con successo.");
             } else {
-                consoleView.mostraMessaggio("Errore nell'aggiornamento dello stato.");
+                consoleIO.mostraMessaggio("Errore nell'aggiornamento dello stato.");
             }
         } else {
-            consoleView.mostraMessaggio("Modifica annullata. Nessun cambiamento effettuato.");
+            consoleIO.mostraMessaggio("Modifica annullata. Nessun cambiamento effettuato.");
         }
     }
 
@@ -196,17 +205,17 @@ public class ConfiguratoriController {
     // }
 
     public void aggiungiDatePrecluse() {
-        consoleView.mostraElencoConOggetti(visiteManagerDB.getDatePrecluseMap().entrySet().stream().toList());
+        consoleIO.mostraElencoConOggetti(visiteManagerDB.getDatePrecluseMap().entrySet().stream().toList());
         boolean continua = true;
         do {
-            if (consoleView.chiediAnnullaOperazione()) {
+            if (consoleIO.chiediAnnullaOperazione()) {
                 break;
             }
-            LocalDate data = consoleView.chiediDataPreclusa();
+            LocalDate data = consoleIO.chiediDataPreclusa();
             if (data != null) {
-                String motivo = consoleView.chiediMotivoPreclusione(data);
+                String motivo = consoleIO.chiediMotivoPreclusione(data);
                 addUtilita.aggiungiDataPreclusa(data, motivo);
-                consoleView.mostraMessaggio("Data preclusa aggiunta con successo.");
+                consoleIO.mostraMessaggio("Data preclusa aggiunta con successo.");
             }
         } while (continua);
     }
@@ -220,18 +229,18 @@ public class ConfiguratoriController {
     // }
 
     public void eliminaDatePrecluse() {
-        List<Map.Entry<LocalDate, String>> datePrecluse = visiteManagerDB.getDatePrecluseMap().entrySet().stream().toList();
+        ConcurrentHashMap<LocalDate, String> datePrecluse = visiteManagerDB.getDatePrecluseMap();
         if (datePrecluse.isEmpty()) {
-            consoleView.mostraMessaggio("Non ci sono date precluse da eliminare.");
+            consoleIO.mostraMessaggio("Non ci sono date precluse da eliminare.");
             return;
         }
-        int scelta = consoleView.chiediDataPreclusaDaEliminare(datePrecluse);
-        LocalDate dataDaEliminare = datePrecluse.get(scelta).getKey();
-        if (consoleView.chiediConfermaEliminazioneData(dataDaEliminare)) {
+        int scelta = consoleIO.chiediDataPreclusaDaEliminare(datePrecluse);
+        LocalDate dataDaEliminare = new ArrayList<>(datePrecluse.keySet()).get(scelta);
+        if (consoleIO.chiediConfermaEliminazioneData(dataDaEliminare)) {
             boolean successo = modificaUtilita.eliminaDataPreclusa(dataDaEliminare);
-            consoleView.mostraRisultatoEliminazioneData(successo);
+            consoleIO.mostraRisultatoEliminazioneData(successo);
         } else {
-            consoleView.mostraRisultatoEliminazioneData(false);
+            consoleIO.mostraRisultatoEliminazioneData(false);
         }
     }
 
@@ -250,15 +259,15 @@ public class ConfiguratoriController {
     public void eliminaLuogo() {
         List<Luogo> luoghi = luoghiController.getLuoghi();
         if (luoghi.isEmpty()) {
-            consoleView.mostraMessaggio("Nessun luogo disponibile per la modifica.");
+            consoleIO.mostraMessaggio("Nessun luogo disponibile per la modifica.");
             return;
         }
-        int scelta = consoleView.chiediSelezioneLuogo(luoghi);
+        int scelta = consoleIO.chiediSelezioneLuogo(luoghi);
         Luogo luogoDaEliminare = luoghi.get(scelta);
-        if (consoleView.chiediConfermaEliminazioneLuogo(luogoDaEliminare)) {
+        if (consoleIO.chiediConfermaEliminazioneLuogo(luogoDaEliminare)) {
             modificaUtilita.eliminaLuogo(luogoDaEliminare, luoghiController);
         } else {
-            consoleView.mostraMessaggio("Operazione annullata.");
+            consoleIO.mostraMessaggio("Operazione annullata.");
         }
     }
 
@@ -269,23 +278,23 @@ public class ConfiguratoriController {
     public void modificaLuogo() {
         List<Luogo> luoghi = luoghiController.getLuoghi();
         if (luoghi.isEmpty()) {
-            consoleView.mostraMessaggio("Nessun luogo disponibile per la modifica.");
+            consoleIO.mostraMessaggio("Nessun luogo disponibile per la modifica.");
             return;
         }
-        int scelta = consoleView.chiediSelezioneLuogo(luoghi);
+        int scelta = consoleIO.chiediSelezioneLuogo(luoghi);
         Luogo luogoDaModificare = luoghi.get(scelta);
 
-        String nuovoNome = consoleView.chiediNuovoNomeLuogo(luogoDaModificare.getNome());
-        String nuovaDescrizione = consoleView.chiediNuovaDescrizioneLuogo(luogoDaModificare.getDescrizione());
-        String nuovaCollocazione = consoleView.chiediNuovaCollocazioneLuogo(luogoDaModificare.getCollocazione());
-        List<TipiVisita> nuoviTipi = consoleView.chiediNuoviTipiVisita(luogoDaModificare.getTipiVisita());
+        String nuovoNome = consoleIO.chiediNuovoNomeLuogo(luogoDaModificare.getNome());
+        String nuovaDescrizione = consoleIO.chiediNuovaDescrizioneLuogo(luogoDaModificare.getDescrizione());
+        String nuovaCollocazione = consoleIO.chiediNuovaCollocazioneLuogo(luogoDaModificare.getCollocazione());
+        List<TipiVisita> nuoviTipi = consoleIO.chiediNuoviTipiVisita(luogoDaModificare.getTipiVisita());
 
-        consoleView.mostraConfrontoLuogo(luogoDaModificare, nuovoNome, nuovaDescrizione, nuovaCollocazione, nuoviTipi);
+        consoleIO.mostraConfrontoLuogo(luogoDaModificare, nuovoNome, nuovaDescrizione, nuovaCollocazione, nuoviTipi);
 
         if (InputDati.yesOrNo("Vuoi confermare e salvare le modifiche?")) {
             modificaUtilita.aggiornaLuogo(luogoDaModificare, nuovoNome, nuovaDescrizione, nuovaCollocazione, nuoviTipi, luoghiController);
         } else {
-            consoleView.mostraMessaggio("Modifiche annullate. Nessun cambiamento effettuato.");
+            consoleIO.mostraMessaggio("Modifiche annullate. Nessun cambiamento effettuato.");
         }
     }
 
@@ -296,15 +305,15 @@ public class ConfiguratoriController {
     public void eliminaVolontario() {
         List<Volontario> volontari = volontariController.getVolontari();
         if (volontari.isEmpty()) {
-            consoleView.mostraMessaggio("Nessun volontario disponibile per la modifica.");
+            consoleIO.mostraMessaggio("Nessun volontario disponibile per la modifica.");
             return;
         }
-        List<Volontario> selezionati = consoleView.chiediVolontariMultipli(volontari);
+        List<Volontario> selezionati = consoleIO.chiediVolontariMultipli(volontari);
         for (Volontario volontarioDaEliminare : selezionati) {
-            if (consoleView.chiediConfermaEliminazioneVolontario(volontarioDaEliminare)) {
+            if (consoleIO.chiediConfermaEliminazioneVolontario(volontarioDaEliminare)) {
                 modificaUtilita.eliminaVolontario(volontarioDaEliminare, volontariController);
             } else {
-                consoleView.mostraMessaggio("Operazione annullata.");
+                consoleIO.mostraMessaggio("Operazione annullata.");
             }
         }
     }
@@ -314,26 +323,26 @@ public class ConfiguratoriController {
     // }
 
     public void aggiungiVolontariATipoVisita() {
-        if (consoleView.chiediAnnullaOperazione()) return;
+        if (consoleIO.chiediAnnullaOperazione()) return;
 
         Map<String, Volontario> volontariMap = volontariManager.getVolontariMap();
         List<TipiVisita> tipiVisitaList = visiteManagerDB.getTipiVisitaList();
 
         if (tipiVisitaList.isEmpty()) {
-            consoleView.mostraMessaggio("Nessun tipo di visita disponibile.");
+            consoleIO.mostraMessaggio("Nessun tipo di visita disponibile.");
             return;
         }
-        TipiVisita tipoVisitaScelto = consoleView.chiediTipoVisita(tipiVisitaList);
+        TipiVisita tipoVisitaScelto = consoleIO.chiediTipoVisita(tipiVisitaList);
 
         if (volontariMap.isEmpty()) {
-            consoleView.mostraMessaggio("Nessun volontario disponibile.");
+            consoleIO.mostraMessaggio("Nessun volontario disponibile.");
             return;
         }
         List<Volontario> volontariDisponibili = new ArrayList<>(volontariMap.values());
-        List<Volontario> volontariSelezionati = consoleView.chiediVolontariMultipli(volontariDisponibili);
+        List<Volontario> volontariSelezionati = consoleIO.chiediVolontariMultipli(volontariDisponibili);
 
         addUtilita.assegnaTipoVisitaAVolontari(volontariSelezionati, tipoVisitaScelto);
-        consoleView.mostraMessaggio("Tipo di visita " + tipoVisitaScelto + " assegnato a " + volontariSelezionati.size() + " volontari.");
+        consoleIO.mostraMessaggio("Tipo di visita " + tipoVisitaScelto + " assegnato a " + volontariSelezionati.size() + " volontari.");
     }
 
 
@@ -342,29 +351,29 @@ public class ConfiguratoriController {
     //     addUtilita.rimuoviVolontariDaTipoVisita();
     // }
     public void rimuoviVolontariDaTipoVisita() {
-        if (consoleView.chiediAnnullaOperazione()) return;
+        if (consoleIO.chiediAnnullaOperazione()) return;
 
         Map<String, Volontario> volontariMap = volontariManager.getVolontariMap();
         List<TipiVisita> tipiVisitaList = visiteManagerDB.getTipiVisitaList();
 
         if (tipiVisitaList.isEmpty()) {
-            consoleView.mostraMessaggio("Nessun tipo di visita disponibile.");
+            consoleIO.mostraMessaggio("Nessun tipo di visita disponibile.");
             return;
         }
-        TipiVisita tipoVisitaScelto = consoleView.chiediTipoVisita(tipiVisitaList);
+        TipiVisita tipoVisitaScelto = consoleIO.chiediTipoVisita(tipiVisitaList);
 
         List<Volontario> volontariConTipoVisita = volontariMap.values().stream()
             .filter(v -> v.getTipiDiVisite().contains(tipoVisitaScelto))
             .toList();
 
         if (volontariConTipoVisita.isEmpty()) {
-            consoleView.mostraMessaggio("Nessun volontario ha questo tipo di visita assegnato.");
+            consoleIO.mostraMessaggio("Nessun volontario ha questo tipo di visita assegnato.");
             return;
         }
-        List<Volontario> volontariSelezionati = consoleView.chiediVolontariMultipli(volontariConTipoVisita);
+        List<Volontario> volontariSelezionati = consoleIO.chiediVolontariMultipli(volontariConTipoVisita);
 
         addUtilita.rimuoviTipoVisitaDaVolontari(volontariSelezionati, tipoVisitaScelto);
-        consoleView.mostraMessaggio("Tipo di visita " + tipoVisitaScelto + " rimosso da " + volontariSelezionati.size() + " volontari.");
+        consoleIO.mostraMessaggio("Tipo di visita " + tipoVisitaScelto + " rimosso da " + volontariSelezionati.size() + " volontari.");
     }
 
     public void visualizzaVolontariPerTipoVisita(){
@@ -378,15 +387,15 @@ public class ConfiguratoriController {
     public void eliminaVisita() {
         List<Visita> visite = visiteController.getVisite();
         if (visite.isEmpty()) {
-            consoleView.mostraMessaggio("Nessuna visita disponibile per la modifica.");
+            consoleIO.mostraMessaggio("Nessuna visita disponibile per la modifica.");
             return;
         }
-        int scelta = consoleView.chiediSelezioneVisita(visite);
+        int scelta = consoleIO.chiediSelezioneVisita(visite);
         Visita visitaDaEliminare = visite.get(scelta);
-        if (consoleView.chiediConfermaEliminazioneVisita(visitaDaEliminare)) {
+        if (consoleIO.chiediConfermaEliminazioneVisita(visitaDaEliminare)) {
             modificaUtilita.eliminaVisita(visitaDaEliminare, visiteController);
         } else {
-            consoleView.mostraMessaggio("Operazione annullata.");
+            consoleIO.mostraMessaggio("Operazione annullata.");
         }
     }
 
@@ -395,12 +404,12 @@ public class ConfiguratoriController {
     // }
 
     public void modificaNumeroPersoneIscrivibili() {
-        int numeroMax = consoleView.chiediNumeroMaxPersone();
-        if (consoleView.chiediConfermaNumeroMax(numeroMax)) {
+        int numeroMax = consoleIO.chiediNumeroMaxPersone();
+        if (consoleIO.chiediConfermaNumeroMax(numeroMax)) {
             boolean successo = modificaUtilita.aggiornaNumeroPersoneIscrivibili(numeroMax);
-            consoleView.mostraRisultatoAggiornamentoNumeroMax(successo, numeroMax);
+            consoleIO.mostraRisultatoAggiornamentoNumeroMax(successo, numeroMax);
         } else {
-            consoleView.mostraMessaggio("Operazione annullata.");
+            consoleIO.mostraMessaggio("Operazione annullata.");
         }
     }
 }

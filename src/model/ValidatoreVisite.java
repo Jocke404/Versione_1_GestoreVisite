@@ -8,12 +8,12 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import src.model.db.VisiteManagerDB;
-import src.view.ConsoleView;
+import src.view.ConsoleIO;
 
 public class ValidatoreVisite {
     private VisiteManagerDB visiteManager;
     private ConcurrentHashMap<Integer, Visita> visiteMap = new ConcurrentHashMap<>();
-    private ConsoleView consoleView = new ConsoleView();
+    private ConsoleIO consoleIO = new ConsoleIO();
 
     public ValidatoreVisite(VisiteManagerDB visiteManager) {
         this.visiteManager = visiteManager;
@@ -125,7 +125,7 @@ public class ValidatoreVisite {
         
         // Verifica se la durata è compatibile con l'orario di chiusura
         if (INIZIO_GIORNATA.plusMinutes(durataMinuti).isAfter(FINE_GIORNATA)) {
-            consoleView.mostraErrore("Durata troppo lunga: la visita non rientra nell'orario di apertura");
+            consoleIO.mostraErrore("Durata troppo lunga: la visita non rientra nell'orario di apertura");
             return slotDisponibili; // Lista vuota
         }
         
@@ -173,8 +173,8 @@ public class ValidatoreVisite {
     //     List<Integer> giorniDisponibili = new ArrayList<>();
     //     List<TipiVisita> tipiVisitaVolontario = volontario.getTipiDiVisite();
 
-    //     consoleView.mostraMessaggio("Calendario del mese di " + meseProssimo.getMonth() + " " + meseProssimo.getYear() + ":");
-    //     consoleView.mostraMessaggio("Giorno\tGiorno della settimana");
+    //     consoleIO.mostraMessaggio("Calendario del mese di " + meseProssimo.getMonth() + " " + meseProssimo.getYear() + ":");
+    //     consoleIO.mostraMessaggio("Giorno\tGiorno della settimana");
 
     //     for (int giorno = 1; giorno <= ym.lengthOfMonth(); giorno++) {
     //         LocalDate data = ym.atDay(giorno);
@@ -215,12 +215,12 @@ public class ValidatoreVisite {
     // public List<LocalDate> raccogliDateDisponibili(List<Integer> giorniDisponibili, YearMonth ym) {
     //     List<LocalDate> dateDisponibili = new ArrayList<>();
 
-    //     consoleView.mostraMessaggio("Seleziona i giorni in cui sei disponibile per il mese di " + 
+    //     consoleIO.mostraMessaggio("Seleziona i giorni in cui sei disponibile per il mese di " + 
     //                             ym.getMonth().getDisplayName(TextStyle.FULL, Locale.ITALIAN) + " " + ym.getYear() + ":");
         
     //     boolean continua = true;
     //     do {
-    //         consoleView.mostraMessaggio("Giorni disponibili: " + giorniDisponibili);
+    //         consoleIO.mostraMessaggio("Giorni disponibili: " + giorniDisponibili);
     //         int giorno = InputDati.leggiIntero("Inserisci il giorno da aggiungere (0 per terminare): ", 0, ym.lengthOfMonth());
             
     //         if (giorno == 0) {
@@ -232,17 +232,17 @@ public class ValidatoreVisite {
     //             LocalDate data = ym.atDay(giorno);
     //             if (!dateDisponibili.contains(data)) {
     //                 dateDisponibili.add(data);
-    //                 consoleView.mostraMessaggio("Data " + data + " aggiunta alle tue disponibilità.");
+    //                 consoleIO.mostraMessaggio("Data " + data + " aggiunta alle tue disponibilità.");
     //                 giorniDisponibili.remove(Integer.valueOf(giorno)); // Rimuovi dalla lista dei disponibili
     //             } else {
-    //                 consoleView.mostraMessaggio("Hai già inserito questa data.");
+    //                 consoleIO.mostraMessaggio("Hai già inserito questa data.");
     //             }
     //         } else {
-    //             consoleView.mostraMessaggio("Giorno non disponibile o già selezionato. Scegli un giorno valido.");
+    //             consoleIO.mostraMessaggio("Giorno non disponibile o già selezionato. Scegli un giorno valido.");
     //         }
             
     //         if (giorniDisponibili.isEmpty()) {
-    //             consoleView.mostraMessaggio("Hai selezionato tutti i giorni disponibili.");
+    //             consoleIO.mostraMessaggio("Hai selezionato tutti i giorni disponibili.");
     //             continua = false;
     //         }
     //     } while (continua);

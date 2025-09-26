@@ -33,7 +33,7 @@ public class MasterController {
     private ValidatoreVisite validatore;
     private AmbitoTerritoriale ambitoTerritoriale = new AmbitoTerritoriale();
     private MenuFactory menuFactory = new MenuFactory();
-    private ConsoleView consoleView = new ConsoleView();
+    private ConsoleIO consoleIO = new ConsoleIO();
 
 
 
@@ -64,12 +64,12 @@ public class MasterController {
         luoghiController = new LuoghiController(luoghiManager, viewUtilita);
         
 
-        ConsoleView consoleView = new ConsoleView();
+        ConsoleIO consoleIO = new ConsoleIO();
         CredentialManager credentialManager = new CredentialManager(
             databaseUpdater, volontariManager, configuratoriManager, fruitoreManager);
         
         AuthenticationController authenticationController = new AuthenticationController(
-            credentialManager, consoleView);
+            credentialManager, consoleIO);
 
         MasterController masterController = this;
         masterController.authenticationController = authenticationController;
@@ -102,8 +102,8 @@ public class MasterController {
         isAuth = authenticationController.autentica();
         if (isAuth) {
             utenteCorrente = authenticationController.getUtenteCorrente();
-            volontariController = new VolontariController(volontariManager, aggiuntaUtilita, consoleView, volontarioCorrente, validatore, viewUtilita);
-            configuratoriController = new ConfiguratoriController(aggiuntaUtilita, modificaUtilita, viewUtilita, volontariController, luoghiController, visiteController);
+            volontariController = new VolontariController(volontariManager, aggiuntaUtilita, consoleIO, volontarioCorrente, validatore, viewUtilita);
+            configuratoriController = new ConfiguratoriController(aggiuntaUtilita, modificaUtilita, viewUtilita, volontariController, luoghiController, visiteController, visiteManager, volontariManager, luoghiManager);
             fruitoreController = new FruitoreController(fruitoreManager, aggiuntaUtilita, viewUtilita, modificaUtilita, fruitoreCorrente, prenotazioneManager);
         } else {
             utenteCorrente = null;
@@ -129,15 +129,15 @@ public class MasterController {
                 fruitoreController.fruitoreCorrente = (Fruitore) utenteCorrente;
                 menu = menuFactory.creaMenuFruitore(fruitoreController);
             } else {
-                consoleView.mostraMessaggio("Errore: tipo di utente non riconosciuto.");
+                consoleIO.mostraMessaggio("Errore: tipo di utente non riconosciuto.");
             }
         } else {
-            consoleView.mostraMessaggio("Accesso negato. Effettua prima l'autenticazione.");
+            consoleIO.mostraMessaggio("Accesso negato. Effettua prima l'autenticazione.");
         }
         if (menu != null) {
             menu.mostraMenu();
         } else {
-            consoleView.mostraMessaggio("Errore nella creazione del menu.");
+            consoleIO.mostraMessaggio("Errore nella creazione del menu.");
         }
     }
 

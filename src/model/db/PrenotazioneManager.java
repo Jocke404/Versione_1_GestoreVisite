@@ -29,19 +29,19 @@ public class PrenotazioneManager extends DatabaseManager {
         // Verifica disponibilità posti
         Visita visita = visiteManager.getVisiteMap().get(idVisita);
         if (visita == null) {
-            consoleView.mostraErrore("Visita non trovata");
+            consoleIO.mostraErrore("Visita non trovata");
             return false;
         }
 
         if (!verificaDisponibilitaPosti(visita, numeroPersone)) {
-            consoleView.mostraErrore("Posti insufficienti. Disponibili: " + 
+            consoleIO.mostraErrore("Posti insufficienti. Disponibili: " + 
                 (visita.getMaxPersone() - visita.getPostiPrenotati()));
             return false;
         }
 
         // Verifica che il fruitore non abbia già prenotato questa visita
         if (haFruitorePrenotatoVisita(emailFruitore, idVisita)) {
-            consoleView.mostraErrore("Hai già prenotato questa visita");
+            consoleIO.mostraErrore("Hai già prenotato questa visita");
             return false;
         }
 
@@ -80,7 +80,7 @@ public class PrenotazioneManager extends DatabaseManager {
             conn.commit();
             prenotazioniMap.put(prenotazione.getCodicePrenotazione(), prenotazione);
             
-            consoleView.mostraMessaggio("Prenotazione confermata! Codice: " + prenotazione.getCodicePrenotazione());
+            consoleIO.mostraMessaggio("Prenotazione confermata! Codice: " + prenotazione.getCodicePrenotazione());
             return true;
 
         } catch (SQLException e) {
@@ -149,7 +149,7 @@ public class PrenotazioneManager extends DatabaseManager {
         Prenotazione prenotazione = prenotazioniMap.get(codicePrenotazione);
 
         if (prenotazione == null || !prenotazione.getEmailFruitore().equals(emailFruitore)) {
-            consoleView.mostraErrore("Prenotazione non trovata o non autorizzata");
+            consoleIO.mostraErrore("Prenotazione non trovata o non autorizzata");
             return false;
         }
 
@@ -174,7 +174,7 @@ public class PrenotazioneManager extends DatabaseManager {
             conn.commit();
             prenotazione.setStato("CANCELLATA");
             
-            consoleView.mostraMessaggio("Prenotazione cancellata");
+            consoleIO.mostraMessaggio("Prenotazione cancellata");
             return true;
 
         } catch (SQLException e) {

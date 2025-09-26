@@ -25,7 +25,7 @@ import src.model.ValidatoreVisite;
 import src.model.db.LuoghiManager;
 import src.model.db.VolontariManager;
 
-public class ConsoleView implements View{
+public class ConsoleIO implements View{
 
     private final Map<String, List<LocalDate>> disponibilitaVolontari = new ConcurrentHashMap<>();
     private final List<Integer> durataList = List.of(30, 60, 90, 120);
@@ -447,11 +447,11 @@ public class ConsoleView implements View{
     }
 
     //DATE PRECLUSE---------------------------------------------------------------------------------------------------------------
-    public int chiediDataPreclusaDaEliminare(List<Map.Entry<LocalDate, String>> datePrecluse) {
+    public int chiediDataPreclusaDaEliminare(ConcurrentHashMap<LocalDate, String> datePrecluse) {
+        int i = 1;
         mostraMessaggio("Date precluse disponibili:");
-        for (int i = 0; i < datePrecluse.size(); i++) {
-            Map.Entry<LocalDate, String> entry = datePrecluse.get(i);
-            System.out.printf("%d. Data: %s, Motivo: %s%n", i + 1, entry.getKey(), entry.getValue());
+        for (Map.Entry<LocalDate, String> entry : datePrecluse.entrySet()) {
+            System.out.printf("%d\tData: %s ---> Motivo: %s%n", i++, entry.getKey(), entry.getValue());
         }
         return InputDati.leggiIntero("Seleziona la data preclusa da eliminare: ", 1, datePrecluse.size()) - 1;
     }

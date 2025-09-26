@@ -1,18 +1,18 @@
 package src.model.db;
 
 import src.model.Utente;
-import src.view.ConsoleView;
+import src.view.ConsoleIO;
 import src.controller.ThreadPoolController;
 import java.sql.*;
 import java.util.concurrent.ExecutorService;
 
 public abstract class DatabaseManager {
-    protected ConsoleView consoleView;
+    protected ConsoleIO consoleIO;
     protected ExecutorService executorService;
 
     public DatabaseManager(ThreadPoolController threadPoolManager) {
         this.executorService = threadPoolManager.createThreadPool(4);
-        this.consoleView = new ConsoleView();
+        this.consoleIO = new ConsoleIO();
     }
 
     public boolean recordEsiste(String sql, Object... parametri) {
@@ -25,7 +25,7 @@ public abstract class DatabaseManager {
                 return rs.next();
             }
         } catch (SQLException e) {
-            consoleView.mostraErrore("Errore verifica record: " + e.getMessage());
+            consoleIO.mostraErrore("Errore verifica record: " + e.getMessage());
         }
         return false;
     }
@@ -42,13 +42,13 @@ public abstract class DatabaseManager {
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
                 utente.setEmail(nuovaEmail);
-                consoleView.mostraMessaggio("Email aggiornata con successo.");
+                consoleIO.mostraMessaggio("Email aggiornata con successo.");
                 return true;
             } else {
-                consoleView.mostraErrore("Nessun record aggiornato. Email non trovata.");
+                consoleIO.mostraErrore("Nessun record aggiornato. Email non trovata.");
             }
         } catch (SQLException e) {
-            consoleView.mostraErrore("Errore aggiornamento email: " + e.getMessage());
+            consoleIO.mostraErrore("Errore aggiornamento email: " + e.getMessage());
         }
         return false;
     }

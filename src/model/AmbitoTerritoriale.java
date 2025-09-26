@@ -10,14 +10,14 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import src.view.ConsoleView;
+import src.view.ConsoleIO;
 import lib.InputDati;
 
 public class AmbitoTerritoriale {
 
 private static final String AMBITO_FILE = "src/utility/ambito_territoriale.config";
     private Set<String> ambitoTerritoriale = new HashSet<>();
-    private final ConsoleView consoleView = new ConsoleView();
+    private final ConsoleIO consoleIO = new ConsoleIO();
 
     public void verificaOAggiornaAmbitoTerritoriale() {
         if (!isAmbitoConfigurato()) {
@@ -34,13 +34,13 @@ private static final String AMBITO_FILE = "src/utility/ambito_territoriale.confi
     }
 
     public void scegliAmbitoTerritoriale() {
-        consoleView.mostraMessaggio("Configurazione ambito territoriale (inserisci uno o più comuni).");
+        consoleIO.mostraMessaggio("Configurazione ambito territoriale (inserisci uno o più comuni).");
         do {
             String comune = InputDati.leggiStringaNonVuota("Inserisci il nome del comune: ");
             ambitoTerritoriale.add(comune);
         } while (InputDati.yesOrNo("Vuoi aggiungere un altro comune? (s/n): "));
         salvaAmbitoTerritoriale();
-        consoleView.mostraMessaggio("Ambito territoriale configurato: " + ambitoTerritoriale);
+        consoleIO.mostraMessaggio("Ambito territoriale configurato: " + ambitoTerritoriale);
     }
 
     private void salvaAmbitoTerritoriale() {
@@ -50,7 +50,7 @@ private static final String AMBITO_FILE = "src/utility/ambito_territoriale.confi
                 writer.newLine();
             }
         } catch (IOException e) {
-            consoleView.mostraMessaggio("Errore nel salvataggio dell'ambito territoriale.");
+            consoleIO.mostraMessaggio("Errore nel salvataggio dell'ambito territoriale.");
         }
     }
 
@@ -62,7 +62,7 @@ private static final String AMBITO_FILE = "src/utility/ambito_territoriale.confi
                 ambitoTerritoriale.add(line.trim());
             }
         } catch (IOException e) {
-            consoleView.mostraMessaggio("Errore nel caricamento dell'ambito territoriale.");
+            consoleIO.mostraMessaggio("Errore nel caricamento dell'ambito territoriale.");
         }
     }
 

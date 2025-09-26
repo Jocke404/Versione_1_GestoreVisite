@@ -10,7 +10,7 @@ import src.model.AggiuntaUtilita;
 import src.model.Disponibilita;
 import src.model.ValidatoreVisite;
 import src.model.Volontario;
-import src.view.ConsoleView;
+import src.view.ConsoleIO;
 import src.view.MenuVolontario;
 import src.view.ViewUtilita;
 import src.model.db.VolontariManager;
@@ -18,18 +18,18 @@ import src.model.db.VolontariManager;
 public class VolontariController {
     private final VolontariManager volontariManager;
     private final AggiuntaUtilita addUtilita;
-    private final ConsoleView consoleView;
+    private final ConsoleIO consoleIO;
     private final Disponibilita disponibilitaManager = new Disponibilita();
     Volontario volontarioCorrente;
     private final ValidatoreVisite validatore;
     private final ViewUtilita viewUtilita;
 
     public VolontariController(VolontariManager volontariManager, AggiuntaUtilita addUtilita, 
-                                ConsoleView consoleView, Volontario volontarioCorrente, ValidatoreVisite validatore, 
+                                ConsoleIO consoleIO, Volontario volontarioCorrente, ValidatoreVisite validatore, 
                                 ViewUtilita viewUtilita) {
         this.volontariManager = volontariManager;
         this.addUtilita = addUtilita;
-        this.consoleView = consoleView;
+        this.consoleIO = consoleIO;
         this.volontarioCorrente = volontarioCorrente;
         this.validatore = validatore;
         this.viewUtilita = viewUtilita;
@@ -39,11 +39,11 @@ public class VolontariController {
         YearMonth ym = YearMonth.now().plusMonths(1);
         List<Integer> giorniDisponibili = validatore.trovaGiorniDisponibili(volontarioCorrente, ym);
         if (giorniDisponibili.isEmpty()) {
-            consoleView.mostraMessaggio("Non ci sono giorni disponibili per dichiarare la disponibilità.");
+            consoleIO.mostraMessaggio("Non ci sono giorni disponibili per dichiarare la disponibilità.");
             return;
         }
-        consoleView.mostraCalendarioMese(ym, giorniDisponibili);
-        List<Integer> giorniSelezionati = consoleView.chiediGiorniDisponibili(ym, new ArrayList<>(giorniDisponibili));
+        consoleIO.mostraCalendarioMese(ym, giorniDisponibili);
+        List<Integer> giorniSelezionati = consoleIO.chiediGiorniDisponibili(ym, new ArrayList<>(giorniDisponibili));
         List<LocalDate> dateDisponibili = validatore.filtraDateDisponibili(giorniSelezionati, ym);
         disponibilitaManager.salvaDisponibilita(volontarioCorrente.getEmail(), dateDisponibili);
         // Passa dateDisponibili al Model per il salvataggio

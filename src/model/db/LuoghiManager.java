@@ -73,7 +73,7 @@ public class LuoghiManager extends DatabaseManager {
                 pstmt.setString(4, nome);
                 pstmt.executeUpdate();
             } catch (SQLException e) {
-                consoleView.mostraMessaggio("Errore durante l'aggiornamento del luogo: " + e.getMessage());
+                consoleIO.mostraMessaggio("Errore durante l'aggiornamento del luogo: " + e.getMessage());
             }
         });
     }
@@ -92,19 +92,19 @@ public class LuoghiManager extends DatabaseManager {
                 pstmt.setString(4, tipiVisitaStr);
                 pstmt.executeUpdate();
     
-                consoleView.mostraMessaggio("Luogo aggiunto con successo.");
+                consoleIO.mostraMessaggio("Luogo aggiunto con successo.");
             } catch (SQLException e) {
-                consoleView.mostraMessaggio("Errore durante l'aggiunta del luogo: " + e.getMessage());
+                consoleIO.mostraMessaggio("Errore durante l'aggiunta del luogo: " + e.getMessage());
             }
     }
 
     public void aggiungiNuovoLuogo(Luogo nuovoLuogo) {
         String verificaSql = "SELECT 1 FROM luoghi WHERE nome = ?";
         if(!recordEsiste(verificaSql, nuovoLuogo.getNome())){
-            consoleView.mostraMessaggio("Il luogo non esiste già. Procedo con l'aggiunta.");
+            consoleIO.mostraMessaggio("Il luogo non esiste già. Procedo con l'aggiunta.");
             aggiungiLuogo(nuovoLuogo);
         } else {
-            consoleView.mostraMessaggio("Il luogo esiste già.");
+            consoleIO.mostraMessaggio("Il luogo esiste già.");
             return;
         }
     }
@@ -117,12 +117,12 @@ public class LuoghiManager extends DatabaseManager {
                 pstmt.setString(1, luogoDaEliminare.getNome());
                 int rowsDeleted = pstmt.executeUpdate();
                 if (rowsDeleted > 0) {
-                    consoleView.mostraMessaggio("Luogo rimosso con successo.");
+                    consoleIO.mostraMessaggio("Luogo rimosso con successo.");
                 } else {
-                    consoleView.mostraMessaggio("Errore: Nessun luogo trovato con il nome specificato.");
+                    consoleIO.mostraMessaggio("Errore: Nessun luogo trovato con il nome specificato.");
                 }
             } catch (SQLException e) {
-                consoleView.mostraMessaggio("Errore durante la rimozione del luogo: " + e.getMessage());
+                consoleIO.mostraMessaggio("Errore durante la rimozione del luogo: " + e.getMessage());
             }
         });
     }

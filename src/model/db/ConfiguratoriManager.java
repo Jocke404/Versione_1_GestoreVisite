@@ -20,7 +20,7 @@ public class ConfiguratoriManager extends DatabaseManager {
         for (Configuratore configuratore : configuratoriMap.values()) {
             aggiornaConfiguratore(configuratore.getEmail(), configuratore);
         }
-        consoleView.mostraMessaggio("Sincronizzazione dei configuratori completata.");
+        consoleIO.mostraMessaggio("Sincronizzazione dei configuratori completata.");
     }
     
     //Logiche dei configuratori--------------------------------------------------
@@ -45,7 +45,7 @@ public class ConfiguratoriManager extends DatabaseManager {
                 }
             }
         } catch (SQLException e) {
-            consoleView.mostraMessaggio("Errore durante il caricamento dei configuratori: " + e.getMessage());
+            consoleIO.mostraMessaggio("Errore durante il caricamento dei configuratori: " + e.getMessage());
         }
     }
 
@@ -61,7 +61,7 @@ public class ConfiguratoriManager extends DatabaseManager {
             pstmt.setString(4, configuratore.getPassword());
             pstmt.setBoolean(5, true);
             pstmt.executeUpdate();
-            consoleView.mostraMessaggio("Configuratore aggiunto con successo nella tabella 'configuratori'.");
+            consoleIO.mostraMessaggio("Configuratore aggiunto con successo nella tabella 'configuratori'.");
     
             // Aggiungi anche nella tabella 'utenti_unificati'
             aggiungiUtenteUnificato(configuratore, true);
@@ -170,11 +170,11 @@ public class ConfiguratoriManager extends DatabaseManager {
     public void aggiungiNuovoConf(Configuratore nuovoConfiguratore) {
         String verificaSql = "SELECT 1 FROM configuratori WHERE email = ?";
         if(!recordEsiste(verificaSql, nuovoConfiguratore.getEmail())){
-            consoleView.mostraMessaggio("Il configuratore non esiste già. Procedo con l'aggiunta.");
+            consoleIO.mostraMessaggio("Il configuratore non esiste già. Procedo con l'aggiunta.");
             aggiungiConfiguratore(nuovoConfiguratore);
         }
         else{
-            consoleView.mostraMessaggio("Il configuratore esiste già.");
+            consoleIO.mostraMessaggio("Il configuratore esiste già.");
             return;
         }
     }
