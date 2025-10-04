@@ -16,7 +16,6 @@ import lib.InputDati;
 import src.model.AmbitoTerritoriale;
 import src.model.CredentialManager;
 import src.model.Luogo;
-import src.model.Prenotazione;
 import src.model.TipiVisita;
 import src.model.Visita;
 import src.model.Volontario;
@@ -126,43 +125,6 @@ public class ConsoleIO implements View{
         int tipoIndex = InputDati.leggiIntero("Seleziona il numero del tipo di visita: ", 1, tipiVisitaList.size()) - 1;
         return tipiVisitaList.get(tipoIndex);
     }
-
-    // public Visita chiediDatiNuovaVisita(List<Luogo> luoghi, List<TipiVisita> tipiVisita, List<Volontario> volontari, int maxPersone) {
-    //     // Chiedi luogo
-    //     mostraMessaggio("Elenco dei luoghi disponibili:");
-    //     mostraElencoConOggetti(luoghi);
-    //     int idxLuogo = InputDati.leggiIntero("Seleziona il numero del luogo: ", 1, luoghi.size()) - 1;
-    //     Luogo luogoScelto = luoghi.get(idxLuogo);
-
-    //     // Chiedi tipi visita
-    //     mostraMessaggio("Tipi di visita disponibili:");
-    //     mostraElencoConOggetti(tipiVisita);
-    //     List<TipiVisita> tipiVisitaScelti = new ArrayList<>();
-    //     do {
-    //         int idxTipo = InputDati.leggiIntero("Seleziona il numero del tipo di visita da aggiungere: ", 1, tipiVisita.size()) - 1;
-    //         TipiVisita tipoScelto = tipiVisita.get(idxTipo);
-    //         tipiVisitaScelti.add(tipoScelto);
-    //     } while (InputDati.yesOrNo("Vuoi aggiungere un altro tipo di visita?"));
-
-    //     // Chiedi volontario
-    //     mostraMessaggio("Volontari disponibili:");
-    //     mostraElencoConOggetti(volontari);
-    //     int idxVol = InputDati.leggiIntero("Seleziona il volontario: ", 1, volontari.size()) - 1;
-    //     Volontario volontarioScelto = volontari.get(idxVol);
-
-    //     // Chiedi data
-    //     LocalDate dataVisita = InputDati.leggiData("Inserisci la data della visita (formato YYYY-MM-DD): ");
-
-    //     // Chiedi orario e durata
-    //     LocalTime oraInizio = InputDati.leggiOra("Inserisci l'ora di inizio della visita (formato HH:MM): ");
-    //     int durataMinuti = InputDati.leggiIntero("Durata in minuti: ", 30, 300);
-
-    //     int id = visiteMap.size() + 1;
-    //     String stato = "Proposta";
-
-    //     return new Visita(id, luogoScelto.getNome(), tipiVisitaScelti, volontarioScelto.getNome() + " " + volontarioScelto.getCognome(),
-    //                     dataVisita, maxPersone, stato, oraInizio, durataMinuti, maxPersone);
-    // }
 
     // --- METODI DI SUPPORTO ---
     public Visita pianificazioneGuidata(VisiteManagerDB visiteManagerDB, VolontariManager volontariManager, LuoghiManager luoghiManager) {
@@ -615,24 +577,6 @@ public class ConsoleIO implements View{
             mostraMessaggio("Numero massimo di persone iscrivibili per visita aggiornato a: " + numeroMax);
         } else {
             mostraMessaggio("Errore nel salvataggio del numero massimo di persone iscrivibili.");
-        }
-    }
-
-    public int chiediSelezionePrenotazione(List<Prenotazione> prenotazioni) {
-        mostraMessaggio("Le tue prenotazioni:");
-        mostraElencoConOggetti(prenotazioni);
-        return InputDati.leggiIntero("Seleziona la prenotazione da cancellare: ", 1, prenotazioni.size()) - 1;
-    }
-
-    public boolean chiediConfermaCancellazionePrenotazione(Prenotazione prenotazione) {
-        return InputDati.yesOrNo("Sei sicuro di voler cancellare la prenotazione con codice: " + prenotazione.getCodicePrenotazione() + "?");
-    }
-
-    public void mostraRisultatoCancellazionePrenotazione(boolean successo) {
-        if (successo) {
-            mostraMessaggio("Prenotazione cancellata con successo.");
-        } else {
-            mostraMessaggio("Errore nella cancellazione della prenotazione.");
         }
     }
 

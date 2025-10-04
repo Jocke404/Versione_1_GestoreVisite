@@ -4,7 +4,6 @@ import java.util.List;
 import src.model.Configuratore;
 import src.model.TipiVisita;
 import src.model.Utente;
-import src.model.Fruitore;
 import src.model.Volontario;
 
 
@@ -23,8 +22,6 @@ public class UserFactory {
                 return new Volontario(nome, cognome, email, password, tipodiVisita);
             case CONFIGURATORE:
                 return new Configuratore(nome, cognome, email, password);
-            case FRUITORE:
-                return new Fruitore(nome, cognome, email, password);
             default:
                 throw new IllegalArgumentException("Tipo di utente sconosciuto: " + userType);
         }

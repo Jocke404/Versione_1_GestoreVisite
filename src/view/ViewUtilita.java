@@ -9,13 +9,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import lib.InputDati;
 import src.controller.VolontariController;
 import src.model.AmbitoTerritoriale;
-import src.model.Fruitore;
 import src.model.Luogo;
-import src.model.Prenotazione;
 import src.model.TipiVisita;
 import src.model.Visita;
 import src.model.Volontario;
-import src.model.db.PrenotazioneManager;
 import src.model.db.VisiteManagerDB;
 import src.model.db.VolontariManager;
 import src.controller.VisiteController;
@@ -238,13 +235,7 @@ public class ViewUtilita {
         }
     }
 
-    public void visualizzaPrenotazioni(Fruitore fruitoreCorrente, PrenotazioneManager prenotazioniManager) {
-        consoleIO.mostraMessaggio("Le tue prenotazioni:");
-        List<Prenotazione> visitePrenotate = prenotazioniManager.miePrenotazioni(fruitoreCorrente);
-        consoleIO.mostraElencoConOggetti(visitePrenotate);
-    }
-
-        //metodo per visualizzare i volontari per ogni tipo di visita
+    //metodo per visualizzare i volontari per ogni tipo di visita
     public void visualizzaVolontariPerTipoVisita(VolontariManager volontariManager){
 
         if (tipiVisitaList.isEmpty()) {

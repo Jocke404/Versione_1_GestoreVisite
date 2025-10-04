@@ -12,22 +12,18 @@ public class MasterController {
 
     public Volontario volontarioCorrente;
     public Configuratore configuratoreCorrente;
-    public Fruitore fruitoreCorrente;
     public Utente utenteCorrente;
     private ThreadPoolController threadPoolController;
     private VolontariManager volontariManager;
     private ConfiguratoriManager configuratoriManager;
-    private FruitoreManager fruitoreManager;
     private LuoghiManager luoghiManager;
     private VisiteManagerDB visiteManager;
-    private PrenotazioneManager prenotazioneManager;
     private DatabaseUpdater databaseUpdater;
     private AggiuntaUtilita aggiuntaUtilita;
     private ModificaUtilita modificaUtilita;
     private AuthenticationController authenticationController;
     private VolontariController volontariController;
     private ConfiguratoriController configuratoriController;
-    private FruitoreController fruitoreController;
     private LuoghiController luoghiController;
     private VisiteController visiteController;
     private ValidatoreVisite validatore;
@@ -52,12 +48,10 @@ public class MasterController {
         threadPoolController = ThreadPoolController.getInstance();
         volontariManager = new VolontariManager(threadPoolController);
         configuratoriManager = new ConfiguratoriManager(threadPoolController);
-        fruitoreManager = new FruitoreManager(threadPoolController);
         luoghiManager = new LuoghiManager(threadPoolController);
         visiteManager = new VisiteManagerDB(threadPoolController);
-        prenotazioneManager = new PrenotazioneManager(threadPoolController, visiteManager, fruitoreManager);
         databaseUpdater = new DatabaseUpdater(volontariManager, configuratoriManager, luoghiManager, visiteManager);
-        aggiuntaUtilita = new AggiuntaUtilita(volontariManager, luoghiManager, visiteManager, prenotazioneManager);
+        aggiuntaUtilita = new AggiuntaUtilita(volontariManager, luoghiManager, visiteManager);
         modificaUtilita = new ModificaUtilita(visiteManager);
         viewUtilita = ViewUtilita.getInstance();
         visiteController = new VisiteController(visiteManager);
@@ -66,7 +60,7 @@ public class MasterController {
 
         ConsoleIO consoleIO = new ConsoleIO();
         CredentialManager credentialManager = new CredentialManager(
-            databaseUpdater, volontariManager, configuratoriManager, fruitoreManager);
+            databaseUpdater, volontariManager, configuratoriManager);
         
         AuthenticationController authenticationController = new AuthenticationController(
             credentialManager, consoleIO);
@@ -104,7 +98,6 @@ public class MasterController {
             utenteCorrente = authenticationController.getUtenteCorrente();
             volontariController = new VolontariController(volontariManager, aggiuntaUtilita, consoleIO, volontarioCorrente, validatore, viewUtilita);
             configuratoriController = new ConfiguratoriController(aggiuntaUtilita, modificaUtilita, viewUtilita, volontariController, luoghiController, visiteController, visiteManager, volontariManager, luoghiManager);
-            fruitoreController = new FruitoreController(fruitoreManager, aggiuntaUtilita, viewUtilita, modificaUtilita, fruitoreCorrente, prenotazioneManager);
         } else {
             utenteCorrente = null;
         }
@@ -125,9 +118,6 @@ public class MasterController {
                     ambitoTerritoriale.caricaAmbitoTerritoriale();
                 }
                 menu = menuFactory.creaMenuConfiguratore(configuratoriController);
-            } else if (utenteCorrente instanceof Fruitore){
-                fruitoreController.fruitoreCorrente = (Fruitore) utenteCorrente;
-                menu = menuFactory.creaMenuFruitore(fruitoreController);
             } else {
                 consoleIO.mostraMessaggio("Errore: tipo di utente non riconosciuto.");
             }

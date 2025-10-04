@@ -58,9 +58,6 @@ public class ConfiguratoriController {
         this.luoghiManager = luoghiManager;
     }
 
-    // public void aggiungiVolontario() {
-    //     addUtilita.aggiungiVolontario();
-    // }
     public void aggiungiVolontario() {
         consoleIO.mostraElencoConOggetti(volontariManager.getVolontariMap().values().stream().toList());
         // Ottieni i dati tramite la View
@@ -76,9 +73,6 @@ public class ConfiguratoriController {
         viewUtilita.stampaVolontari(volontariController);
     }
 
-    // public void aggiungiLuogo() {
-    //     addUtilita.aggiungiLuogo();
-    // }
     public void aggiungiLuogo() {
         consoleIO.mostraElencoConOggetti(luoghiManager.getLuoghiMap().values().stream().toList());
         // Ottieni i dati tramite la View
@@ -102,9 +96,6 @@ public class ConfiguratoriController {
         viewUtilita.stampaVisitePerStato();
     }
 
-    // public void modificaNumeroMaxPersonePerVisita() {
-    //     modificaUtilita.modificaMaxPersone();
-    // }
     public void modificaMaxPersone() {
         int numeroMax = consoleIO.chiediNumeroMaxPersone();
         if (consoleIO.chiediConfermaNumeroMax(numeroMax)) {
@@ -115,9 +106,6 @@ public class ConfiguratoriController {
         }
     }
 
-    // public void modificaDataVisita() {
-    //     modificaUtilita.modificaDataVisita();
-    // }
     public void modificaDataVisita() {
         List<Visita> visite = new ArrayList<>(visiteManagerDB.getVisiteMap().values());
         if (visite.isEmpty()) {
@@ -135,10 +123,6 @@ public class ConfiguratoriController {
             consoleIO.mostraMessaggio("Modifica annullata. Nessun cambiamento effettuato.");
         }
     }
-
-    // public void aggiungiVisita() {
-    //     addUtilita.aggiungiVisita();
-    // }
 
     public void aggiungiVisita() {
         consoleIO.mostraElencoConOggetti(visiteManagerDB.getVisiteMap().values().stream().toList());
@@ -164,10 +148,6 @@ public class ConfiguratoriController {
             consoleIO.mostraMessaggio("Operazione annullata.");
         }
     }
-
-    // public void modificaStatoVisita() {
-    //     modificaUtilita.modificaStatoVisita();
-    // }
 
     public void modificaStatoVisita() {
         List<Visita> visite = new ArrayList<>(visiteManagerDB.getVisiteMap().values());
@@ -200,10 +180,6 @@ public class ConfiguratoriController {
         viewUtilita.stampaArchivioStorico(visiteController);
     }
 
-    // public void aggiungiDatePrecluse() {
-    //     addUtilita.aggiungiDatePrecluse();
-    // }
-
     public void aggiungiDatePrecluse() {
         consoleIO.mostraElencoConOggetti(visiteManagerDB.getDatePrecluseMap().entrySet().stream().toList());
         boolean continua = true;
@@ -223,10 +199,6 @@ public class ConfiguratoriController {
     public void mostraDatePrecluse() {
         viewUtilita.stampaDatePrecluse(visiteController);
     }
-
-    // public void eliminaDatePrecluse() {
-    //     modificaUtilita.eliminaDatePrecluse();
-    // }
 
     public void eliminaDatePrecluse() {
         ConcurrentHashMap<LocalDate, String> datePrecluse = visiteManagerDB.getDatePrecluseMap();
@@ -252,10 +224,6 @@ public class ConfiguratoriController {
        viewUtilita.stampaTipiVisitaPerLuogo(luoghiController);
     }
 
-    // public void eliminaLuogo() {
-    //     modificaUtilita.eliminaLuogo(luoghiController);
-    // }
-
     public void eliminaLuogo() {
         List<Luogo> luoghi = luoghiController.getLuoghi();
         if (luoghi.isEmpty()) {
@@ -270,10 +238,6 @@ public class ConfiguratoriController {
             consoleIO.mostraMessaggio("Operazione annullata.");
         }
     }
-
-    // public void modificaLuogo() {
-    //     modificaUtilita.modificaLuogo(luoghiController);
-    // }
 
     public void modificaLuogo() {
         List<Luogo> luoghi = luoghiController.getLuoghi();
@@ -298,10 +262,6 @@ public class ConfiguratoriController {
         }
     }
 
-    // public void eliminaVolontario() {
-    //     modificaUtilita.eliminaVolontario(volontariController);
-    // }
-
     public void eliminaVolontario() {
         List<Volontario> volontari = volontariController.getVolontari();
         if (volontari.isEmpty()) {
@@ -317,10 +277,6 @@ public class ConfiguratoriController {
             }
         }
     }
-
-    // public void aggiungiVolontariATipoVisita(){
-    //     addUtilita.aggiungiVolontariATipoVisita();
-    // }
 
     public void aggiungiVolontariATipoVisita() {
         if (consoleIO.chiediAnnullaOperazione()) return;
@@ -345,11 +301,6 @@ public class ConfiguratoriController {
         consoleIO.mostraMessaggio("Tipo di visita " + tipoVisitaScelto + " assegnato a " + volontariSelezionati.size() + " volontari.");
     }
 
-
-
-    // public void rimuoviVolontariDaTipoVisita(){
-    //     addUtilita.rimuoviVolontariDaTipoVisita();
-    // }
     public void rimuoviVolontariDaTipoVisita() {
         if (consoleIO.chiediAnnullaOperazione()) return;
 
@@ -380,10 +331,6 @@ public class ConfiguratoriController {
         viewUtilita.visualizzaVolontariPerTipoVisita(volontariManager);
     }
 
-    // public void eliminaVisita() {
-    //     modificaUtilita.eliminaVisita(visiteController);
-    // }
-
     public void eliminaVisita() {
         List<Visita> visite = visiteController.getVisite();
         if (visite.isEmpty()) {
@@ -398,10 +345,6 @@ public class ConfiguratoriController {
             consoleIO.mostraMessaggio("Operazione annullata.");
         }
     }
-
-    // public void modificaNumeroPersoneIscrivibili() {
-    //     modificaUtilita.modificaNumeroPersoneIscrivibili();
-    // }
 
     public void modificaNumeroPersoneIscrivibili() {
         int numeroMax = consoleIO.chiediNumeroMaxPersone();

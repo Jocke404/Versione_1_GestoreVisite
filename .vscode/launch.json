@@ -4,6 +4,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "MainVisite",
+            "request": "launch",
+            "mainClass": "src.MainVisite",
+            "projectName": "Versione_1_5fc3f5f0"
+        },
+        {
+            "type": "java",
             "name": "AllTestsRunner",
             "request": "launch",
             "mainClass": "test.java.AllTestsRunner",
