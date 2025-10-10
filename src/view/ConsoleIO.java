@@ -57,10 +57,8 @@ public class ConsoleIO implements View{
         }
     }
 
-        public void mostraVisiteDisponibili(List<Visita> visite) {
-        for (Visita visita : visite) {
-            mostraMessaggio(visita.toString());
-        }
+    public void mostraVisiteDisponibili(List<Visita> visite) {
+        mostraElencoConOggetti(visite);
     }
 
     public String chiediEmail() {
