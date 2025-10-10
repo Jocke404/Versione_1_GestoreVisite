@@ -7,6 +7,13 @@
             "name": "MainVisite",
             "request": "launch",
             "mainClass": "src.MainVisite",
+            "projectName": "Versione_1_GestoreVisite_e12b04ee"
+        },
+        {
+            "type": "java",
+            "name": "MainVisite",
+            "request": "launch",
+            "mainClass": "src.MainVisite",
             "projectName": "Versione_1_5fc3f5f0"
         },
         {
