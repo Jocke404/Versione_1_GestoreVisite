@@ -157,6 +157,9 @@ public class ConfiguratoriController {
         }
         consoleIO.mostraVisiteDisponibili(visite);
 
+        if (consoleIO.chiediAnnullaOperazione()) {
+            return;
+        }
         int scelta = consoleIO.chiediSelezioneVisita(visite.size());
         Visita visitaSelezionata = visite.get(scelta - 1);
 
