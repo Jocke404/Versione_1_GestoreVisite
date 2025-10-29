@@ -32,7 +32,7 @@ public class CredentialManager {
 
         String nome = null;
         String cognome = null;
-        List<TipiVisita> tipidiVisite = null;
+        List<TipiVisitaClass> tipidiVisite = null;
 
         switch (tipoUtente) {
             case UserFactory.VOLONTARIO:

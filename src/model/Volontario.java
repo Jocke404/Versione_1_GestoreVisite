@@ -3,33 +3,33 @@ package src.model;
 import java.util.List;
 
 public class Volontario extends Utente {
-    private List<TipiVisita> tipiDiVisite; // Tipi di visite a cui il volontario è assegnato
+    private List<TipiVisitaClass> tipiDiVisite; // Tipi di visite a cui il volontario è assegnato
 
     // Costruttore, getter e setter
-    public Volontario(String nome, String cognome, String email, String password, List<TipiVisita> tipiDiVisite) {
+    public Volontario(String nome, String cognome, String email, String password, List<TipiVisitaClass> tipiDiVisite) {
         super(email, password, nome, cognome);
         this.tipiDiVisite = tipiDiVisite;
     }
     
-    public List<TipiVisita> getTipiDiVisite() {
+    public List<TipiVisitaClass> getTipiDiVisite() {
         return tipiDiVisite;
     }
 
-    public void setTipiDiVisite(List<TipiVisita> tipiDiVisite) {
+    public void setTipiDiVisite(List<TipiVisitaClass> tipiDiVisite) {
         this.tipiDiVisite = tipiDiVisite;
     }
     
-    public void aggiungiTipoVisita(TipiVisita tipoVisita) {
+    public void aggiungiTipoVisita(TipiVisitaClass tipoVisita) {
         if (!this.tipiDiVisite.contains(tipoVisita)) {
             this.tipiDiVisite.add(tipoVisita);
         }
     }
     
-    public void rimuoviTipoVisita(TipiVisita tipoVisita) {
+    public void rimuoviTipoVisita(TipiVisitaClass tipoVisita) {
         this.tipiDiVisite.remove(tipoVisita);
     }
 
-    public boolean contieneTipoVisita(TipiVisita tipoVisita) {
+    public boolean contieneTipoVisita(TipiVisitaClass tipoVisita) {
         return this.tipiDiVisite.contains(tipoVisita);
     }
 

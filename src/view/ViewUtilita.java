@@ -1,18 +1,22 @@
 package src.view;
 
+import java.io.File;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
 import lib.InputDati;
+import lib.ServizioFile;
 import src.controller.VolontariController;
 import src.model.AmbitoTerritoriale;
 import src.model.Luogo;
-import src.model.TipiVisita;
+import src.model.TipiVisitaClass;
 import src.model.Visita;
 import src.model.Volontario;
+import src.model.db.ApplicationSettingsDAO;
 import src.model.db.VisiteManagerDB;
 import src.model.db.VolontariManager;
 import src.controller.VisiteController;
@@ -21,9 +25,10 @@ import src.controller.ThreadPoolController;
 
 public class ViewUtilita {
 
+    private static final File NUMERO_PERSONE_FILE = new File("src/utility/max_persone_iscrivibili.config");
     private ConcurrentHashMap<Integer, Visita> visiteMap = new VisiteManagerDB(ThreadPoolController.getInstance()).getVisiteMap();
     private final ConsoleIO consoleIO = new ConsoleIO();
-    private List<TipiVisita> tipiVisitaList = new VisiteManagerDB(ThreadPoolController.getInstance()).getTipiVisitaList();
+    private List<TipiVisitaClass> tipiVisitaList = new VisiteManagerDB(ThreadPoolController.getInstance()).getTipiVisitaClassList();
     
     private static ViewUtilita instance;
 
@@ -78,9 +83,7 @@ public class ViewUtilita {
     }
 
     // Metodo per visualizzare le visite per stato
-    public void stampaVisitePerStato() {
-        if(consoleIO.chiediAnnullaOperazione())
-            return; 
+    public void stampaVisitePerStato() { 
         if (visiteMap.isEmpty()) {
             System.out.println("Non ci sono visite disponibili.");
             return;
@@ -94,17 +97,15 @@ public class ViewUtilita {
 
         int sceltaStato = InputDati.leggiIntero("Seleziona lo stato da visualizzare: ", 1, stati.length) - 1;
         String statoScelto = stati[sceltaStato];
+        List<Visita> visiteInStato = new ArrayList<>();
 
         System.out.printf("Visite in stato '%s':%n", statoScelto);
         for (Visita visita : visiteMap.values()) {
             if (visita.getStato().equalsIgnoreCase(statoScelto)) {
-                System.out.printf("Luogo: %s, Tipo Visita: %s, Volontario: %s, Data: %s, Ora Inizio: %s, Durata: %d minuti%n",
-                        visita.getLuogo(), visita.getTipiVisita(), visita.getVolontario(),
-                        visita.getData() != null ? visita.getData() : "Nessuna data",
-                        visita.getOraInizio() != null ? visita.getOraInizio() : "Nessuna ora",
-                        visita.getDurataMinuti());
+                visiteInStato.add(visita);
             }
         }
+        consoleIO.mostraElencoConOggetti(visiteInStato);
     }
 
     // Metodo per visualizzare l'archivio storico delle visite
@@ -120,7 +121,7 @@ public class ViewUtilita {
         for (Visita visita : visiteMap.values()) {
             if ("Effettuata".equalsIgnoreCase(visita.getStato())) {
                 System.out.printf("Luogo: %s, Tipo Visita: %s, Volontario: %s, Data: %s%n",
-                        visita.getLuogo(), visita.getTipiVisita(), visita.getVolontario(),
+                        visita.getLuogo(), visita.getTipiVisitaClass(), visita.getVolontario(),
                         visita.getData() != null ? visita.getData() : "Nessuna data");
             }
         }
@@ -142,7 +143,7 @@ public class ViewUtilita {
             if (visita.getVolontario().equals(volontario.getNome() + " " + volontario.getCognome())) {
                 System.out.println("ID: " + entry.getKey());
                 System.out.println("Luogo: " + visita.getLuogo());
-                System.out.println("Tipi Visita: " + visita.getTipiVisitaString());
+                System.out.println("Tipi Visita: " + visita.getTipiVisitaClassString());
                 System.out.println("Data: " + (visita.getData() != null ? visita.getData() : "Nessuna data"));
                 System.out.println("Stato: " + visita.getStato());
                 System.out.println("-------------------------");
@@ -182,7 +183,7 @@ public class ViewUtilita {
     }
 
     //Metodo per visualizzare i tipi di visita per luogo
-    public void stampaTipiVisitaPerLuogo(LuoghiController luoghiController) {
+    public void stampaTipiVisitaClassPerLuogo(LuoghiController luoghiController) {
 
         System.out.println ("Tipi di visita per luogo:");
 
@@ -195,12 +196,12 @@ public class ViewUtilita {
 
         for (Luogo luogo : luoghi) {
             System.out.println("Luogo: " + luogo.getNome());
-            List<TipiVisita> tipiVisita = luogo.getTipiVisita();
+            List<TipiVisitaClass> tipiVisita = luogo.getTipiVisitaClass();
             System.out.println("Tipi di visita:");
             if (tipiVisita == null || tipiVisita.isEmpty()) {
                 System.out.println("  Nessun tipo di visita disponibile.");
             } else {
-                for (TipiVisita tipo : tipiVisita) {
+                for (TipiVisitaClass tipo : tipiVisita) {
                     System.out.println("  - " + tipo.getNome());
                 }
             }
@@ -218,9 +219,10 @@ public class ViewUtilita {
             if ((stato.equalsIgnoreCase("Proposta") || stato.equalsIgnoreCase("Confermata")|| stato.equalsIgnoreCase("Cancellata"))
                 && postiDisponibili > 0) {
                 consoleIO.mostraMessaggio("ID: " + visita.getId());
+                consoleIO.mostraMessaggio("Titolo: " + visita.getTitolo());
                 consoleIO.mostraMessaggio("Descrizione: " + visita.getDescrizione());
                 consoleIO.mostraMessaggio("Luogo: " + visita.getLuogo());
-                consoleIO.mostraMessaggio("Tipi Visita: " + visita.getTipiVisitaString());
+                consoleIO.mostraMessaggio("Tipi Visita: " + visita.getTipiVisitaClassString());
                 consoleIO.mostraMessaggio("Data: " + (visita.getData() != null ? visita.getData() : "Nessuna data"));
                 consoleIO.mostraMessaggio("Orario: " + (visita.getOraInizio() != null ? visita.getOraInizio() : "Nessun orario"));
                 consoleIO.mostraMessaggio("Posti disponibili: " + postiDisponibili);
@@ -245,7 +247,7 @@ public class ViewUtilita {
 
         consoleIO.mostraMessaggio ("VOLONTARI PER TIPO DI VISITA");
 
-        for (TipiVisita tipovisita : tipiVisitaList){
+        for (TipiVisitaClass tipovisita : tipiVisitaList){
             List<Volontario> volontari = volontariManager.getVolontariPerTipoVisita(tipovisita);
             consoleIO.mostraMessaggio("\nTipo di visita: " + tipovisita);
             consoleIO.mostraMessaggio ("Numero volontari assegnati: " + volontari.size());
@@ -266,7 +268,7 @@ public class ViewUtilita {
     //metodo alternativo per visualizzazione dettagliata di un tipo specifico
     public void visualizzaVolontariPerTipoVisitaSpecifico(VisiteManagerDB visiteManagerDB, VolontariManager volontariManager){
         //mostra i tipi di visita disponibili
-        List <TipiVisita> tipiVisitaDisponibili = visiteManagerDB.getTipiVisitaList();
+        List <TipiVisitaClass> tipiVisitaDisponibili = visiteManagerDB.getTipiVisitaClassList();
 
         if (tipiVisitaDisponibili.isEmpty()) {
             consoleIO.mostraMessaggio("Nessun tipo di visita disponibile.");
@@ -276,7 +278,7 @@ public class ViewUtilita {
         consoleIO.mostraMessaggio ("Seleziona il tipo di visita da visualizzare:");
         consoleIO.mostraElencoConOggetti(tipiVisitaDisponibili);
         int tipoIndex = InputDati.leggiIntero ("Seleziona il numero del tipo di visita: ", 1, tipiVisitaDisponibili.size()) -1;
-        TipiVisita tipoVisitaScelto = tipiVisitaDisponibili.get(tipoIndex);
+        TipiVisitaClass tipoVisitaScelto = tipiVisitaDisponibili.get(tipoIndex);
         
 
         List<Volontario> volontari = volontariManager.getVolontariPerTipoVisita(tipoVisitaScelto);
@@ -293,7 +295,7 @@ public class ViewUtilita {
             for (Volontario v : volontari) {
                 if (!v.getTipiDiVisite().isEmpty()) {
                     consoleIO.mostraMessaggio("   Altri tipi di visita assegnati:");
-                    for (TipiVisita altroTipo : v.getTipiDiVisite()) {
+                    for (TipiVisitaClass altroTipo : v.getTipiDiVisite()) {
                         if (!altroTipo.equals(tipoVisitaScelto)) {
                             consoleIO.mostraMessaggio("   - " + altroTipo);
                         } else {
@@ -303,6 +305,42 @@ public class ViewUtilita {
                 }
             }
         }
+    }
+
+    public void stampaMaxPersoneIscrivibiliNow() {
+    Integer maxDb = null;
+        try {
+            maxDb = ApplicationSettingsDAO.getMaxPeoplePerVisit();
+        } catch (Throwable t) {
+            // ignore DB error -> fallback file
+        }
+
+        int value;
+        if (maxDb != null) {
+            value = maxDb.intValue();
+        } else {
+            // fallback legacy: leggi dal file
+            Object props = ServizioFile.caricaProperties(NUMERO_PERSONE_FILE);
+            // prova a estrarre un valore numerico da props (Properties o stringa)
+            int fallback = 10;
+            try {
+                if (props instanceof java.util.Properties) {
+                    java.util.Properties p = (java.util.Properties) props;
+                    if (!p.isEmpty()) {
+                        String first = p.values().iterator().next().toString();
+                        fallback = Integer.parseInt(first.trim());
+                    }
+                } else if (props != null) {
+                    String s = props.toString().trim();
+                    fallback = Integer.parseInt(s);
+                }
+            } catch (Exception e) {
+                // keep default
+            }
+            value = fallback;
+        }
+
+        consoleIO.mostraMessaggio("Il numero massimo di persone iscrivibili da un fruitore è attualmente: " + value);
     }
     
 }

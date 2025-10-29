@@ -7,21 +7,21 @@ public class Luogo {
     private String nome;
     private String descrizione;
     private String collocazione;
-    private List<TipiVisita> tipiVisita; 
+    private List<TipiVisitaClass> tipiVisita; 
 
 
-    public Luogo(String nome, String descrizione, String collocazione, List<TipiVisita> tipiVisita) {
+    public Luogo(String nome, String descrizione, String collocazione, List<TipiVisitaClass> tipiVisita) {
         this.nome = nome;
         this.descrizione = descrizione;
         this.collocazione = collocazione;
         this.tipiVisita = tipiVisita;
     }
 
-    public List<TipiVisita> getTipiVisita() {
+    public List<TipiVisitaClass> getTipiVisitaClass() {
         return tipiVisita;
     }
 
-    public void setTipiVisita(List<TipiVisita> tipiVisita) {
+    public void setTipiVisitaClass(List<TipiVisitaClass> tipiVisita) {
         this.tipiVisita = tipiVisita;
     }
 

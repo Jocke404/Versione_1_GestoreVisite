@@ -1,30 +1,20 @@
 package src.model;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
+import src.model.db.ApplicationSettingsDAO;
 import src.model.db.VisiteManagerDB;
 import src.controller.LuoghiController;
 import src.controller.VisiteController;
 import src.controller.VolontariController;
-import lib.InputDati;
-import src.view.ConsoleIO;
 
 public class ModificaUtilita {
 
     private final VisiteManagerDB visiteManagerDB;
-    private final ConsoleIO consoleIO = new ConsoleIO();
     private static final String NUMERO_PERSONE_FILE = "src/utility/max_persone_iscrivibili.config";
 
 
@@ -48,14 +38,13 @@ public class ModificaUtilita {
         return true;
     }
 
+
     public boolean aggiornaMaxPersone(int numeroMax) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(NUMERO_PERSONE_FILE))) {
-            writer.write(String.valueOf(numeroMax));
-            return true;
-        } catch (IOException e) {
-            return false;
-        }
+        if (numeroMax < 2) return false;
+        visiteManagerDB.aggiornaMaxPersone(numeroMax);
+        return true;
     }
+
 
     public boolean eliminaDataPreclusa(LocalDate data) {
         visiteManagerDB.eliminaData(data);
@@ -67,11 +56,11 @@ public class ModificaUtilita {
     }
 
     public void aggiornaLuogo(Luogo luogo, String nuovoNome, String nuovaDescrizione, 
-                            String nuovaCollocazione, List<TipiVisita> nuoviTipi, LuoghiController luoghiController) {
+                            String nuovaCollocazione, List<TipiVisitaClass> nuoviTipi, LuoghiController luoghiController) {
         if (!nuovoNome.isEmpty()) luogo.setName(nuovoNome);
         if (!nuovaDescrizione.isEmpty()) luogo.setDescrizione(nuovaDescrizione);
         if (!nuovaCollocazione.isEmpty()) luogo.setCollocazione(nuovaCollocazione);
-        luogo.setTipiVisita(nuoviTipi);
+        luogo.setTipiVisitaClass(nuoviTipi);
         luoghiController.aggiornaLuoghi(luogo);
     }
 
@@ -83,36 +72,26 @@ public class ModificaUtilita {
         visiteController.eliminaVisita(visita);
     }
 
-    // Leggi il valore dal file (chiamalo all'avvio)
-    public int caricaNumeroPersoneIscrivibili() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(NUMERO_PERSONE_FILE))) {
-            String line = reader.readLine();
-            if (line != null && !line.isEmpty()) {
-                return Integer.parseInt(line.trim());
-            }
-        } catch (IOException | NumberFormatException e) {
-            // Se il file non esiste o c'è errore, ritorna un valore di default
-            return 10;
-        }
-        return 10;
-    }    
-    
-    // Metodo per modificare il numero massimo
-    public void modificaNumeroPersoneIscrivibili() {
-        if (consoleIO.chiediAnnullaOperazione())
-            return;
-        int numeroMax = InputDati.leggiInteroConMinimo("Inserisci il numero massimo di persone iscrivibili per visita: ", 1);
-        aggiornaNumeroPersoneIscrivibili(numeroMax);
-        consoleIO.mostraMessaggio("Numero massimo di persone iscrivibili per visita aggiornato a: " + numeroMax);
-    }
-
     public boolean aggiornaNumeroPersoneIscrivibili(int numeroMax) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(NUMERO_PERSONE_FILE))) {
-            writer.write(String.valueOf(numeroMax));
-            return true;
-        } catch (IOException e) {
-            return false;
+        if (numeroMax < 1) return false;
+
+        boolean ok = false;
+        try {
+            ok = ApplicationSettingsDAO.setMaxPeoplePerVisit(numeroMax);
+        } catch (Throwable t) {
+            ok = false;
         }
+
+        if (!ok) {
+            // fallback legacy: scrivi ancora il file
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(NUMERO_PERSONE_FILE))) {
+                writer.write(String.valueOf(numeroMax));
+                ok = true;
+            } catch (IOException e) {
+                ok = false;
+            }
+        }
+        return ok;
     }
 
 }

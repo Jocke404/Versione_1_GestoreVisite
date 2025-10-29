@@ -1,11 +1,8 @@
 {
     "java.project.referencedLibraries": {
         "include": [
-            "src\\utility\\mysql-connector-j-9.2.0.jar"
+            "lib\\mysql-connector-j-9.2.0.jar"
         ],
-        "exclude": [
-            "src/lib/mylib.jar"
-        ]
     },
     "java.project.sourcePaths": [
         "."

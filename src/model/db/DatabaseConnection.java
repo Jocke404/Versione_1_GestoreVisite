@@ -8,8 +8,8 @@ import src.view.ConsoleIO;
 public class DatabaseConnection {
 
     private static final String URL = "jdbc:mysql://localhost:3306/gestione_visite?useSSL=false";
-    private static final String USER = "root"; // Cambia se hai impostato un altro utente
-    private static final String PASSWORD = ""; // Cambia se hai impostato una password
+    private static final String USER = "root"; 
+    private static final String PASSWORD = ""; 
 
     private static ConsoleIO consoleIO = new ConsoleIO();
 

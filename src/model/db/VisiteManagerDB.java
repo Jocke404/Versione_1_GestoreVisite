@@ -10,8 +10,10 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import src.controller.ThreadPoolController;
-import src.model.TipiVisita;
+import src.model.TipiVisitaClass;
 import src.model.Visita;
+import src.model.Volontario;
+import src.model.TipiVisitaClass;
 
 public class VisiteManagerDB extends DatabaseManager {
     private ConcurrentHashMap<Integer, Visita> visiteMap = new ConcurrentHashMap<>();
@@ -30,7 +32,7 @@ public class VisiteManagerDB extends DatabaseManager {
     //Logiche delle visite--------------------------------------------------
     // Metodo per caricare un luogo nel database e memorizzarlo nella HashMap
     protected void caricaVisite() {
-        String sql = "SELECT id, luogo, tipo_visita, volontario, data, stato, max_persone, ora_inizio, durata_minuti, posti_prenotati FROM visite";
+        String sql = "SELECT id, titolo, luogo, tipo_visita, volontario, data, stato, max_persone, ora_inizio, durata_minuti, posti_prenotati, min_partecipanti, biglietto, barriere_architettoniche FROM visite";
         try (Connection conn = DatabaseConnection.connect();
             PreparedStatement pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery()) {
@@ -38,9 +40,10 @@ public class VisiteManagerDB extends DatabaseManager {
             synchronized (visiteMap) {
                 visiteMap.clear();
                 while (rs.next()) {
-                    int id = rs.getInt("id"); // ID della visita
+                    int id = rs.getInt("id");
+                    String titolo = rs.getString("titolo");
                     String luogo = rs.getString("luogo");
-                    List<TipiVisita> tipoVisita = TipiVisita.fromString(rs.getString("tipo_visita")); ;
+                    List<TipiVisitaClass> tipoVisita = TipiVisitaClass.fromString(rs.getString("tipo_visita"));
                     String volontario = rs.getString("volontario");
                     LocalDate data = rs.getDate("data") != null ? rs.getDate("data").toLocalDate() : null; // Converte la data in LocalDate
                     int maxPersone = rs.getInt("max_persone");
@@ -48,9 +51,14 @@ public class VisiteManagerDB extends DatabaseManager {
                     LocalTime oraInizio = rs.getTime("ora_inizio") != null ? rs.getTime("ora_inizio").toLocalTime() : null;
                     int durataMinuti = rs.getInt("durata_minuti");
                     int postiPrenotati = rs.getInt("posti_prenotati");
+                    int minPartecipanti = rs.getInt("min_partecipanti");
+                    boolean biglietto = rs.getBoolean("biglietto");
+                    boolean barriereArchitettoniche = rs.getBoolean("barriere_architettoniche");
 
                     // Usa il costruttore completo di Visite
-                    Visita visita = new Visita(id, luogo, tipoVisita, volontario, data, maxPersone, stato, oraInizio, durataMinuti, postiPrenotati);
+                    Visita visita = new Visita(id, titolo, luogo, tipoVisita, volontario,
+                                                data, maxPersone, stato, oraInizio,
+                                                durataMinuti, postiPrenotati, minPartecipanti, biglietto, barriereArchitettoniche);
                     visiteMap.putIfAbsent(id, visita);
                 }
             }
@@ -61,19 +69,22 @@ public class VisiteManagerDB extends DatabaseManager {
 
     // Metodo per aggiungere una visita al database
     protected void aggiungiVisita(Visita visita) {
-        String inserisciSql = "INSERT INTO visite (luogo, tipo_visita, volontario, data, stato, max_persone, ora_inizio, durata_minuti) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String inserisciSql = "INSERT INTO visite (luogo, titolo, tipo_visita, volontario, data, stato, max_persone, ora_inizio, durata_minuti, min_partecipanti, biglietto) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             try (Connection conn = DatabaseConnection.connect();
                  PreparedStatement pstmt = conn.prepareStatement(inserisciSql)) {
     
                 pstmt.setString(1, visita.getLuogo());
-                pstmt.setString(2, visita.getTipiVisitaString());
-                pstmt.setString(3, visita.getVolontario());
-                pstmt.setDate(4, visita.getData() != null ? java.sql.Date.valueOf(visita.getData()) : null);
-                pstmt.setString(5, visita.getStato());
-                pstmt.setInt(6, visita.getMaxPersone());
-                pstmt.setTime(7, visita.getOraInizio() != null ? java.sql.Time.valueOf(visita.getOraInizio()) : null);
-                pstmt.setInt(8, visita.getDurataMinuti());
+                pstmt.setString(2, visita.getTitolo());
+                pstmt.setString(3, visita.getTipiVisitaClassString());
+                pstmt.setString(4, visita.getVolontario());
+                pstmt.setDate(5, visita.getData() != null ? java.sql.Date.valueOf(visita.getData()) : null);
+                pstmt.setString(6, visita.getStato());
+                pstmt.setInt(7, visita.getMaxPersone());
+                pstmt.setTime(8, visita.getOraInizio() != null ? java.sql.Time.valueOf(visita.getOraInizio()) : null);
+                pstmt.setInt(9, visita.getDurataMinuti());
+                pstmt.setInt(10, visita.getMinPartecipanti());
+                pstmt.setBoolean(11, visita.isBiglietto());
                 pstmt.executeUpdate();
     
                 consoleIO.mostraMessaggio("Visita aggiunta con successo.");
@@ -146,7 +157,7 @@ public class VisiteManagerDB extends DatabaseManager {
             try (Connection conn = DatabaseConnection.connect();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
                 pstmt.setString(1, visitaAggiornata.getLuogo());
-                pstmt.setString(2, visitaAggiornata.getTipiVisitaString());
+                pstmt.setString(2, visitaAggiornata.getTipiVisitaClassString());
                 pstmt.setString(3, visitaAggiornata.getVolontario());
                 pstmt.setDate(4, visitaAggiornata.getData() != null ? java.sql.Date.valueOf(visitaAggiornata.getData()) : null);
                 pstmt.setString(5, visitaAggiornata.getStato());
@@ -161,6 +172,22 @@ public class VisiteManagerDB extends DatabaseManager {
         });
     }
 
+    protected void assegnaVisitaAVolontarioDB(Volontario volontarioSelezionato, Visita visitaSelezionata) {
+        String sql = "UPDATE visite SET volontario = ? WHERE id = ?";
+        executorService.submit(() -> {
+            try (Connection conn = DatabaseConnection.connect();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setString(1, volontarioSelezionato.getNome()+" "+volontarioSelezionato.getCognome());
+                pstmt.setInt(2, visitaSelezionata.getId());
+                pstmt.executeUpdate();
+
+                consoleIO.mostraMessaggio("Visita assegnata con successo al volontario.");
+            } catch (SQLException e) {
+                System.err.println("Errore durante l'assegnazione della visita al volontario: " + e.getMessage());
+            }
+        });
+    }
+
     // Metodo per aggiornare il numero massimo di persone per tutte le visite
     protected void aggiornaMaxPersonePerVisita(int maxPersonePerVisita) {
         String sql = "UPDATE visite SET max_persone = ?";
@@ -168,13 +195,8 @@ public class VisiteManagerDB extends DatabaseManager {
             try (Connection conn = DatabaseConnection.connect();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
                 pstmt.setInt(1, maxPersonePerVisita);
-                int rowsUpdated = pstmt.executeUpdate();
+                pstmt.executeUpdate();
 
-                if (rowsUpdated > 0) {
-                    System.err.println("Numero massimo di persone per visita aggiornato con successo.");
-                } else {
-                    System.err.println("Nessuna visita trovata da aggiornare.");
-                }
             } catch (SQLException e) {
                 System.err.println("Errore durante l'aggiornamento del numero massimo di persone per visita: " + e.getMessage());
             }
@@ -247,11 +269,11 @@ public class VisiteManagerDB extends DatabaseManager {
         return visiteMap;
     }
 
-    public List<TipiVisita> getTipiVisitaList() {
+    public List<TipiVisitaClass> getTipiVisitaClassList() {
         return List.of(visiteMap.values().stream()
-                .flatMap(v -> v.getTipiVisita().stream())
+                .flatMap(v -> v.getTipiVisitaClass().stream())
                 .distinct()
-                .toArray(TipiVisita[]::new));
+                .toArray(TipiVisitaClass[]::new));
     }
 
     public ConcurrentHashMap<LocalDate, String> getDatePrecluseMap() {
@@ -275,7 +297,8 @@ public class VisiteManagerDB extends DatabaseManager {
         eliminaVisitaDB(visita.getId());
     }
 
-
-
-
+    public void assegnaVisitaAVolontario(Volontario volontarioSelezionato, Visita visitaSelezionata) {
+        assegnaVisitaAVolontarioDB(volontarioSelezionato, visitaSelezionata);
+    }
 }
+

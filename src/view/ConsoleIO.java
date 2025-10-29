@@ -16,7 +16,7 @@ import lib.InputDati;
 import src.model.AmbitoTerritoriale;
 import src.model.CredentialManager;
 import src.model.Luogo;
-import src.model.TipiVisita;
+import src.model.TipiVisitaClass;
 import src.model.Visita;
 import src.model.Volontario;
 import src.model.db.VisiteManagerDB;
@@ -38,7 +38,7 @@ public class ConsoleIO implements View{
     }
 
     public boolean chiediAnnullaOperazione() {
-        return InputDati.yesOrNo("Vuoi annullare e tornare indietro? ");
+        return InputDati.yesOrNo("Vuoi annullare l'operazione e tornare indietro? ");
     }
 
     public void mostraElenco(List<String> elementi) {
@@ -67,6 +67,10 @@ public class ConsoleIO implements View{
 
     public String chiediPassword() {
         return InputDati.leggiStringaNonVuota("password: ");
+    }
+
+    public String chiediNuovaPassword() {
+        return InputDati.leggiStringaNonVuota("Inserisci la nuova password: ");
     }
 
     public String chiediNome() {
@@ -102,7 +106,12 @@ public class ConsoleIO implements View{
         return InputDati.yesOrNo("La tua email registrata è: " + email + ". Vuoi mantenerla?");
     }
 
-    //VISITE---------------------------------------------------------------------------------------------------------------
+    //VISITE---------------------------------------------------------------------------------------------------------------    
+    public void mostraMaxPersonePerVisita(VisiteManagerDB visiteManagerDB) {
+        int numeroMax = visiteManagerDB.getMaxPersone();
+        System.out.println("Numero massimo di persone per visita: " + numeroMax);
+    }
+
     public int chiediSelezioneVisita(int max) {
         return InputDati.leggiIntero("Seleziona la visita da modificare: ", 1, max);
     }
@@ -117,7 +126,7 @@ public class ConsoleIO implements View{
     }
 
     // Selezione di un tipo di visita
-    public TipiVisita chiediTipoVisita(List<TipiVisita> tipiVisitaList) {
+    public TipiVisitaClass chiediTipoVisita(List<TipiVisitaClass> tipiVisitaList) {
         mostraMessaggio("Seleziona il tipo di visita:");
         mostraElencoConOggetti(tipiVisitaList);
         int tipoIndex = InputDati.leggiIntero("Seleziona il numero del tipo di visita: ", 1, tipiVisitaList.size()) - 1;
@@ -128,6 +137,7 @@ public class ConsoleIO implements View{
     public Visita pianificazioneGuidata(VisiteManagerDB visiteManagerDB, VolontariManager volontariManager, LuoghiManager luoghiManager) {
 
         ConcurrentHashMap<Integer, Visita> visiteMap = visiteManagerDB.getVisiteMap();
+        String nuovoTitolo = InputDati.leggiStringaNonVuota("Titolo della visita: ");
         int durata = InputDati.leggiIntero("Durata in minuti: ", 30, 300);
         LocalTime orario = InputDati.leggiOra("Orario di inizio (HH:MM): ");
         List<String> volontariConDisp = getVolontariConDisponibilita();
@@ -144,21 +154,31 @@ public class ConsoleIO implements View{
         LocalDate data = scegliDataDisponibile(dateDisp);
         if (data == null) return null;
 
-        TipiVisita tipoScelto = scegliTipoVisita(volontario.getTipiDiVisite());
+        TipiVisitaClass tipoScelto = scegliTipoVisita(volontario.getTipiDiVisite());
         if (tipoScelto == null) return null;
 
         String luogoScelto = scegliLuogoCompatibile(tipoScelto, luoghiManager);
         if (luogoScelto == null) return null;
 
+        int minPartecipanti = InputDati.leggiIntero("Minimo partecipanti: ", 3, visiteManagerDB.getMaxPersone());
+
+        boolean biglietto = InputDati.yesOrNo("Richiesta biglietto?");
+
+        boolean barriereArchitettoniche = InputDati.yesOrNo("Presenza di barriere architettoniche?");
+
         int nuovoId = visiteMap.size() + 1;
-        Visita nuovaVisita = new Visita(nuovoId, luogoScelto, List.of(tipoScelto), volontario.getNome() + " " + volontario.getCognome(),
-                                        data, visiteManagerDB.getMaxPersone(), "Proposta", orario, durata, visiteManagerDB.getMaxPersone());
+        Visita nuovaVisita = new Visita(nuovoId, nuovoTitolo, luogoScelto, List.of(tipoScelto), 
+                                        volontario.getNome() + " " + volontario.getCognome(),
+                                        data, visiteManagerDB.getMaxPersone(), "Proposta", orario, 
+                                        durata, visiteManagerDB.getMaxPersone(), 
+                                        minPartecipanti, biglietto, barriereArchitettoniche);
         dateDisp.remove(String.valueOf(data.getDayOfMonth()));
         disponibilitaVolontari.put(volontario.getEmail(), dateDisp);
         return nuovaVisita;
     }
 
     public Visita pianificazioneLibera(VisiteManagerDB visiteManagerDB, VolontariManager volontariManager, LuoghiManager luoghiManager) {
+        String titolo = InputDati.leggiStringaNonVuota("Titolo della visita: ");
         String luogoNomeScelto = scegliLuogo(luoghiManager);
         if (luogoNomeScelto == null) return null;
         ConcurrentHashMap<String, Luogo> luoghiMap = luoghiManager.getLuoghiMap();
@@ -166,30 +186,37 @@ public class ConsoleIO implements View{
         ConcurrentHashMap<Integer, Visita> visiteMap = visiteManagerDB.getVisiteMap();
         ValidatoreVisite validatoreVisite = new ValidatoreVisite(visiteManagerDB);
         Luogo luogoSceltoObj = luoghiMap.get(luogoNomeScelto);
-        List<TipiVisita> tipiVisita = luogoSceltoObj.getTipiVisita();
+        List<TipiVisitaClass> tipiVisita = luogoSceltoObj.getTipiVisitaClass();
         if (tipiVisita == null || tipiVisita.isEmpty()) {
             mostraMessaggio("Nessun tipo di visita disponibile per questo luogo.");
             return null;
         }
-        List<TipiVisita> tipiVisitaScelti = scegliTipiVisitaMultipli(tipiVisita);
+        List<TipiVisitaClass> tipiVisitaScelti = scegliTipiVisitaClassMultipli(tipiVisita);
         if (tipiVisitaScelti.isEmpty()) {
             mostraMessaggio("Non hai selezionato alcun tipo di visita. La visita non verrà creata.");
             return null;
         }
 
-        Volontario volontario = scegliVolontario(new ArrayList<>(volontariMap.keySet()), volontariManager);
+        Volontario volontario = scegliVolontario(new ArrayList<>(volontariMap.keySet()), volontariManager, tipiVisitaScelti);
         if (volontario == null) return null;
         String volontarioNomeScelto = volontario.getNome() + " " + volontario.getCognome();
 
         LocalDate dataVisita = scegliDataVisita();
         if (dataVisita == null) return null;
 
+        int minPartecipanti = InputDati.leggiIntero("Minimo partecipanti: ", 3, visiteManagerDB.getMaxPersone());
+        boolean biglietto = InputDati.yesOrNo("Richiesta biglietto?");
+        boolean barriereArchitettoniche = InputDati.yesOrNo("Presenza di barriere architettoniche?");
+
         int id = visiteMap.size() + 1;
         int maxPersone = visiteManagerDB.getMaxPersone();
         String stato = "Proposta";
         LocalTime oraInizio = null;
         int durataMinuti = 0;
-        Visita nuovaVisita = new Visita(id, luogoNomeScelto, tipiVisitaScelti, volontarioNomeScelto, dataVisita, maxPersone, stato, oraInizio, durataMinuti, maxPersone);
+        Visita nuovaVisita = new Visita(id, titolo, luogoNomeScelto, tipiVisitaScelti, 
+                                        volontarioNomeScelto, dataVisita, maxPersone, stato, 
+                                        oraInizio, durataMinuti, maxPersone, minPartecipanti, 
+                                        biglietto, barriereArchitettoniche);
 
         if (InputDati.yesOrNo("Vuoi scegliere un orario specifico per la visita?")) {
             do {
@@ -233,15 +260,42 @@ public class ConsoleIO implements View{
     }
 
     private Volontario scegliVolontario(List<String> emails, VolontariManager volontariManager) {
-        if (emails.isEmpty()) return null;
-        mostraMessaggio("Volontari disponibili:");
-        for (int i = 0; i < emails.size(); i++) {
-            Volontario v = volontariManager.getVolontariMap().get(emails.get(i));
-            mostraMessaggio((i + 1) + ". " + v.getNome() + " " + v.getCognome() + " (" + emails.get(i) + ")");
+        return scegliVolontario(emails, volontariManager, null);
+    }
+
+    private Volontario scegliVolontario(List<String> emails, VolontariManager volontariManager, List<TipiVisitaClass> tipiRichiesti) {
+        if (emails == null || emails.isEmpty()) return null;
+
+        List<String> filtrati = new ArrayList<>();
+        for (String email : emails) {
+            Volontario v = volontariManager.getVolontariMap().get(email);
+            if (v == null) continue;
+
+            if (tipiRichiesti == null || tipiRichiesti.isEmpty()) {
+                filtrati.add(email);
+                continue;
+            }
+
+            List<TipiVisitaClass> tipiVolontario = v.getTipiDiVisite();
+            if (tipiVolontario != null && tipiVolontario.stream().anyMatch(t -> tipiRichiesti.contains(t))) {
+                filtrati.add(email);
+            }
         }
-        int idxVol = InputDati.leggiIntero("Scegli il volontario (0 per uscire): ", 0, emails.size()) - 1;
+
+        if (filtrati.isEmpty()) {
+            mostraMessaggio("Nessun volontario disponibile per il tipo di visita selezionato.");
+            return null;
+        }
+
+        mostraMessaggio("Volontari disponibili:");
+        for (int i = 0; i < filtrati.size(); i++) {
+            Volontario v = volontariManager.getVolontariMap().get(filtrati.get(i));
+            mostraMessaggio((i + 1) + ". " + v.getNome() + " " + v.getCognome() + " (" + filtrati.get(i) + ")");
+        }
+
+        int idxVol = InputDati.leggiIntero("Scegli il volontario (0 per uscire): ", 0, filtrati.size()) - 1;
         if (idxVol == -1) return null;
-        return volontariManager.getVolontariMap().get(emails.get(idxVol));
+        return volontariManager.getVolontariMap().get(filtrati.get(idxVol));
     }
 
     private LocalDate scegliDataDisponibile(List<LocalDate> dateDisp) {
@@ -261,7 +315,7 @@ public class ConsoleIO implements View{
         }
     }
 
-    private TipiVisita scegliTipoVisita(List<TipiVisita> tipi) {
+    private TipiVisitaClass scegliTipoVisita(List<TipiVisitaClass> tipi) {
         if (tipi == null || tipi.isEmpty()) return null;
         mostraMessaggio("Tipi di visita disponibili:");
         for (int i = 0; i < tipi.size(); i++) {
@@ -272,10 +326,10 @@ public class ConsoleIO implements View{
         return tipi.get(idxTipo);
     }
 
-    private String scegliLuogoCompatibile(TipiVisita tipoScelto, LuoghiManager luoghiManager) {
+    private String scegliLuogoCompatibile(TipiVisitaClass tipoScelto, LuoghiManager luoghiManager) {
         List<String> luoghiCompatibili = new ArrayList<>();
         for (Luogo luogo : luoghiManager.getLuoghiMap().values()) {
-            if (luogo.getTipiVisita() != null && luogo.getTipiVisita().stream().anyMatch(tv -> tv.equals(tipoScelto))) {
+            if (luogo.getTipiVisitaClass() != null && luogo.getTipiVisitaClass().stream().anyMatch(tv -> tv.equals(tipoScelto))) {
                 luoghiCompatibili.add(luogo.getNome());
             }
         }
@@ -299,15 +353,15 @@ public class ConsoleIO implements View{
         return luoghiNomi.get(idxLuogo);
     }
 
-    private List<TipiVisita> scegliTipiVisitaMultipli(List<TipiVisita> tipiVisita) {
-        List<TipiVisita> tipiVisitaDisponibili = new ArrayList<>(tipiVisita);
-        List<TipiVisita> tipiVisitaScelti = new ArrayList<>();
+    private List<TipiVisitaClass> scegliTipiVisitaClassMultipli(List<TipiVisitaClass> tipiVisita) {
+        List<TipiVisitaClass> tipiVisitaDisponibili = new ArrayList<>(tipiVisita);
+        List<TipiVisitaClass> tipiVisitaScelti = new ArrayList<>();
         while (!tipiVisitaDisponibili.isEmpty()) {
             mostraMessaggio("Tipi di visita disponibili:");
             mostraElencoConOggetti(tipiVisitaDisponibili);
             int idxTipo = InputDati.leggiIntero("Seleziona il numero del tipo di visita da aggiungere (0 per terminare): ", 0, tipiVisitaDisponibili.size());
             if (idxTipo == 0) break;
-            TipiVisita tipoVisitaScelto = tipiVisitaDisponibili.get(idxTipo - 1);
+            TipiVisitaClass tipoVisitaScelto = tipiVisitaDisponibili.get(idxTipo - 1);
             tipiVisitaScelti.add(tipoVisitaScelto);
             tipiVisitaDisponibili.remove(tipoVisitaScelto);
             if (!tipiVisitaDisponibili.isEmpty()) {
@@ -361,7 +415,7 @@ public class ConsoleIO implements View{
     public int chiediSelezioneVisita(List<Visita> visite) {
         mostraMessaggio("Visite disponibili:");
         mostraElencoConOggetti(visite);
-        return InputDati.leggiIntero("Seleziona la visita da eliminare: ", 1, visite.size()) - 1;
+        return InputDati.leggiIntero("Seleziona la visita: ", 1, visite.size()) - 1;
     }
 
     public boolean chiediConfermaEliminazioneVisita(Visita visita) {
@@ -390,8 +444,8 @@ public class ConsoleIO implements View{
     }
 
     //MAX PERSONE---------------------------------------------------------------------------------------------------------------
-    public int chiediNumeroMaxPersone() {
-        return InputDati.leggiInteroConMinimo("Inserisci il numero massimo di persone per visita: ", 2);
+    public int chiediNumeroMaxPersone(VisiteManagerDB visiteManagerDB) {
+        return InputDati.leggiIntero("Inserisci il numero massimo di persone per visita: ", 2, visiteManagerDB.getMaxPersone());
     }
 
     public boolean chiediConfermaNumeroMax(int numeroMax) {
@@ -416,6 +470,26 @@ public class ConsoleIO implements View{
         return InputDati.leggiIntero("Seleziona la data preclusa da eliminare: ", 1, datePrecluse.size()) - 1;
     }
 
+    public LocalDate chiediDataPreclusaStandard() {
+        LocalDate oggi = LocalDate.now();
+        YearMonth meseTarget = YearMonth.from(oggi).plusMonths(2);
+        List<LocalDate> dateValide = new ArrayList<>();
+        for (int giorno = 1; giorno <= meseTarget.lengthOfMonth(); giorno++) {
+            dateValide.add(meseTarget.atDay(giorno));
+        }
+
+        mostraMessaggio("\nDate disponibili per il mese di " + meseTarget.getMonth().getDisplayName(TextStyle.FULL, Locale.ITALIAN) + " " + meseTarget.getYear() + ":");
+        for (int i = 0; i < dateValide.size(); i++) {
+            LocalDate d = dateValide.get(i);
+            String giornoSettimana = d.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ITALIAN);
+            System.out.printf("%d. %02d (%s)%n", i + 1, d.getDayOfMonth(), giornoSettimana);
+        }
+
+        int scelta = InputDati.leggiIntero("Seleziona la data (0 per annullare): ", 0, dateValide.size());
+        if (scelta == 0) return null;
+        return dateValide.get(scelta - 1);
+    }
+
     public boolean chiediConfermaEliminazioneData(LocalDate data) {
         return InputDati.yesOrNo("Sei sicuro di voler eliminare la data preclusa: " + data + "?");
     }
@@ -429,7 +503,18 @@ public class ConsoleIO implements View{
     }
 
     public LocalDate chiediDataPreclusa() {
-        return InputDati.leggiData("Inserisci la data da aggiungere alle date precluse: ");
+        while (true) {
+            LocalDate data = InputDati.leggiData("Inserisci la data da aggiungere alle date precluse (formato YYYY-MM-DD): ");
+            if (data == null) return null;
+            if (data.isAfter(LocalDate.now())) {
+                return data;
+            } else {
+                mostraMessaggio("La data deve essere successiva alla data odierna (" + LocalDate.now() + ").");
+                if (!InputDati.yesOrNo("Vuoi riprovare? (s/n): ")) {
+                    return null;
+                }
+            }
+        }
     }
 
     public String chiediMotivoPreclusione(LocalDate data) {
@@ -449,7 +534,7 @@ public class ConsoleIO implements View{
         mostraElencoConOggetti(ambitoTerritoriale.getAmbitoTerritoriale());
         int luogoIndex = InputDati.leggiIntero("inserire la collocazione del luogo: ", 1, ambitoTerritoriale.getAmbitoTerritoriale().size()) - 1;
         String collocazione = ambitoTerritoriale.getAmbitoTerritoriale().get(luogoIndex);
-        List<TipiVisita> tipiVisita = chiediNuoviTipiVisita(new ArrayList<>());
+        List<TipiVisitaClass> tipiVisita = chiediNuoviTipiVisitaClass(new ArrayList<>());
         return new Luogo(nome, descrizione, collocazione, tipiVisita);
     }
 
@@ -469,9 +554,9 @@ public class ConsoleIO implements View{
         return InputDati.leggiStringa("Inserisci la nuova collocazione del luogo (lascia vuoto per mantenere il valore attuale): " + collocazioneAttuale + "): ");
     }
 
-    public List<TipiVisita> chiediNuoviTipiVisita(List<TipiVisita> tipiAttuali) {
-        
-        List<TipiVisita> nuoviTipi = new ArrayList<>(tipiAttuali);
+    public List<TipiVisitaClass> chiediNuoviTipiVisitaClass(List<TipiVisitaClass> tipiAttuali) {
+
+        List<TipiVisitaClass> nuoviTipi = new ArrayList<>(tipiAttuali);
         // FASE 1: Eliminazione tipi di visita
         if (!nuoviTipi.isEmpty() && InputDati.yesOrNo("Vuoi eliminare uno o più tipi di visita attuali?")) {
             boolean eliminaAltro;
@@ -482,14 +567,14 @@ public class ConsoleIO implements View{
                 if (sceltaElimina == 0) {
                     break;
                 }
-                TipiVisita tipoDaEliminare = nuoviTipi.get(sceltaElimina - 1);
+                TipiVisitaClass tipoDaEliminare = nuoviTipi.get(sceltaElimina - 1);
                 nuoviTipi.remove(tipoDaEliminare);
                 eliminaAltro = !nuoviTipi.isEmpty() && InputDati.yesOrNo("Vuoi eliminare un altro tipo di visita?");
             } while (eliminaAltro);
         }
 
         // FASE 2: Aggiunta tipi di visita
-        List<TipiVisita> tipiDisponibili = new ArrayList<>(List.of(TipiVisita.values()));
+        List<TipiVisitaClass> tipiDisponibili = new ArrayList<>();
         tipiDisponibili.removeAll(nuoviTipi);
 
         if (!tipiDisponibili.isEmpty() && InputDati.yesOrNo("Vuoi aggiungere nuovi tipi di visita?")) {
@@ -501,7 +586,7 @@ public class ConsoleIO implements View{
                 if (sceltaTipi == 0) {
                     break;
                 }
-                TipiVisita tipoScelto = tipiDisponibili.get(sceltaTipi - 1);
+                TipiVisitaClass tipoScelto = tipiDisponibili.get(sceltaTipi - 1);
                 nuoviTipi.add(tipoScelto);
                 tipiDisponibili.remove(tipoScelto);
 
@@ -515,20 +600,20 @@ public class ConsoleIO implements View{
         return tipiAttuali; // Placeholder
     }
 
-    public void mostraConfrontoLuogo(Luogo luogo, String nuovoNome, String nuovaDescrizione, String nuovaCollocazione, List<TipiVisita> nuoviTipi) {
+    public void mostraConfrontoLuogo(Luogo luogo, String nuovoNome, String nuovaDescrizione, String nuovaCollocazione, List<TipiVisitaClass> nuoviTipi) {
         mostraMessaggio("\n--- CONFRONTO MODIFICHE ---");
         mostraMessaggio("Nome: " + luogo.getNome() + " -> " + (nuovoNome.isEmpty() ? luogo.getNome() : nuovoNome));
         mostraMessaggio("Descrizione: " + luogo.getDescrizione() + " -> " + (nuovaDescrizione.isEmpty() ? luogo.getDescrizione() : nuovaDescrizione));
         mostraMessaggio("Collocazione: " + luogo.getCollocazione() + " -> " + (nuovaCollocazione.isEmpty() ? luogo.getCollocazione() : nuovaCollocazione));
-        mostraMessaggio("Tipi di visita: " + luogo.getTipiVisita() + " -> " + nuoviTipi);
+        mostraMessaggio("Tipi di visita: " + luogo.getTipiVisitaClass() + " -> " + nuoviTipi);
     }
 
     //VOLONTARI---------------------------------------------------------------------------------------------------------------
-    // public int chiediSelezioneVolontario(List<Volontario> volontari) {
-    //     mostraMessaggio("Volontari disponibili:");
-    //     mostraElencoConOggetti(volontari);
-    //     return InputDati.leggiIntero("Seleziona il volontario da eliminare: ", 1, volontari.size()) - 1;
-    // }
+    public int chiediSelezioneVolontario(List<Volontario> volontari) {
+        mostraMessaggio("Volontari disponibili:");
+        mostraElencoConOggetti(volontari);
+        return InputDati.leggiIntero("Seleziona il volontario: ", 1, volontari.size()) - 1;
+    }
 
     public boolean chiediConfermaEliminazioneVolontario(Volontario volontario) {
         return InputDati.yesOrNo("Sei sicuro di voler eliminare il volontario: " + volontario.getNome() + "?");
@@ -539,7 +624,7 @@ public class ConsoleIO implements View{
         String cognome = InputDati.leggiStringaNonVuota("Inserisci il cognome: ");
         String email = InputDati.leggiStringaNonVuota("Inserisci l'email: ");
         String password = InputDati.leggiStringaNonVuota("Inserisci la password: ");
-        List<TipiVisita> tipiVisita = chiediNuoviTipiVisita(new ArrayList<>());
+        List<TipiVisitaClass> tipiVisita = chiediNuoviTipiVisitaClass(new ArrayList<>());
         return new Volontario(nome, cognome, email, password, tipiVisita);
     }
 
@@ -611,4 +696,20 @@ public class ConsoleIO implements View{
         } while (continua);
         return giorniSelezionati;
     }
+
+    public void mostraRisultatoAggiornamentoVisitaVolontario(boolean b){
+        if (b) {
+            mostraMessaggio("Visita aggiornata con successo.");
+        } else {
+            mostraMessaggio("Errore nell'aggiornamento della visita.");
+        }
+    }
+
+    // public TipiVisitaClass chiediNuovoTipoVisita() {
+    //     mostraMessaggio("Tipi di visita attuali:");
+    //     mostraElencoConOggetti(List.of(TipiVisitaClass.values()));
+
+    // }
+
+
 }

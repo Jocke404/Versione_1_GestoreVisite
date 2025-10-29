@@ -1,6 +1,6 @@
 package src.controller;
 
-import src.model.TipiVisita;
+import src.model.TipiVisitaClass;
 import src.model.Visita;
 import src.model.db.VisiteManagerDB;
 
@@ -16,8 +16,8 @@ public class VisiteController {
         this.visiteManagerDB = visiteManagerDB;
     }
 
-    public List<TipiVisita> getTipiVisitaList() {
-        return visiteManagerDB.getTipiVisitaList();
+    public List<TipiVisitaClass> getTipiVisitaClassList() {
+        return visiteManagerDB.getTipiVisitaClassList();
     }
 
 

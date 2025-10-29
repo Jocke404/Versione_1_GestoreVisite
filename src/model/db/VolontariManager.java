@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import src.controller.ThreadPoolController;
-import src.model.TipiVisita;
+import src.model.TipiVisitaClass;
 import src.model.Volontario;
 
 public class VolontariManager extends DatabaseManager {
@@ -46,10 +46,10 @@ public class VolontariManager extends DatabaseManager {
                 while (rs.next()) {
                     String email = rs.getString("email");
                     String tipiDiVisite = rs.getString("tipi_di_visite");
-                    List<TipiVisita> listaTipiVisite = new ArrayList<>();
+                    List<TipiVisitaClass> listaTipiVisite = new ArrayList<>();
                     if (tipiDiVisite != null && !tipiDiVisite.isEmpty()) {
                         for (String tipo : tipiDiVisite.split(",")) {
-                            listaTipiVisite.add(TipiVisita.valueOf(tipo.trim()));
+                            listaTipiVisite.add(TipiVisitaClass.valueOf(tipo.trim()));
                         }
                     }
                     Volontario volontario = new Volontario(
@@ -77,7 +77,7 @@ public class VolontariManager extends DatabaseManager {
             pstmt.setString(2, volontario.getCognome());
             pstmt.setString(3, volontario.getEmail());
             pstmt.setString(4, volontario.getPassword());
-            pstmt.setString(5, String.join(",", volontario.getTipiDiVisite().stream().map(TipiVisita::name).toArray(String[]::new)));
+            pstmt.setString(5, String.join(",", volontario.getTipiDiVisite().stream().map(TipiVisitaClass::getNome).toArray(String[]::new)));
             pstmt.setBoolean(6, false);
             pstmt.executeUpdate();
             consoleIO.mostraMessaggio("Volontario aggiunto con successo nella tabella 'volontari'.");
@@ -162,12 +162,12 @@ public class VolontariManager extends DatabaseManager {
     }
 
     //metodo per aggiornare i tipi di visita di un volontario
-    protected void aggiornaTipiVisitaVolontario(String email, List<TipiVisita> nuoviTipiVisita) {
+    protected void aggiornaTipiVisitaClassVolontario(String email, List<TipiVisitaClass> nuoviTipiVisitaClass) {
         String sql= "UPDATE volontari SET tipi_di_visite = ? WHERE email = ?";
         executorService.submit(() -> {
             try (Connection conn = DatabaseConnection.connect();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
-                pstmt.setString(1, String.join(",", nuoviTipiVisita.stream().map(TipiVisita::name).toArray(String[]::new)));
+                pstmt.setString(1, String.join(",", nuoviTipiVisitaClass.stream().map(TipiVisitaClass::getNome).toArray(String[]::new)));
                 pstmt.setString(2, email);
                 int rowsUpdated = pstmt.executeUpdate();
                 if (rowsUpdated > 0) {
@@ -175,12 +175,12 @@ public class VolontariManager extends DatabaseManager {
                     synchronized (volontariMap) {
                         Volontario volontario = volontariMap.get(email);
                         if (volontario != null) {
-                            volontario.setTipiDiVisite(nuoviTipiVisita);
+                            volontario.setTipiDiVisite(nuoviTipiVisitaClass);
                         }
                     }
-                    System.out.println("Tipi di visita aggiornati con successo per il volontario " + email);
+                    consoleIO.mostraMessaggio("Tipi di visita aggiornati con successo per il volontario " + email);
                 }else {
-                    System.out.println("Nessun volontario trovato con l'email " + email);
+                    consoleIO.mostraMessaggio("Nessun volontario trovato con l'email " + email);
                 }
             } catch (SQLException e) {
                 System.err.println("Errore durante l'aggiornamento dei tipi di visita: " + e.getMessage());
@@ -189,22 +189,22 @@ public class VolontariManager extends DatabaseManager {
     }
 
     // metodo per aggiungere un tipo di visita a un volontaro
-    public void aggiungiTipoVisitaAVolontari (String email, TipiVisita tipoVisita){
+    public void aggiungiTipoVisitaAVolontari (String email, TipiVisitaClass tipoVisita){
         synchronized (volontariMap){
             Volontario volontario = volontariMap.get(email);
             if (volontario !=null){
-                List<TipiVisita> tipiEsistenti = new ArrayList<>(volontario.getTipiDiVisite());
+                List<TipiVisitaClass> tipiEsistenti = new ArrayList<>(volontario.getTipiDiVisite());
                 if (!tipiEsistenti.contains(tipoVisita)){
                     tipiEsistenti.add(tipoVisita);
-                    aggiornaTipiVisitaVolontario(email, tipiEsistenti);
+                    aggiornaTipiVisitaClassVolontario(email, tipiEsistenti);
                 } 
             }
         }
     }
 
     //metodo per rimuovere tipi di visita da un volontario
-    public void rimuoviTipiVisitaVolontario (String email, List<TipiVisita> tipiVisitaDaRimuovere){
-        String sql = "UPDATE volontari SET tipi_di_visite = ? WHERE email = ?";
+    public void rimuoviTipiVisitaClassVolontario (String email, List<TipiVisitaClass> tipiVisitaDaRimuovere){
+        String sql = "UPDATE volontari SET tipi_visita = ? WHERE email = ?";
         executorService.submit(() -> {
             try (Connection conn= DatabaseConnection.connect();
                 PreparedStatement pstmt = conn.prepareStatement(sql)){
@@ -213,16 +213,23 @@ public class VolontariManager extends DatabaseManager {
                     Volontario volontario = volontariMap.get(email);
                     if (volontario != null) {
                         //rimuovi i tipi di visita dalla lista
-                        List<TipiVisita> nuoviTipiVisita = new ArrayList<>(volontario.getTipiDiVisite());
-                        nuoviTipiVisita.removeAll(tipiVisitaDaRimuovere);
+                        List<TipiVisitaClass> nuoviTipiVisitaClass = new ArrayList<>(volontario.getTipiDiVisite());
+                        nuoviTipiVisitaClass.removeAll(tipiVisitaDaRimuovere);
 
-                        pstmt.setString (1, String.join(",", nuoviTipiVisita.stream().map(TipiVisita::name).toArray(String[]::new)));
+                        pstmt.setString (1, String.join(",", nuoviTipiVisitaClass.stream().map(TipiVisitaClass::getNome).toArray(String[]::new)));
                         pstmt.setString(2, email);
-                        pstmt.executeUpdate();
-                        //aggiorna anche nella mappa locale
-                        volontario.setTipiDiVisite(nuoviTipiVisita);
+                        int rowsUpdated = pstmt.executeUpdate();
+
+                        if (rowsUpdated > 0) {
+                            //aggiorna anche nella mappa locale
+                            volontario.setTipiDiVisite(nuoviTipiVisitaClass);
+                            consoleIO.mostraMessaggio("Tipi di visita rimossi con successo per il volontario " + email);
+                        } else {
+                            consoleIO.mostraMessaggio("Nessun volontario trovato con l'email " + email);
+                        }
                     }
                 }
+                
             } catch (SQLException e) {
                 System.err.println("Errore durante la rimozione dei tipi di visita: " + e.getMessage());
             }
@@ -230,12 +237,12 @@ public class VolontariManager extends DatabaseManager {
     }
 
     //metodo per rimuovere un singolo tipo di visita da un volontario
-    public void rimuoviTipoVisitaDaVolontario (String email, TipiVisita tipoVisita){
-        rimuoviTipiVisitaVolontario(email, Arrays.asList(tipoVisita));
+    public void rimuoviTipoVisitaDaVolontario (String email, TipiVisitaClass tipoVisita){
+        rimuoviTipiVisitaClassVolontario(email, Arrays.asList(tipoVisita));
     }
 
     //metodo per ottenere tutti i volontaari per un tipo di visita specifico
-    public List<Volontario> getVolontariPerTipoVisita (TipiVisita tipoVisita){
+    public List<Volontario> getVolontariPerTipoVisita (TipiVisitaClass tipoVisita){
         List<Volontario> volontariPerTipo = new ArrayList<>();
         synchronized (volontariMap) {
             for (Volontario volontario : volontariMap.values()) {
@@ -247,11 +254,11 @@ public class VolontariManager extends DatabaseManager {
     }
 
     //metodo per ottenere tutti i tipi di visita con i relativi volontari
-    public Map<TipiVisita, List<Volontario>> getVolontariPerTipoVisita(){
-        Map<TipiVisita, List<Volontario>> volontariPerTipo = new HashMap<>();
+    public Map<TipiVisitaClass, List<Volontario>> getVolontariPerTipoVisita(){
+        Map<TipiVisitaClass, List<Volontario>> volontariPerTipo = new HashMap<>();
         synchronized (volontariMap) {
             for (Volontario volontario : volontariMap.values()) {
-                for (TipiVisita tipoVisita : volontario.getTipiDiVisite()) {
+                for (TipiVisitaClass tipoVisita : volontario.getTipiDiVisite()) {
                     volontariPerTipo.computeIfAbsent(tipoVisita, k -> new ArrayList<>()).add(volontario);
                 }
             }

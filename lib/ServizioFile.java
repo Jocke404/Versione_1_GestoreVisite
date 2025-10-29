@@ -1,5 +1,6 @@
 package lib;
 import java.io.*;
+import java.util.Properties;
 
 
 public class ServizioFile
@@ -84,8 +85,19 @@ public class ServizioFile
 				}
 			} // finally
 
-		 } // metodo salvaSingoloOggetto
-	
+	} // metodo salvaSingoloOggetto
+
+	public static Properties caricaProperties(File f) {
+        Properties p = new Properties();
+        if (f == null || !f.exists()) return p;
+        try (FileInputStream in = new FileInputStream(f)) {
+            p.load(in);
+        } catch (IOException e) {
+            System.out.println(MSG_NO_LETTURA + f.getName());
+            e.printStackTrace();
+        }
+        return p;
+    }
 	
 }
 

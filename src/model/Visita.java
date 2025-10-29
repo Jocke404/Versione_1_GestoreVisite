@@ -5,9 +5,10 @@ import java.time.LocalTime;
 import java.util.List;
 
 public class Visita {
-    private int id; // ID univoco della visita
+    private int id;
+    private String titolo;
     private String luogo;
-    private List<TipiVisita> tipiVisita;
+    private List<TipiVisitaClass> tipiVisita;
     private String volontario;
     private LocalDate data;
     private int maxPersone; 
@@ -15,11 +16,17 @@ public class Visita {
     private LocalTime oraInizio; 
     private int durataMinuti;
     private int postiPrenotati;
+    private int minPartecipanti;
+    private boolean biglietto;
+    private boolean barriereArchitettoniche;
 
     // Costruttore completo (inclusi tutti i campi)
-    public Visita(int id, String luogo, List<TipiVisita> tipiVisita, String volontario, 
-                LocalDate data, int maxPersone, String stato, LocalTime oraInizio, int durataMinuti, int postiPrenotati) {
+    public Visita(int id, String titolo, String luogo, List<TipiVisitaClass> tipiVisita, String volontario, 
+                LocalDate data, int maxPersone, String stato, LocalTime oraInizio, 
+                int durataMinuti, int postiPrenotati, int minPartecipanti, boolean biglietto, 
+                boolean barriereArchitettoniche) {
         this.id = id;
+        this.titolo = titolo;
         this.luogo = luogo;
         this.tipiVisita = tipiVisita;
         this.volontario = volontario;
@@ -29,6 +36,9 @@ public class Visita {
         this.oraInizio = oraInizio;
         this.durataMinuti = durataMinuti;
         this.postiPrenotati = postiPrenotati;
+        this.minPartecipanti = minPartecipanti;
+        this.biglietto = biglietto;
+        this.barriereArchitettoniche = barriereArchitettoniche;
     }
 
     
@@ -69,26 +79,28 @@ public class Visita {
         this.durataMinuti = durataMinuti;
     }
 
-
-    // Getter e Setter
     public int getId() {
         return id;
+    }
+
+    public String getTitolo() {
+        return titolo;
     }
 
     public String getLuogo() {
         return luogo;
     }
 
-    public List<TipiVisita> getTipiVisita() {
+    public List<TipiVisitaClass> getTipiVisitaClass() {
         return tipiVisita;
     }
 
-    public String getTipiVisitaString() {
+    public String getTipiVisitaClassString() {
         if (tipiVisita == null || tipiVisita.isEmpty()) {
             return "";
         }
         StringBuilder sb = new StringBuilder();
-        for (TipiVisita tipo : tipiVisita) {
+        for (TipiVisitaClass tipo : tipiVisita) {
             sb.append(tipo.getNome()).append(", ");
         }
         return sb.substring(0, sb.length() - 2);
@@ -118,14 +130,26 @@ public class Visita {
         this.stato = stato;
     }
 
-
     public String getDescrizione() {
         return tipiVisita != null && !tipiVisita.isEmpty() ? tipiVisita.get(0).getDescrizione() : "";
     }
 
+    public int getMinPartecipanti() {
+        return minPartecipanti;
+    }
+
+    public boolean isBiglietto() {
+        return biglietto;
+    }
+
+    public boolean getBarriereArchitettoniche() {
+        return barriereArchitettoniche;
+    }
+
     @Override
     public String toString() {
-        return "Tipo di visita: " + getTipiVisitaString() +
+        return  "Titolo: " + getTitolo()+
+            "\nTipo di visita: " + getTipiVisitaClassString() +
             "\nDescrizione: " + getDescrizione() +
             "\nLuogo: " + getLuogo() +
             "\nData: " + getData() +
@@ -133,7 +157,10 @@ public class Visita {
             "\nStato: " + getStato() +
             "\nDurata: " + getDurataMinuti() + " minuti" +
             "\nNumero massimo di persone: " + getMaxPersone() +
-            "\nPosti disponibili: " + getPostiDisponibili();   
+            "\nPosti disponibili: " + getPostiDisponibili() +
+            "\nMinimo partecipanti: " + getMinPartecipanti() +
+            "\nBiglietto richiesto: " + (isBiglietto() ? "Sì" : "No") +
+            "\nBarriere architettoniche: " + (getBarriereArchitettoniche() ? "Sì" : "No");
     }
 }
    

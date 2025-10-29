@@ -4,7 +4,9 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import src.model.db.VisiteManagerDB;
@@ -18,6 +20,86 @@ public class ValidatoreVisite {
     public ValidatoreVisite(VisiteManagerDB visiteManager) {
         this.visiteManager = visiteManager;
         this.visiteMap = visiteManager.getVisiteMap();
+    }
+
+    public void gestioneVisiteAuto(){
+        visiteMap = visiteManager.getVisiteMap();
+        for(Visita visita : visiteMap.values()){
+            if(visita.getData().isBefore(LocalDate.now()) && 
+               !visita.getStato().equals("Completata") && 
+               !visita.getStato().equals("Cancellata")){
+                if(visita.getPostiPrenotati() >= visita.getMinPartecipanti()){
+                    visita.setStato("Confermata");
+                    visiteManager.aggiornaVisita(visita.getId(), visita);
+                } else {
+                    visita.setStato("Cancellata");
+                    visiteManager.aggiornaVisita(visita.getId(), visita);
+                }
+            }
+        }
+    }
+
+    public void gestioneDatePrecluseAuto() {
+        try {
+            Map<LocalDate, String> precluse = visiteManager.getDatePrecluseMap();
+            LocalDate today = LocalDate.now();
+            // rimuovi date passate solo se l'anno non coincide con l'anno corrente
+            for (LocalDate d : precluse.keySet()) {
+                if (d.isBefore(today)) {
+                    try {
+                        visiteManager.eliminaData(d);
+                    } catch (Throwable t) {
+                        System.err.println("Errore cancellazione data preclusa " + d + ": " + t.getMessage());
+                    }
+                }
+            }
+            List<LocalDate> toRemove = new ArrayList<>();
+            for (LocalDate d : precluse.keySet()) {
+                if (d.getYear() != today.getYear() && d.isBefore(today)) {
+                    toRemove.add(d);
+                }
+            }
+            for (LocalDate d : toRemove) {
+                try {
+                    visiteManager.eliminaData(d);
+                } catch (Throwable t) {
+                    System.err.println("Errore cancellazione data preclusa " + d + ": " + t.getMessage());
+                }
+            }
+
+            // se è il primo giorno dell'anno, assicura l'inserimento delle festività fisse
+            if (today.getDayOfMonth() == 1 && today.getMonthValue() == 1) {
+                Map<LocalDate, String> holidays = generateFixedHolidays(today.getYear());
+                for (Map.Entry<LocalDate, String> e : holidays.entrySet()) {
+                    LocalDate h = e.getKey();
+                    String descr = e.getValue();
+                    try {
+                        // aggiungi la data preclusa con descrizione (idempotente lato DB)
+                        visiteManager.aggiungiNuovaDataPreclusa(h, descr);
+                    } catch (Throwable t) {
+                        System.err.println("Errore inserimento festività " + h + ": " + t.getMessage());
+                    }
+                }
+            }
+        } catch (Throwable t) {
+            System.err.println("gestioneDatePrecluseAuto error: " + t.getMessage());
+        }
+    }
+
+    // Festività fisse (Italia) — estendi la lista se necessario
+    private Map<LocalDate, String> generateFixedHolidays(int year) {
+        Map<LocalDate, String> h = new LinkedHashMap<>();
+        h.put(LocalDate.of(year, 1, 1), "Capodanno");
+        h.put(LocalDate.of(year, 1, 6), "Epifania");
+        h.put(LocalDate.of(year, 4, 25), "Festa della Liberazione");
+        h.put(LocalDate.of(year, 5, 1), "Festa dei Lavoratori");
+        h.put(LocalDate.of(year, 8, 15), "Ferragosto");
+        h.put(LocalDate.of(year, 11, 1), "Ognissanti");
+        h.put(LocalDate.of(year, 12, 8), "Immacolata Concezione");
+        h.put(LocalDate.of(year, 12, 25), "Natale");
+        h.put(LocalDate.of(year, 12, 26), "Santo Stefano");
+        // Nota: festività mobili (es. Pasqua) non incluse — puoi aggiungerle se necessario
+        return h;
     }
 
     /**
@@ -149,7 +231,7 @@ public class ValidatoreVisite {
             boolean slotLibero = true;
             
             // Controllo 3: verifica sovrapposizione con visite esistenti
-            Visita visitaTemp = new Visita(-1, luogo, List.of(), "", data, 0, "", slotCorrente, durataMinuti, 0);
+            Visita visitaTemp = new Visita(-1, null, luogo, List.of(), "", data, 0, "", slotCorrente, durataMinuti, 0, 0, false, false);
             
             for (Visita visitaEsistente : visiteGiorno) {
                 if (siSovrappongono(visitaTemp.getOraInizio(), visitaTemp.getOraInizio().plusMinutes(visitaTemp.getDurataMinuti()),
@@ -163,7 +245,7 @@ public class ValidatoreVisite {
                 slotDisponibili.add(slotCorrente);
             }
             
-            slotCorrente = slotCorrente.plusMinutes(30); // Check ogni 30 minuti
+            slotCorrente = slotCorrente.plusMinutes(30);
         }
         
         return slotDisponibili;
@@ -171,7 +253,7 @@ public class ValidatoreVisite {
 
     public List<Integer> trovaGiorniDisponibili(Volontario volontario, YearMonth ym) {
         List<Integer> giorniDisponibili = new ArrayList<>();
-        List<TipiVisita> tipiVisitaVolontario = volontario.getTipiDiVisite();
+        List<TipiVisitaClass> tipiVisitaVolontario = volontario.getTipiDiVisite();
 
         for (int giorno = 1; giorno <= ym.lengthOfMonth(); giorno++) {
             LocalDate data = ym.atDay(giorno);
@@ -183,15 +265,19 @@ public class ValidatoreVisite {
     }
 
     private boolean isGiornoDisponibile(LocalDate data, ConcurrentHashMap<Integer, Visita> visiteMap, 
-                                    List<TipiVisita> tipiVisitaVolontario) {
+                                    List<TipiVisitaClass> tipiVisitaVolontario) {
         boolean visitaProgrammata = visiteMap.values().stream()
-            .anyMatch(v -> v.getData() != null && v.getData().equals(data));
+            .anyMatch(v -> v.getData() != null
+                        && v.getData().equals(data) 
+                        && (v.getStato() == null || !v.getStato().equalsIgnoreCase("Cancellata")) 
+                        );
 
         boolean tipoVisitaConsentito = tipiVisitaVolontario.stream()
             .anyMatch(tipo -> isTipoVisitaProgrammabileInGiorno(tipo, data.getDayOfWeek().toString()));
 
         return !visitaProgrammata && tipoVisitaConsentito;
     }
+
 
     public List<LocalDate> filtraDateDisponibili(List<Integer> giorniSelezionati, YearMonth ym) {
         List<LocalDate> dateDisponibili = new ArrayList<>();
@@ -201,8 +287,8 @@ public class ValidatoreVisite {
         return dateDisponibili;
     }
 
-    private boolean isTipoVisitaProgrammabileInGiorno(TipiVisita tipoVisita, String giornoSettimana) {
-        String tipo = tipoVisita.toString().trim().toLowerCase();
+    private boolean isTipoVisitaProgrammabileInGiorno(TipiVisitaClass tipoVisita, String giornoSettimana) {
+        String tipo = tipoVisita.toString().trim().toUpperCase();
         String giorno = giornoSettimana.trim().toUpperCase();
 
         switch (tipo) {

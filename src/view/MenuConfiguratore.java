@@ -20,13 +20,16 @@ public class MenuConfiguratore implements Menu {
     private static final String [] SOTTOMENU_VOLONTARI={
         "Aggiungi Volontario", "Aggiungi volontari a un tipo di visita",
         "Rimuovi volontari da un tipo di visita", "Visualizza tutti i Volontari",
-        "Visualizza volontari per tipo di visita",  
+        "Visualizza volontari per tipo di visita",
+        "Elimina Volontario" 
     };
 
     private static final String [] SOTTOMENU_VISITE={
         "Aggiungi Visita", "Visualizza Visite", 
-        "Modifica stato della visita", "Visualizza visite per stato", 
-        "Visualizza archivio storico", "Stampa Tipi Visita per Luogo",
+        "Modifica stato della visita", "Modifica data della visita",  
+        "Visualizza visite per stato", "Visualizza archivio storico", 
+        "Stampa Tipi Visita per Luogo", "Elimina Visita",
+        "Assegna Visita a Volontario"
     };
 
     private static final String [] SOTTOMENU_LUOGHI={
@@ -75,6 +78,7 @@ public class MenuConfiguratore implements Menu {
                 case 4 -> configuratoriController.modificaMaxPersone();
                 case 5 -> configuratoriController.modificaNumeroPersoneIscrivibili();
                 case 6 -> configuratoriController.eliminaDatePrecluse();
+                //case 7 -> configuratoriController.aggiungiNuovoTipoVisita();
 
                 case 0 -> tornaIndietro = true;
                 default -> System.out.println("Opzione non valida.");
@@ -114,10 +118,14 @@ public class MenuConfiguratore implements Menu {
                 case 1 -> configuratoriController.aggiungiVisita();
                 case 2 -> configuratoriController.mostraVisite();
                 case 3 -> configuratoriController.modificaStatoVisita();
-                case 4 -> configuratoriController.visualizzaVisitePerStato();
-                case 5 -> configuratoriController.visualizzaArchivioStorico();
-                case 6 -> configuratoriController.stampaTipiVisitaPerLuogo();
-                case 7 -> configuratoriController.eliminaVisita();
+                case 4 -> configuratoriController.modificaDataVisita();
+                case 5 -> configuratoriController.visualizzaVisitePerStato();
+                case 6 -> configuratoriController.visualizzaArchivioStorico();
+                case 7 -> configuratoriController.stampaTipiVisitaClassPerLuogo();
+                case 8 -> configuratoriController.eliminaVisita();
+                case 9 -> configuratoriController.assegnaVisitaAVolontario();
+                case 10 -> configuratoriController.rimuoviVisitaDaVolontario();
+
 
 
                 case 0 -> tornaIndietro = true;

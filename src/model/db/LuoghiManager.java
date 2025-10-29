@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import src.controller.ThreadPoolController;
 import src.model.Luogo;
-import src.model.TipiVisita;
+import src.model.TipiVisitaClass;
 
 public class LuoghiManager extends DatabaseManager {
     private ConcurrentHashMap<String, Luogo> luoghiMap = new ConcurrentHashMap<>();
@@ -30,14 +30,14 @@ public class LuoghiManager extends DatabaseManager {
                 while (rs.next()) {
                     String nome = rs.getString("nome");
                     String tipiVisitaStr = rs.getString("tipi_di_visita");
-                    List<TipiVisita> tipiVisitaList = new java.util.ArrayList<>();
+                    List<TipiVisitaClass> tipiVisitaList = new java.util.ArrayList<>();
                     if (tipiVisitaStr != null && !tipiVisitaStr.trim().isEmpty()) {
                         tipiVisitaList = Arrays.stream(tipiVisitaStr.split(","))
                             .map(String::trim)
                             .filter(s -> !s.isEmpty())
                             .map(s -> {
                                 try {
-                                    return TipiVisita.valueOf(s.toUpperCase());
+                                    return TipiVisitaClass.valueOf(s.toUpperCase());
                                 } catch (IllegalArgumentException e) {
                                     System.err.println("Tipo visita non valido: " + s);
                                     return null;
@@ -68,7 +68,7 @@ public class LuoghiManager extends DatabaseManager {
                     PreparedStatement pstmt = conn.prepareStatement(sql)) {
                 pstmt.setString(1, luogoAggiornato.getDescrizione());
                 pstmt.setString(2, luogoAggiornato.getCollocazione());
-                String tipiVisitaStr = String.join(",", luogoAggiornato.getTipiVisita().stream().map(TipiVisita::name).toList());
+                String tipiVisitaStr = String.join(",", luogoAggiornato.getTipiVisitaClass().stream().map(TipiVisitaClass::getNome).toList());
                 pstmt.setString(3, tipiVisitaStr);
                 pstmt.setString(4, nome);
                 pstmt.executeUpdate();
@@ -88,7 +88,7 @@ public class LuoghiManager extends DatabaseManager {
                 pstmt.setString(1, luogo.getNome());
                 pstmt.setString(2, luogo.getDescrizione());
                 pstmt.setString(3, luogo.getCollocazione());
-                String tipiVisitaStr = String.join(",", luogo.getTipiVisita().stream().map(TipiVisita::name).toList());
+                String tipiVisitaStr = String.join(",", luogo.getTipiVisitaClass().stream().map(TipiVisitaClass::getNome).toList());
                 pstmt.setString(4, tipiVisitaStr);
                 pstmt.executeUpdate();
     
