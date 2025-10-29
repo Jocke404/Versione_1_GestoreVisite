@@ -108,11 +108,8 @@ public class MasterController {
         Menu menu = null;
         if (isAuth) {
             System.out.println("Buongiorno " + utenteCorrente.getNome() + "!");
-            if (utenteCorrente instanceof Volontario){
-                volontariController.volontarioCorrente = (Volontario) utenteCorrente;  
-                menu = menuFactory.creaMenuVolontario(volontariController);
-            } else if (utenteCorrente instanceof Configuratore){
-                if(!ambitoTerritoriale.isAmbitoConfigurato()){
+            if (utenteCorrente instanceof Configuratore) {
+                if (!ambitoTerritoriale.isAmbitoConfigurato()) {
                     ambitoTerritoriale.scegliAmbitoTerritoriale();
                 } else {
                     ambitoTerritoriale.caricaAmbitoTerritoriale();

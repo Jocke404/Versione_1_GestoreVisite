@@ -151,25 +151,6 @@ public class VolontariManager extends DatabaseManager {
         });
     }
 
-    public void aggiornaDisponibilitaVolontario(String email, String disponibilita) {
-        String sql = "UPDATE volontari SET disponibilita = ? WHERE email = ?";
-        executorService.submit(() -> {
-            try (Connection conn = DatabaseConnection.connect();
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
-                pstmt.setString(1, disponibilita);
-                pstmt.setString(2, email);
-                int rowsUpdated = pstmt.executeUpdate();
-                if (rowsUpdated > 0) {
-                    System.out.println("Disponibilità aggiornata con successo per il volontario " + email);
-                } else {
-                    System.out.println("Nessun volontario trovato con l'email " + email);
-                }
-            } catch (SQLException e) {
-                System.err.println("Errore durante l'aggiornamento della disponibilità: " + e.getMessage());
-            }
-        });
-    }
-
     public void aggiungiNuovoVolontario(Volontario nuovoVolontario) {
         String verificaSql = "SELECT 1 FROM volontari WHERE email = ?";
         if(!recordEsiste(verificaSql, nuovoVolontario.getEmail())){
@@ -180,7 +161,7 @@ public class VolontariManager extends DatabaseManager {
         }
     }
 
-        //metodo per aggiornare i tipi di visita di un volontario
+    //metodo per aggiornare i tipi di visita di un volontario
     protected void aggiornaTipiVisitaVolontario(String email, List<TipiVisita> nuoviTipiVisita) {
         String sql= "UPDATE volontari SET tipi_di_visite = ? WHERE email = ?";
         executorService.submit(() -> {
@@ -197,9 +178,9 @@ public class VolontariManager extends DatabaseManager {
                             volontario.setTipiDiVisite(nuoviTipiVisita);
                         }
                     }
-                    consoleIO.mostraMessaggio("Tipi di visita aggiornati con successo per il volontario " + email);
+                    System.out.println("Tipi di visita aggiornati con successo per il volontario " + email);
                 }else {
-                    consoleIO.mostraMessaggio("Nessun volontario trovato con l'email " + email);
+                    System.out.println("Nessun volontario trovato con l'email " + email);
                 }
             } catch (SQLException e) {
                 System.err.println("Errore durante l'aggiornamento dei tipi di visita: " + e.getMessage());
@@ -223,7 +204,7 @@ public class VolontariManager extends DatabaseManager {
 
     //metodo per rimuovere tipi di visita da un volontario
     public void rimuoviTipiVisitaVolontario (String email, List<TipiVisita> tipiVisitaDaRimuovere){
-        String sql = "UPDATE volontari SET tipi_visita = ? WHERE email = ?";
+        String sql = "UPDATE volontari SET tipi_di_visite = ? WHERE email = ?";
         executorService.submit(() -> {
             try (Connection conn= DatabaseConnection.connect();
                 PreparedStatement pstmt = conn.prepareStatement(sql)){
@@ -237,18 +218,11 @@ public class VolontariManager extends DatabaseManager {
 
                         pstmt.setString (1, String.join(",", nuoviTipiVisita.stream().map(TipiVisita::name).toArray(String[]::new)));
                         pstmt.setString(2, email);
-                        int rowsUpdated = pstmt.executeUpdate();
-
-                        if (rowsUpdated > 0) {
-                            //aggiorna anche nella mappa locale
-                            volontario.setTipiDiVisite(nuoviTipiVisita);
-                            consoleIO.mostraMessaggio("Tipi di visita rimossi con successo per il volontario " + email);
-                        } else {
-                            consoleIO.mostraMessaggio("Nessun volontario trovato con l'email " + email);
-                        }
+                        pstmt.executeUpdate();
+                        //aggiorna anche nella mappa locale
+                        volontario.setTipiDiVisite(nuoviTipiVisita);
                     }
                 }
-                
             } catch (SQLException e) {
                 System.err.println("Errore durante la rimozione dei tipi di visita: " + e.getMessage());
             }

@@ -169,25 +169,6 @@ public class ValidatoreVisite {
         return slotDisponibili;
     }
 
-    // public List<Integer> trovaGiorniDisponibili(Volontario volontario, LocalDate meseProssimo, YearMonth ym) {
-    //     List<Integer> giorniDisponibili = new ArrayList<>();
-    //     List<TipiVisita> tipiVisitaVolontario = volontario.getTipiDiVisite();
-
-    //     consoleIO.mostraMessaggio("Calendario del mese di " + meseProssimo.getMonth() + " " + meseProssimo.getYear() + ":");
-    //     consoleIO.mostraMessaggio("Giorno\tGiorno della settimana");
-
-    //     for (int giorno = 1; giorno <= ym.lengthOfMonth(); giorno++) {
-    //         LocalDate data = ym.atDay(giorno);
-    //         String giornoSettimana = data.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ITALIAN);
-
-    //         if (isGiornoDisponibile(data, visiteMap, tipiVisitaVolontario)) {
-    //             System.out.printf("%02d\t%s%n", giorno, giornoSettimana);
-    //             giorniDisponibili.add(giorno);
-    //         }
-    //     }
-        
-    //     return giorniDisponibili;
-    // }
     public List<Integer> trovaGiorniDisponibili(Volontario volontario, YearMonth ym) {
         List<Integer> giorniDisponibili = new ArrayList<>();
         List<TipiVisita> tipiVisitaVolontario = volontario.getTipiDiVisite();
@@ -212,43 +193,6 @@ public class ValidatoreVisite {
         return !visitaProgrammata && tipoVisitaConsentito;
     }
 
-    // public List<LocalDate> raccogliDateDisponibili(List<Integer> giorniDisponibili, YearMonth ym) {
-    //     List<LocalDate> dateDisponibili = new ArrayList<>();
-
-    //     consoleIO.mostraMessaggio("Seleziona i giorni in cui sei disponibile per il mese di " + 
-    //                             ym.getMonth().getDisplayName(TextStyle.FULL, Locale.ITALIAN) + " " + ym.getYear() + ":");
-        
-    //     boolean continua = true;
-    //     do {
-    //         consoleIO.mostraMessaggio("Giorni disponibili: " + giorniDisponibili);
-    //         int giorno = InputDati.leggiIntero("Inserisci il giorno da aggiungere (0 per terminare): ", 0, ym.lengthOfMonth());
-            
-    //         if (giorno == 0) {
-    //             continua = false;
-    //             break;
-    //         }
-            
-    //         if (giorniDisponibili.contains(giorno)) {
-    //             LocalDate data = ym.atDay(giorno);
-    //             if (!dateDisponibili.contains(data)) {
-    //                 dateDisponibili.add(data);
-    //                 consoleIO.mostraMessaggio("Data " + data + " aggiunta alle tue disponibilità.");
-    //                 giorniDisponibili.remove(Integer.valueOf(giorno)); // Rimuovi dalla lista dei disponibili
-    //             } else {
-    //                 consoleIO.mostraMessaggio("Hai già inserito questa data.");
-    //             }
-    //         } else {
-    //             consoleIO.mostraMessaggio("Giorno non disponibile o già selezionato. Scegli un giorno valido.");
-    //         }
-            
-    //         if (giorniDisponibili.isEmpty()) {
-    //             consoleIO.mostraMessaggio("Hai selezionato tutti i giorni disponibili.");
-    //             continua = false;
-    //         }
-    //     } while (continua);
-
-    //     return dateDisponibili;
-    // }
     public List<LocalDate> filtraDateDisponibili(List<Integer> giorniSelezionati, YearMonth ym) {
         List<LocalDate> dateDisponibili = new ArrayList<>();
         for (Integer giorno : giorniSelezionati) {
