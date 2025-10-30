@@ -88,8 +88,11 @@ public class AggiuntaUtilita {
     }
 
     public void aggiungiNuovoTipoVisita(TipiVisitaClass nuovoTipo) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'aggiungiNuovoTipoVisita'");
+        visiteManagerDB.addNuovoTipoVisita(nuovoTipo);
+    }
+
+    public void rimuoviVisitaDaVolontario(Visita visitaSelezionata, Volontario volontarioSelezionato) {
+        visiteManagerDB.rimuoviVisitaDaVolontario(volontarioSelezionato, visitaSelezionata);
     }
 
 }

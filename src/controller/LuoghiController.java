@@ -2,7 +2,6 @@ package src.controller;
 
 import src.model.Luogo;
 import src.model.db.LuoghiManager;
-import src.model.AggiuntaUtilita;
 import src.view.ViewUtilita;
 
 import java.util.List;
@@ -22,10 +21,6 @@ public class LuoghiController {
 
     public List<Luogo> getLuoghi() {
         return List.copyOf(luoghiManager.getLuoghiMap().values());
-    }
-
-    public void eliminaLuogo(Luogo luogoDaEliminare) {
-        luoghiManager.rimuoviLuogo(luogoDaEliminare);
     }
 
     public void aggiornaLuoghi(Luogo luogoDaModificare) {

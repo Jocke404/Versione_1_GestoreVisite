@@ -47,6 +47,6 @@ public abstract class Utente {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + " [nome=" + nome + ", cognome=" + cognome + ", email=" + email + "]";
+        return getClass().getSimpleName() + " \nNome=" + nome + "\nCognome=" + cognome + "\nEmail=" + email;
     }
 }

@@ -161,7 +161,7 @@ public class DatabaseUpdater {
 
     public boolean isPasswordModificata(String email) {
         String sql = "SELECT password_modificata FROM utenti_unificati WHERE email = ?";
-        boolean passwordModificata = false; // Valore di default
+        boolean passwordModificata = false; 
     
         try (Connection conn = DatabaseConnection.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {

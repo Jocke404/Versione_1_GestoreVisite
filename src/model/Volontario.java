@@ -33,4 +33,21 @@ public class Volontario extends Utente {
         return this.tipiDiVisite.contains(tipoVisita);
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(super.toString())
+          .append("\nTipi di Visite:");
+
+        if (tipiDiVisite == null || tipiDiVisite.isEmpty()) {
+            sb.append(" []");
+        } else {
+            for (TipiVisitaClass t : tipiDiVisite) {
+                sb.append("\n - ");
+                sb.append(t == null ? "null" : t.toString());
+            }
+        }
+        return sb.toString();
+    }
+
 }

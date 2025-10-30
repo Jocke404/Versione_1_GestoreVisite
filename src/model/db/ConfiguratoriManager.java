@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import src.controller.ThreadPoolController;
 import src.model.Configuratore;
+import src.model.Utente;
 
 public class ConfiguratoriManager extends DatabaseManager {
     private ConcurrentHashMap<String, Configuratore> configuratoriMap = new ConcurrentHashMap<>();
@@ -71,7 +72,7 @@ public class ConfiguratoriManager extends DatabaseManager {
     }
 
     // Metodo per aggiornare un configuratore nel database
-    public void aggiornaConfiguratore(String email, Configuratore configuratoreAggiornato) {
+    protected void aggiornaConfiguratore(String email, Configuratore configuratoreAggiornato) {
         String sqlConfiguratori = "UPDATE configuratori SET nome = ?, cognome = ?, password = ?, email = ? WHERE email = ?";
         String sqlUtentiUnificati = "UPDATE utenti_unificati SET nome = ?, cognome = ?, password = ?, email = ? WHERE email = ?";
     
@@ -84,13 +85,7 @@ public class ConfiguratoriManager extends DatabaseManager {
                     pstmtConfiguratori.setString(3, configuratoreAggiornato.getPassword());
                     pstmtConfiguratori.setString(4, configuratoreAggiornato.getEmail()); // Nuova email
                     pstmtConfiguratori.setString(5, email); // Email corrente
-                    int rowsUpdatedConfiguratori = pstmtConfiguratori.executeUpdate();
-    
-                    if (rowsUpdatedConfiguratori > 0) {
-                        System.err.println("Configuratore aggiornato con successo nella tabella 'configuratori'.");
-                    } else {
-                        System.err.println("Errore: Nessun configuratore trovato con l'email specificata.");
-                    }
+                    pstmtConfiguratori.executeUpdate();
                 }
     
                 // Aggiorna la tabella "utenti_unificati"
@@ -100,13 +95,7 @@ public class ConfiguratoriManager extends DatabaseManager {
                     pstmtUtentiUnificati.setString(3, configuratoreAggiornato.getPassword());
                     pstmtUtentiUnificati.setString(4, configuratoreAggiornato.getEmail()); // Nuova email
                     pstmtUtentiUnificati.setString(5, email); // Email corrente
-                    int rowsUpdatedUtentiUnificati = pstmtUtentiUnificati.executeUpdate();
-    
-                    if (rowsUpdatedUtentiUnificati > 0) {
-                        System.err.println("Configuratore aggiornato con successo nella tabella 'utenti_unificati'.");
-                    } else {
-                        System.err.println("Errore: Nessun utente trovato con l'email specificata nella tabella 'utenti_unificati'.");
-                    }
+                    pstmtUtentiUnificati.executeUpdate();
                 }
             } catch (SQLException e) {
                 System.err.println("Errore durante l'aggiornamento del configuratore: " + e.getMessage());
@@ -126,13 +115,7 @@ public class ConfiguratoriManager extends DatabaseManager {
                     pstmtConfiguratori.setString(1, nuovaPassword);
                     pstmtConfiguratori.setBoolean(2, true); // Imposta password_modificata a true
                     pstmtConfiguratori.setString(3, email);
-                    int rowsUpdatedConfiguratori = pstmtConfiguratori.executeUpdate();
-
-                    if (rowsUpdatedConfiguratori > 0) {
-                        System.err.println("Password aggiornata con successo nella tabella 'configuratori'.");
-                    } else {
-                        System.err.println("Errore: Nessun configuratore trovato con l'email specificata.");
-                    }
+                    pstmtConfiguratori.executeUpdate();
                 }
 
                 // Aggiorna la tabella "utenti_unificati"
@@ -140,12 +123,7 @@ public class ConfiguratoriManager extends DatabaseManager {
                     pstmtUtenti.setString(1, nuovaPassword);
                     pstmtUtenti.setBoolean(2, true); // Imposta password_modificata a true
                     pstmtUtenti.setString(3, email);
-                    int rowsUpdatedUtenti = pstmtUtenti.executeUpdate();
-                    if (rowsUpdatedUtenti > 0) {
-                        System.err.println("Password aggiornata con successo nella tabella 'utenti_unificati'.");
-                    } else {
-                        System.err.println("Errore: Nessun utente trovato con l'email specificata.");
-                    }
+                    pstmtUtenti.executeUpdate();
                 }
     
                 // Aggiorna la tabella "utenti_unificati"
@@ -153,13 +131,7 @@ public class ConfiguratoriManager extends DatabaseManager {
                     pstmtUtenti.setString(1, nuovaPassword);
                     pstmtUtenti.setBoolean(2, true); // Imposta password_modificata a true
                     pstmtUtenti.setString(3, email);
-                    int rowsUpdatedUtenti = pstmtUtenti.executeUpdate();
-    
-                    if (rowsUpdatedUtenti > 0) {
-                        System.err.println("Password aggiornata con successo nella tabella 'utenti_unificati'.");
-                    } else {
-                        System.err.println("Errore: Nessun utente trovato con l'email specificata nella tabella 'utenti_unificati'.");
-                    }
+                    pstmtUtenti.executeUpdate();
                 }
             } catch (SQLException e) {
                 System.err.println("Errore durante l'aggiornamento della password: " + e.getMessage());
@@ -185,6 +157,11 @@ public class ConfiguratoriManager extends DatabaseManager {
     
     public void setConfiguratoriMap(ConcurrentHashMap<String, Configuratore> configuratoriMap) {
         this.configuratoriMap = configuratoriMap;
+    }
+
+    public void aggiornaNomeCognome(String email, Configuratore newConfiguratore) {
+        configuratoriMap.put(email, newConfiguratore);
+        aggiornaConfiguratore(email, newConfiguratore);
     }
 
 }

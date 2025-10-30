@@ -119,4 +119,11 @@ public class CredentialManager {
         }
     }
 
+    public void aggiornaNomeCognomeConf(Utente utente, String nuovoNome, String nuovoCognome) {
+        configuratoreCorrente = (Configuratore) utente;
+        configuratoreCorrente.setNome(nuovoNome);
+        configuratoreCorrente.setCognome(nuovoCognome);
+        configuratoriManager.aggiornaNomeCognome(utente.getEmail(), configuratoreCorrente);
+    }
+
 }

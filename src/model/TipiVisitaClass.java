@@ -3,7 +3,6 @@ package src.model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -20,10 +19,10 @@ public class TipiVisitaClass {
     }
 
     // costanti built‑in (sostituisci i nomi coi valori che avevi nell'enum)
-    public static final TipiVisitaClass STORICA = new TipiVisitaClass("Visita Storica", "Un percorso guidato alla scoperta della storia e dei monumenti principali della città.");
-    public static final TipiVisitaClass SCIENTIFICA = new TipiVisitaClass("Visita Scientifica", "Un'esperienza educativa dedicata alle scienze e alle innovazioni tecnologiche.");
-    public static final TipiVisitaClass ENOGASTRONOMICA = new TipiVisitaClass("Visita Enogastronomica", "Un viaggio tra i sapori tipici locali con degustazioni di prodotti tradizionali.");
-    public static final TipiVisitaClass LABBAMBINI = new TipiVisitaClass("Laboratorio Bambini", "Attività ludico-didattiche pensate per i più piccoli, con laboratori creativi e giochi.");
+    public static final TipiVisitaClass STORICA = new TipiVisitaClass("STORICA", "Un percorso guidato alla scoperta della storia e dei monumenti principali della città.");
+    public static final TipiVisitaClass SCIENTIFICA = new TipiVisitaClass("SCIENTIFICA", "Un'esperienza educativa dedicata alle scienze e alle innovazioni tecnologiche.");
+    public static final TipiVisitaClass ENOGASTRONOMICA = new TipiVisitaClass("ENOGASTRONOMICA", "Un viaggio tra i sapori tipici locali con degustazioni di prodotti tradizionali.");
+    public static final TipiVisitaClass LABBAMBINI = new TipiVisitaClass("LABBAMBINI", "Attività ludico-didattiche pensate per i più piccoli, con laboratori creativi e giochi.");
 
     // registry dinamico thread-safe: key = nome normalizzato, value = TipiVisitaClass
     private static final ConcurrentHashMap<String, TipiVisitaClass> registry = new ConcurrentHashMap<>();
@@ -59,11 +58,6 @@ public class TipiVisitaClass {
         if (!(o instanceof TipiVisitaClass)) return false;
         TipiVisitaClass that = (TipiVisitaClass) o;
         return nome.equalsIgnoreCase(that.nome);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(nome.toLowerCase());
     }
 
     /**
@@ -136,6 +130,10 @@ public class TipiVisitaClass {
                 || key.equals(normalizeKey(SCIENTIFICA.getNome()))
                 || key.equals(normalizeKey(ENOGASTRONOMICA.getNome()))
                 || key.equals(normalizeKey(LABBAMBINI.getNome()));
+    }
+
+    public static List<TipiVisitaClass> values() {
+        return new ArrayList<>(registry.values());
     }
         
 }

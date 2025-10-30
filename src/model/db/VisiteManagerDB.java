@@ -13,7 +13,6 @@ import src.controller.ThreadPoolController;
 import src.model.TipiVisitaClass;
 import src.model.Visita;
 import src.model.Volontario;
-import src.model.TipiVisitaClass;
 
 public class VisiteManagerDB extends DatabaseManager {
     private ConcurrentHashMap<Integer, Visita> visiteMap = new ConcurrentHashMap<>();
@@ -91,6 +90,21 @@ public class VisiteManagerDB extends DatabaseManager {
             } catch (SQLException e) {
                 System.err.println("Errore durante l'aggiunta della visita: " + e.getMessage());
             }
+    }
+
+    protected void aggiungiNuovoTipoVisita(TipiVisitaClass nuovoTipo) {
+        String sql = "INSERT INTO tipi_visita (nome, descrizione) VALUES (?, ?)";
+        executorService.submit(() -> {
+            try (Connection conn = DatabaseConnection.connect();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setString(1, nuovoTipo.getNome());
+                pstmt.setString(2, nuovoTipo.getDescrizione());
+                pstmt.executeUpdate();
+
+            } catch (SQLException e) {
+                System.err.println("Errore durante l'aggiunta del nuovo tipo di visita: " + e.getMessage());
+            }
+        });
     }
 
     protected void aggiungiDataPreclusa(LocalDate data, String motivo) {
@@ -203,6 +217,31 @@ public class VisiteManagerDB extends DatabaseManager {
         });
     }
 
+    protected void sganciaVisitaVol(Volontario volontarioSelezionato, Visita visitaSelezionata) {
+        String sql = "UPDATE visite SET volontario = NULL WHERE id = ?";
+        executorService.submit(() -> {
+            try (Connection conn = DatabaseConnection.connect();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setInt(1, visitaSelezionata.getId());
+                pstmt.executeUpdate();
+
+                consoleIO.mostraMessaggio("Visita rimossa con successo dal volontario.");
+            } catch (SQLException e) {
+                System.err.println("Errore durante la rimozione della visita dal volontario: " + e.getMessage());
+            }
+        });
+    }
+
+    public void addNuovoTipoVisita(TipiVisitaClass nuovoTipo) {
+        String verificaSql = "SELECT 1 FROM tipi_visita WHERE nome = ?";
+        if(!recordEsiste(verificaSql, nuovoTipo.getNome())){
+            aggiungiNuovoTipoVisita(nuovoTipo);
+        } else {
+            consoleIO.mostraMessaggio("Il tipo di visita esiste già. Non posso aggiungerlo.");
+            return;
+        }
+    }
+
     public void aggiungiNuovaVisita(Visita nuovaVisita) {
         String verificaSql = "SELECT 1 FROM visite WHERE luogo = ? AND data = ? AND volontario = ? AND ora_inizio = ?";
         if(!recordEsiste(verificaSql, nuovaVisita.getLuogo(), nuovaVisita.getData(), nuovaVisita.getVolontario(), nuovaVisita.getOraInizio())){
@@ -299,6 +338,10 @@ public class VisiteManagerDB extends DatabaseManager {
 
     public void assegnaVisitaAVolontario(Volontario volontarioSelezionato, Visita visitaSelezionata) {
         assegnaVisitaAVolontarioDB(volontarioSelezionato, visitaSelezionata);
+    }
+
+    public void rimuoviVisitaDaVolontario(Volontario volontarioSelezionato, Visita visitaSelezionata) {
+        sganciaVisitaVol(volontarioSelezionato, visitaSelezionata);
     }
 }
 

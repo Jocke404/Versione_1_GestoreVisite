@@ -42,6 +42,15 @@ public class AuthenticationController {
                 modificaPasswordUtente(utente);
             }
 
+            if (!credentialManager.isPasswordModificata(email)) {
+                if(utente instanceof Configuratore) {
+                    String nuovoNome = consoleIO.chiediNome();
+                    String nuovoCognome = consoleIO.chiediCognome();
+                    credentialManager.aggiornaNomeCognomeConf(utente, nuovoNome, nuovoCognome);
+                }
+            }
+
+
             this.utenteLoggato = utente;
             return true;
         } else {

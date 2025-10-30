@@ -68,7 +68,8 @@ public class LuoghiManager extends DatabaseManager {
                     PreparedStatement pstmt = conn.prepareStatement(sql)) {
                 pstmt.setString(1, luogoAggiornato.getDescrizione());
                 pstmt.setString(2, luogoAggiornato.getCollocazione());
-                String tipiVisitaStr = String.join(",", luogoAggiornato.getTipiVisitaClass().stream().map(TipiVisitaClass::getNome).toList());
+                String tipiVisitaStr = String.join(",", luogoAggiornato.getTipiVisitaClass()
+                                                    .stream().map(t -> t.getNome().toUpperCase()).toList());
                 pstmt.setString(3, tipiVisitaStr);
                 pstmt.setString(4, nome);
                 pstmt.executeUpdate();
@@ -109,35 +110,12 @@ public class LuoghiManager extends DatabaseManager {
         }
     }
 
-    private void rimuoviLuogoDalDatabase(Luogo luogoDaEliminare) {
-        String sql = "DELETE FROM luoghi WHERE nome = ?";
-        executorService.submit(() -> {
-            try (Connection conn = DatabaseConnection.connect();
-                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
-                pstmt.setString(1, luogoDaEliminare.getNome());
-                int rowsDeleted = pstmt.executeUpdate();
-                if (rowsDeleted > 0) {
-                    consoleIO.mostraMessaggio("Luogo rimosso con successo.");
-                } else {
-                    consoleIO.mostraMessaggio("Errore: Nessun luogo trovato con il nome specificato.");
-                }
-            } catch (SQLException e) {
-                consoleIO.mostraMessaggio("Errore durante la rimozione del luogo: " + e.getMessage());
-            }
-        });
-    }
-
     public ConcurrentHashMap<String, Luogo> getLuoghiMap() {
         return luoghiMap;
     }
     
     public void setLuoghiMap(ConcurrentHashMap<String, Luogo> luoghiMap) {
         this.luoghiMap = luoghiMap;
-    }
-
-    public void rimuoviLuogo(Luogo luogoDaEliminare) {
-        rimuoviLuogoDalDatabase(luogoDaEliminare);
-        luoghiMap.remove(luogoDaEliminare.getNome());
     }
 
     public void aggiornaLuoghi(Luogo luogo) {

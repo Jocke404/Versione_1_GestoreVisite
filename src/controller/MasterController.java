@@ -93,13 +93,27 @@ public class MasterController {
     }
 
     private boolean autentica() {
-        isAuth = authenticationController.autentica();
+        final int maxAttempts = 3;
+        int attempt = 0;
+        isAuth = false;
+        while (attempt < maxAttempts && !isAuth) {
+            attempt++;
+            isAuth = authenticationController.autentica();
+            if (!isAuth) {
+                consoleIO.mostraMessaggio("Autenticazione fallita (" + attempt + "/" + maxAttempts + ").");
+                if (attempt < maxAttempts) {
+                    consoleIO.mostraMessaggio("Riprova.");
+                }
+            }
+        }
+
         if (isAuth) {
             utenteCorrente = authenticationController.getUtenteCorrente();
             volontariController = new VolontariController(volontariManager, aggiuntaUtilita, consoleIO, volontarioCorrente, validatore, viewUtilita);
             configuratoriController = new ConfiguratoriController(aggiuntaUtilita, modificaUtilita, viewUtilita, volontariController, luoghiController, visiteController, visiteManager, volontariManager, luoghiManager);
         } else {
             utenteCorrente = null;
+            consoleIO.mostraMessaggio("Numero massimo di tentativi superato. Accesso negato.");
         }
         return isAuth;
     }

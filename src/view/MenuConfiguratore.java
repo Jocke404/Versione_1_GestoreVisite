@@ -20,21 +20,18 @@ public class MenuConfiguratore implements Menu {
     private static final String [] SOTTOMENU_VOLONTARI={
         "Aggiungi Volontario", "Aggiungi volontari a un tipo di visita",
         "Rimuovi volontari da un tipo di visita", "Visualizza tutti i Volontari",
-        "Visualizza volontari per tipo di visita",
-        "Elimina Volontario" 
+        "Visualizza volontari per tipo di visita"
     };
 
     private static final String [] SOTTOMENU_VISITE={
         "Aggiungi Visita", "Visualizza Visite", 
         "Modifica stato della visita", "Modifica data della visita",  
-        "Visualizza visite per stato", "Visualizza archivio storico", 
-        "Stampa Tipi Visita per Luogo", "Elimina Visita",
-        "Assegna Visita a Volontario"
+        "Visualizza visite per stato", "Visualizza archivio storico",
+        "Elimina Visita", "Assegna Visita a Volontario"
     };
 
     private static final String [] SOTTOMENU_LUOGHI={
-        "Aggiungi Luogo", "Visualizza Luoghi", 
-        "Modifica Luogo", "Elimina Luogo"
+        "Aggiungi Luogo", "Visualizza Luoghi", "Stampa Tipi Visita per Luogo"
     };
 
     private final ConfiguratoriController configuratoriController;
@@ -45,7 +42,6 @@ public class MenuConfiguratore implements Menu {
     
     @Override
     public void mostraMenu() {
-        // Inizializza il menu con le opzioni disponibili
         boolean goOn = true;
         System.out.printf("oggi è il: %d/%d/%d\n", LocalDate.now().getDayOfMonth(), LocalDate.now().getMonthValue(), LocalDate.now().getYear());
         do {
@@ -78,7 +74,6 @@ public class MenuConfiguratore implements Menu {
                 case 4 -> configuratoriController.modificaMaxPersone();
                 case 5 -> configuratoriController.modificaNumeroPersoneIscrivibili();
                 case 6 -> configuratoriController.eliminaDatePrecluse();
-                //case 7 -> configuratoriController.aggiungiNuovoTipoVisita();
 
                 case 0 -> tornaIndietro = true;
                 default -> System.out.println("Opzione non valida.");
@@ -97,8 +92,7 @@ public class MenuConfiguratore implements Menu {
                 switch (sceltaSottomenu){
                     case 1 -> configuratoriController.aggiungiLuogo();
                     case 2 -> configuratoriController.mostraLuoghi();
-                    case 3 -> configuratoriController.modificaLuogo();
-                    case 4 -> configuratoriController.eliminaLuogo();
+                    case 3 -> configuratoriController.stampaTipiVisitaClassPerLuogo();
 
                     case 0 -> tornaIndietro = true;
                     default -> System.out.println("Opzione non valida.");
@@ -121,7 +115,6 @@ public class MenuConfiguratore implements Menu {
                 case 4 -> configuratoriController.modificaDataVisita();
                 case 5 -> configuratoriController.visualizzaVisitePerStato();
                 case 6 -> configuratoriController.visualizzaArchivioStorico();
-                case 7 -> configuratoriController.stampaTipiVisitaClassPerLuogo();
                 case 8 -> configuratoriController.eliminaVisita();
                 case 9 -> configuratoriController.assegnaVisitaAVolontario();
                 case 10 -> configuratoriController.rimuoviVisitaDaVolontario();
@@ -148,7 +141,6 @@ public class MenuConfiguratore implements Menu {
                 case 3 -> configuratoriController.rimuoviVolontariDaTipoVisita();
                 case 4 -> configuratoriController.mostraVolontari();
                 case 5 -> configuratoriController.visualizzaVolontariPerTipoVisita();
-                case 6 -> configuratoriController.eliminaVolontario();
 
                 case 0 -> tornaIndietro = true;
                 default -> System.out.println("Opzione non valida.");

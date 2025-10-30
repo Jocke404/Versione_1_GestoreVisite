@@ -51,7 +51,26 @@ public class Luogo {
 
     @Override
     public String toString() {
-        return "Luogo [nome=" + nome + ", descrizione=" + descrizione + ", collocazione=" + collocazione + ", tipiVisita=" + tipiVisita + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("Nome: ").append(getNome())
+          .append("\nDescrizione: ").append(getDescrizione())
+          .append("\nCollocazione: ").append(getCollocazione())
+          .append("\nTipi di visita:");
+
+        List<TipiVisitaClass> tipi = getTipiVisitaClass();
+        if (tipi == null || tipi.isEmpty()) {
+            sb.append(" []");
+        } else {
+            for (TipiVisitaClass t : tipi) {
+                sb.append("\n - ");
+                if (t == null) {
+                    sb.append("null");
+                } else {
+                    sb.append(t.toString());
+                }
+            }
+        }
+        return sb.toString();
     }
 
 }

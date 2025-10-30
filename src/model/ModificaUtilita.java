@@ -51,10 +51,6 @@ public class ModificaUtilita {
         return true;
     }
 
-    public void eliminaLuogo(Luogo luogo, LuoghiController luoghiController) {
-        luoghiController.eliminaLuogo(luogo);
-    }
-
     public void aggiornaLuogo(Luogo luogo, String nuovoNome, String nuovaDescrizione, 
                             String nuovaCollocazione, List<TipiVisitaClass> nuoviTipi, LuoghiController luoghiController) {
         if (!nuovoNome.isEmpty()) luogo.setName(nuovoNome);
@@ -62,10 +58,6 @@ public class ModificaUtilita {
         if (!nuovaCollocazione.isEmpty()) luogo.setCollocazione(nuovaCollocazione);
         luogo.setTipiVisitaClass(nuoviTipi);
         luoghiController.aggiornaLuoghi(luogo);
-    }
-
-    public void eliminaVolontario(Volontario volontario, VolontariController volontariController) {
-        volontariController.eliminaVolontario(volontario);
     }
 
     public void eliminaVisita(Visita visita, VisiteController visiteController) {

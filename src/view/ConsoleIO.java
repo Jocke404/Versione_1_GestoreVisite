@@ -62,7 +62,12 @@ public class ConsoleIO implements View{
     }
 
     public String chiediEmail() {
-        return InputDati.leggiStringaNonVuota("email: ");
+        String email = InputDati.leggiStringaNonVuota("email: ");
+        if (!isEmailValida(email)) {
+            mostraMessaggio("Formato email non valido. Riprova.");
+            return chiediEmail();
+        }
+        return email;
     }
 
     public String chiediPassword() {
@@ -556,7 +561,8 @@ public class ConsoleIO implements View{
 
     public List<TipiVisitaClass> chiediNuoviTipiVisitaClass(List<TipiVisitaClass> tipiAttuali) {
 
-        List<TipiVisitaClass> nuoviTipi = new ArrayList<>(tipiAttuali);
+        List<TipiVisitaClass> nuoviTipi = new ArrayList<>(tipiAttuali == null ? List.of() : tipiAttuali);
+
         // FASE 1: Eliminazione tipi di visita
         if (!nuoviTipi.isEmpty() && InputDati.yesOrNo("Vuoi eliminare uno o più tipi di visita attuali?")) {
             boolean eliminaAltro;
@@ -574,7 +580,8 @@ public class ConsoleIO implements View{
         }
 
         // FASE 2: Aggiunta tipi di visita
-        List<TipiVisitaClass> tipiDisponibili = new ArrayList<>();
+        // ottieni tutti i tipi disponibili e rimuovi quelli già presenti
+        List<TipiVisitaClass> tipiDisponibili = new ArrayList<>(TipiVisitaClass.values());
         tipiDisponibili.removeAll(nuoviTipi);
 
         if (!tipiDisponibili.isEmpty() && InputDati.yesOrNo("Vuoi aggiungere nuovi tipi di visita?")) {
@@ -597,7 +604,7 @@ public class ConsoleIO implements View{
                 }
             }
         }
-        return tipiAttuali; // Placeholder
+        return nuoviTipi;
     }
 
     public void mostraConfrontoLuogo(Luogo luogo, String nuovoNome, String nuovaDescrizione, String nuovaCollocazione, List<TipiVisitaClass> nuoviTipi) {
@@ -613,10 +620,6 @@ public class ConsoleIO implements View{
         mostraMessaggio("Volontari disponibili:");
         mostraElencoConOggetti(volontari);
         return InputDati.leggiIntero("Seleziona il volontario: ", 1, volontari.size()) - 1;
-    }
-
-    public boolean chiediConfermaEliminazioneVolontario(Volontario volontario) {
-        return InputDati.yesOrNo("Sei sicuro di voler eliminare il volontario: " + volontario.getNome() + "?");
     }
 
     public Volontario chiediDatiNuovoVolontario() {
@@ -705,11 +708,13 @@ public class ConsoleIO implements View{
         }
     }
 
-    // public TipiVisitaClass chiediNuovoTipoVisita() {
-    //     mostraMessaggio("Tipi di visita attuali:");
-    //     mostraElencoConOggetti(List.of(TipiVisitaClass.values()));
-
-    // }
+    public TipiVisitaClass chiediNuovoTipoVisita() {
+        mostraMessaggio("Tipi di visita attuali:");
+        mostraElencoConOggetti(TipiVisitaClass.values());
+        String newTipo = InputDati.leggiStringaNonVuota("Nome del nuovo Tipo: ");
+        String newTipoDesc = InputDati.leggiStringaNonVuota("Descrizione del nuovo Tipo: ");
+        return new TipiVisitaClass(newTipo, newTipoDesc);
+    }
 
 
 }

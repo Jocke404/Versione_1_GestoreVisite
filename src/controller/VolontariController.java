@@ -27,9 +27,4 @@ public class VolontariController {
     public List<Volontario> getVolontari() {
         return List.copyOf(volontariManager.getVolontariMap().values());
     }
-
-    public void eliminaVolontario(Volontario volontarioDaEliminare) {
-        volontariManager.eliminaVolontario(volontarioDaEliminare);
-    }
-
 }

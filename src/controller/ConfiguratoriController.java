@@ -229,60 +229,6 @@ public class ConfiguratoriController {
        viewUtilita.stampaTipiVisitaClassPerLuogo(luoghiController);
     }
 
-    public void eliminaLuogo() {
-        List<Luogo> luoghi = luoghiController.getLuoghi();
-        if (luoghi.isEmpty()) {
-            consoleIO.mostraMessaggio("Nessun luogo disponibile per la modifica.");
-            return;
-        }
-        int scelta = consoleIO.chiediSelezioneLuogo(luoghi);
-        Luogo luogoDaEliminare = luoghi.get(scelta);
-        if (consoleIO.chiediConfermaEliminazioneLuogo(luogoDaEliminare)) {
-            modificaUtilita.eliminaLuogo(luogoDaEliminare, luoghiController);
-        } else {
-            consoleIO.mostraMessaggio("Operazione annullata.");
-        }
-    }
-
-    public void modificaLuogo() {
-        List<Luogo> luoghi = luoghiController.getLuoghi();
-        if (luoghi.isEmpty()) {
-            consoleIO.mostraMessaggio("Nessun luogo disponibile per la modifica.");
-            return;
-        }
-        int scelta = consoleIO.chiediSelezioneLuogo(luoghi);
-        Luogo luogoDaModificare = luoghi.get(scelta);
-
-        String nuovoNome = consoleIO.chiediNuovoNomeLuogo(luogoDaModificare.getNome());
-        String nuovaDescrizione = consoleIO.chiediNuovaDescrizioneLuogo(luogoDaModificare.getDescrizione());
-        String nuovaCollocazione = consoleIO.chiediNuovaCollocazioneLuogo(luogoDaModificare.getCollocazione());
-        List<TipiVisitaClass> nuoviTipi = consoleIO.chiediNuoviTipiVisitaClass(luogoDaModificare.getTipiVisitaClass());
-
-        consoleIO.mostraConfrontoLuogo(luogoDaModificare, nuovoNome, nuovaDescrizione, nuovaCollocazione, nuoviTipi);
-
-        if (InputDati.yesOrNo("Vuoi confermare e salvare le modifiche?")) {
-            modificaUtilita.aggiornaLuogo(luogoDaModificare, nuovoNome, nuovaDescrizione, nuovaCollocazione, nuoviTipi, luoghiController);
-        } else {
-            consoleIO.mostraMessaggio("Modifiche annullate. Nessun cambiamento effettuato.");
-        }
-    }
-
-    public void eliminaVolontario() {
-        List<Volontario> volontari = volontariController.getVolontari();
-        if (volontari.isEmpty()) {
-            consoleIO.mostraMessaggio("Nessun volontario disponibile per la modifica.");
-            return;
-        }
-        List<Volontario> selezionati = consoleIO.chiediVolontariMultipli(volontari);
-        for (Volontario volontarioDaEliminare : selezionati) {
-            if (consoleIO.chiediConfermaEliminazioneVolontario(volontarioDaEliminare)) {
-                modificaUtilita.eliminaVolontario(volontarioDaEliminare, volontariController);
-            } else {
-                consoleIO.mostraMessaggio("Operazione annullata.");
-            }
-        }
-    }
-
     public void aggiungiVolontariATipoVisita() {
         if (consoleIO.chiediAnnullaOperazione()) return;
 
@@ -406,21 +352,10 @@ public class ConfiguratoriController {
         int sceltaVolontario = consoleIO.chiediSelezioneVolontario(volontari);
         Volontario volontarioSelezionato = volontari.get(sceltaVolontario);
         if (!consoleIO.chiediAnnullaOperazione()) {
-            //addUtilita.rimuoviVisitaDaVolontario(visitaSelezionata, volontarioSelezionato);
+            addUtilita.rimuoviVisitaDaVolontario(visitaSelezionata, volontarioSelezionato);
             consoleIO.mostraRisultatoAggiornamentoVisitaVolontario(true);
         } else {
             consoleIO.mostraMessaggio("Operazione annullata.");
         }
-
     }
-
-    // public void aggiungiNuovoTipoVisita() {
-    //     TipiVisitaClass nuovoTipo = consoleIO.chiediNuovoTipoVisita();
-    //     if (nuovoTipo != null && InputDati.yesOrNo("Vuoi confermare e aggiungere il nuovo tipo di visita?")) {
-    //         addUtilita.aggiungiNuovoTipoVisita(nuovoTipo);
-    //         consoleIO.mostraMessaggio("Nuovo tipo di visita aggiunto con successo.");
-    //     } else {
-    //         consoleIO.mostraMessaggio("Operazione annullata.");
-    //     }
-    // }
 }
