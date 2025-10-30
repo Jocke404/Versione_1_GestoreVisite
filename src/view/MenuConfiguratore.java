@@ -27,7 +27,8 @@ public class MenuConfiguratore implements Menu {
         "Aggiungi Visita", "Visualizza Visite", 
         "Modifica stato della visita", "Modifica data della visita",  
         "Visualizza visite per stato", "Visualizza archivio storico",
-        "Elimina Visita", "Assegna Visita a Volontario"
+        "Elimina Visita", "Assegna Visita a Volontario",
+        "Rimuovi Visita da Volontario"
     };
 
     private static final String [] SOTTOMENU_LUOGHI={
@@ -115,9 +116,9 @@ public class MenuConfiguratore implements Menu {
                 case 4 -> configuratoriController.modificaDataVisita();
                 case 5 -> configuratoriController.visualizzaVisitePerStato();
                 case 6 -> configuratoriController.visualizzaArchivioStorico();
-                case 8 -> configuratoriController.eliminaVisita();
-                case 9 -> configuratoriController.assegnaVisitaAVolontario();
-                case 10 -> configuratoriController.rimuoviVisitaDaVolontario();
+                case 7 -> configuratoriController.eliminaVisita();
+                case 8 -> configuratoriController.assegnaVisitaAVolontario();
+                case 9 -> configuratoriController.rimuoviVisitaDaVolontario();
 
 
 
