@@ -10,7 +10,6 @@ import src.model.db.ApplicationSettingsDAO;
 import src.model.db.VisiteManagerDB;
 import src.controller.LuoghiController;
 import src.controller.VisiteController;
-import src.controller.VolontariController;
 
 public class ModificaUtilita {
 

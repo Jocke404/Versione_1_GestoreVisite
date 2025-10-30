@@ -1,6 +1,5 @@
 package src.model;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -8,8 +7,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.time.*;
 
 import src.model.db.*;
-
-import lib.InputDati;
 import src.view.ConsoleIO;
 import src.view.ViewUtilita;
 
@@ -35,8 +32,7 @@ public class AggiuntaUtilita {
     
 
     private final ConsoleIO consoleIO = new ConsoleIO();
-    private final Map<String, List<LocalDate>> disponibilitaVolontari = new ConcurrentHashMap<>();
-
+    
     public AggiuntaUtilita(VolontariManager volontariManager, LuoghiManager luoghiManager, 
                             VisiteManagerDB visiteManagerDB) {
         this.volontariManager = volontariManager;

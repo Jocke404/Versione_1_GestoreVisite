@@ -109,7 +109,7 @@ public class MasterController {
 
         if (isAuth) {
             utenteCorrente = authenticationController.getUtenteCorrente();
-            volontariController = new VolontariController(volontariManager, aggiuntaUtilita, consoleIO, volontarioCorrente, validatore, viewUtilita);
+            volontariController = new VolontariController(volontariManager, aggiuntaUtilita, volontarioCorrente, validatore, viewUtilita);
             configuratoriController = new ConfiguratoriController(aggiuntaUtilita, modificaUtilita, viewUtilita, volontariController, luoghiController, visiteController, visiteManager, volontariManager, luoghiManager);
         } else {
             utenteCorrente = null;
