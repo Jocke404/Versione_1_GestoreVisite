@@ -16,6 +16,8 @@ public class ApplicationSettingsDAO {
     private static final String SELECT_SQL = "SELECT territorial_scope FROM application_settings LIMIT 1";
     private static final String UPDATE_SQL = "UPDATE application_settings SET territorial_scope = ?, updated_at = CURRENT_TIMESTAMP";
     private static final String INSERT_SQL = "INSERT INTO application_settings(territorial_scope, created_at, updated_at) VALUES (?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
+
+    private static final String UPDATE_STATO_RACCOLTA_SQL = "UPDATE application_settings SET stato_raccolta = ?, updated_at = CURRENT_TIMESTAMP";
     
     private static final String SELECT_MAX_SQL = "SELECT max_people_per_visit FROM application_settings LIMIT 1";
     private static final String UPDATE_MAX_SQL = "UPDATE application_settings SET max_people_per_visit = ?, updated_at = CURRENT_TIMESTAMP";
@@ -142,5 +144,16 @@ public class ApplicationSettingsDAO {
         }
         sb.append("]");
         return sb.toString();
+    }
+
+    public void setStatoRaccolta(Boolean stato) {
+        try (Connection conn = DatabaseConnection.connect()) {
+            try (PreparedStatement ps = conn.prepareStatement(UPDATE_STATO_RACCOLTA_SQL)) {
+                ps.setBoolean(1, stato);
+                ps.executeUpdate();
+            }
+        } catch (SQLException e) {
+            System.err.println("ApplicationSettingsDAO.setStatoRaccolta error: " + e.getMessage());
+        }
     }
 }

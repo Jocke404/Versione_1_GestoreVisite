@@ -1,6 +1,9 @@
 package src.controller;
 
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import src.factory.MenuFactory;
 import src.model.*;
@@ -30,6 +33,7 @@ public class MasterController {
     private AmbitoTerritoriale ambitoTerritoriale = new AmbitoTerritoriale();
     private MenuFactory menuFactory = new MenuFactory();
     private ConsoleIO consoleIO = new ConsoleIO();
+    private ScheduledExecutorService scheduledExecutor;
 
 
 
@@ -75,6 +79,31 @@ public class MasterController {
 
     public void startApp() {
         if (autentica()) {
+            threadPoolController.createThreadPool(1).submit(() -> {
+                try {
+                    validatore.gestioneVisiteAuto();
+                    validatore.gestioneDatePrecluseAuto();
+                } catch (Throwable t) {
+                    System.err.println("Errore gestioneVisiteAuto (immediato): " + t.getMessage());
+                }
+            });
+
+            // programma l'esecuzione ripetuta (una volta ogni 24 ore)
+            if (scheduledExecutor == null || scheduledExecutor.isShutdown()) {
+                scheduledExecutor = Executors.newSingleThreadScheduledExecutor(r -> {
+                    Thread t = new Thread(r);
+                    t.setDaemon(true);
+                    t.setName("validatore-visite-scheduler");
+                    return t;
+                });
+                scheduledExecutor.scheduleAtFixedRate(() -> {
+                    try {
+                        validatore.gestioneVisiteAuto();
+                    } catch (Throwable t) {
+                        System.err.println("Errore gestioneVisiteAuto (scheduler): " + t.getMessage());
+                    }
+                }, 5, 5, TimeUnit.SECONDS); 
+            }
             showMenu();
             aggiornaDatabaseAsync();
         }
@@ -123,11 +152,7 @@ public class MasterController {
         if (isAuth) {
             System.out.println("Buongiorno " + utenteCorrente.getNome() + "!");
             if (utenteCorrente instanceof Configuratore) {
-                if (!ambitoTerritoriale.isAmbitoConfigurato()) {
-                    ambitoTerritoriale.scegliAmbitoTerritoriale();
-                } else {
-                    ambitoTerritoriale.caricaAmbitoTerritoriale();
-                }
+                ambitoTerritoriale.verificaAggiornaAmbitoTerritoriale();
                 menu = menuFactory.creaMenuConfiguratore(configuratoriController);
             } else {
                 consoleIO.mostraMessaggio("Errore: tipo di utente non riconosciuto.");
