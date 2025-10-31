@@ -477,7 +477,7 @@ public class ConsoleIO implements View{
 
     public LocalDate chiediDataPreclusaStandard() {
         LocalDate oggi = LocalDate.now();
-        YearMonth meseTarget = YearMonth.from(oggi).plusMonths(2);
+        YearMonth meseTarget = YearMonth.from(oggi).plusMonths(3);
         List<LocalDate> dateValide = new ArrayList<>();
         for (int giorno = 1; giorno <= meseTarget.lengthOfMonth(); giorno++) {
             dateValide.add(meseTarget.atDay(giorno));

@@ -119,9 +119,7 @@ public class MenuConfiguratore implements Menu {
                 case 7 -> configuratoriController.eliminaVisita();
                 case 8 -> configuratoriController.assegnaVisitaAVolontario();
                 case 9 -> configuratoriController.rimuoviVisitaDaVolontario();
-
-
-
+                
                 case 0 -> tornaIndietro = true;
                 default -> System.out.println("Opzione non valida.");
             }
@@ -130,7 +128,6 @@ public class MenuConfiguratore implements Menu {
 
     private void sottomenuVolontari(){
         boolean tornaIndietro = false;
-
         do{
             MyMenu sottomenu = new MyMenu ("GESTIONE VOLONTARI", SOTTOMENU_VOLONTARI);
             
