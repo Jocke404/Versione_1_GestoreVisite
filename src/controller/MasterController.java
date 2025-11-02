@@ -60,6 +60,7 @@ public class MasterController {
         viewUtilita = ViewUtilita.getInstance();
         visiteController = new VisiteController(visiteManager);
         luoghiController = new LuoghiController(luoghiManager, viewUtilita);
+        validatore = new ValidatoreVisite(visiteManager);
         
 
         ConsoleIO consoleIO = new ConsoleIO();
