@@ -1,20 +1,16 @@
 package src.model;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import java.time.*;
 
 import src.model.db.*;
-import src.view.ConsoleIO;
-import src.view.ViewUtilita;
 
 
 
 public class AggiuntaUtilita {
 
-    // private final DatabaseUpdater databaseUpdater;
     private final VolontariManager volontariManager;
     private final LuoghiManager luoghiManager;
     private final VisiteManagerDB visiteManagerDB;
@@ -24,16 +20,8 @@ public class AggiuntaUtilita {
     List<TipiVisitaClass> tipiVisitaList;
     ConcurrentHashMap<Integer, Visita> visiteMap;
     ConcurrentHashMap<LocalDate, String> datePrecluseMap;
-    private final ValidatoreVisite validatoreVisite;
-    private final ViewUtilita viewUtilita = ViewUtilita.getInstance();
-    private final ModificaUtilita modificaUtilita;
-    private int maxPersoneIscrivibili;
-    private AmbitoTerritoriale ambitoTerritoriale = new AmbitoTerritoriale();
-    
 
-    private final ConsoleIO consoleIO = new ConsoleIO();
-    
-    public AggiuntaUtilita(VolontariManager volontariManager, LuoghiManager luoghiManager, 
+    public AggiuntaUtilita(VolontariManager volontariManager, LuoghiManager luoghiManager,
                             VisiteManagerDB visiteManagerDB) {
         this.volontariManager = volontariManager;
         this.luoghiManager = luoghiManager;
@@ -42,8 +30,6 @@ public class AggiuntaUtilita {
         this.volontariMap = volontariManager.getVolontariMap();
         this.visiteMap = visiteManagerDB.getVisiteMap();
         this.tipiVisitaList = visiteManagerDB.getTipiVisitaClassList();
-        this.validatoreVisite = new ValidatoreVisite(visiteManagerDB);
-        this.modificaUtilita = new ModificaUtilita(visiteManagerDB);
     }
 
     public boolean aggiungiVisita(Visita nuovaVisita) {
@@ -71,7 +57,6 @@ public class AggiuntaUtilita {
             volontariManager.aggiungiTipoVisitaAVolontari(volontario.getEmail(), tipoVisita);
         }
     }
-
 
     public void rimuoviTipoVisitaDaVolontari(List<Volontario> volontari, TipiVisitaClass tipoVisita) {
         for (Volontario volontario : volontari) {

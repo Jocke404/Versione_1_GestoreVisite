@@ -57,18 +57,6 @@ public class ViewUtilita {
     public void stampaVolontari(VolontariController volontariController) {
         List<Volontario> volontari = volontariController.getVolontari();
         consoleIO.mostraElencoConOggetti(volontari);
-        // if (volontari.isEmpty()) {
-        //     System.out.println("Nessun volontario disponibile.");
-        //     return;
-        // }
-
-        // System.out.println("Volontari:");
-        // for (Volontario volontario : volontari) {
-        //     System.out.println("Nome: " + volontario.getNome() + " " + volontario.getCognome());
-        //     System.out.println("Email: " + volontario.getEmail());
-        //     System.out.println("Tipi di Visite: " + volontario.getTipiDiVisite());
-        //     System.out.println("-------------------------");
-        // }
     }
 
     // Metodo per stampare le visite
