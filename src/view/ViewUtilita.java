@@ -41,7 +41,7 @@ public class ViewUtilita {
         return instance;
     }
 
-    // Metodo per stampare i luoghi
+     
     public void stampaLuoghi(LuoghiController luoghiController) {
         List<Luogo> luoghi = luoghiController.getLuoghi();
         if (luoghi.isEmpty()) {
@@ -53,13 +53,13 @@ public class ViewUtilita {
         consoleIO.mostraElencoConOggetti(luoghi);
     }
 
-    // Metodo per stampare i volontari
+     
     public void stampaVolontari(VolontariController volontariController) {
         List<Volontario> volontari = volontariController.getVolontari();
         consoleIO.mostraElencoConOggetti(volontari);
     }
 
-    // Metodo per stampare le visite
+     
     public void stampaVisite(VisiteController visiteController) {
         List<Visita> visite = visiteController.getVisite();
         if (visite.isEmpty()) {
@@ -71,7 +71,7 @@ public class ViewUtilita {
         consoleIO.mostraElencoConOggetti(visite);
     }
 
-    // Metodo per visualizzare le visite per stato
+     
     public void stampaVisitePerStato() { 
         if (visiteMap.isEmpty()) {
             System.out.println("Non ci sono visite disponibili.");
@@ -97,7 +97,7 @@ public class ViewUtilita {
         consoleIO.mostraElencoConOggetti(visiteInStato);
     }
 
-    // Metodo per visualizzare l'archivio storico delle visite
+     
     public void stampaArchivioStorico(VisiteController visiteController) {
         ConcurrentHashMap<Integer, Visita> visiteMap = visiteController.getVisiteMap();
 
@@ -117,7 +117,7 @@ public class ViewUtilita {
     }
 
 
-    // Metodo per visualizzare le visite assegnate a un volontario
+     
     public void stampaVisiteVolontario(Volontario volontario) {
         System.out.println("Visite assegnate a " + volontario.getNome() + " " + volontario.getCognome() + ":");
         if (visiteMap.isEmpty()) {
@@ -158,7 +158,7 @@ public class ViewUtilita {
         }
     }
 
-  // Metodo per visualizzare l'ambito territoriale
+   
     public void stampaAmbitoTerritoriale(AmbitoTerritoriale ambitoTerritoriale) {
         List<String> ambito = ambitoTerritoriale.getAmbitoTerritoriale();
         if (ambito.isEmpty()) {
@@ -171,7 +171,7 @@ public class ViewUtilita {
         }
     }
 
-    //Metodo per visualizzare i tipi di visita per luogo
+     
     public void stampaTipiVisitaClassPerLuogo(LuoghiController luoghiController) {
 
         System.out.println ("Tipi di visita per luogo:");
@@ -226,7 +226,7 @@ public class ViewUtilita {
         }
     }
 
-    //metodo per visualizzare i volontari per ogni tipo di visita
+     
     public void visualizzaVolontariPerTipoVisita(VolontariManager volontariManager){
 
         if (tipiVisitaList.isEmpty()) {
@@ -254,9 +254,9 @@ public class ViewUtilita {
 
     }
 
-    //metodo alternativo per visualizzazione dettagliata di un tipo specifico
+     
     public void visualizzaVolontariPerTipoVisitaSpecifico(VisiteManagerDB visiteManagerDB, VolontariManager volontariManager){
-        //mostra i tipi di visita disponibili
+         
         List <TipiVisitaClass> tipiVisitaDisponibili = visiteManagerDB.getTipiVisitaClassList();
 
         if (tipiVisitaDisponibili.isEmpty()) {
@@ -280,7 +280,7 @@ public class ViewUtilita {
             consoleIO.mostraMessaggio ("Volontari assegnati:");
             consoleIO.mostraElencoConOggetti(volontari);
 
-            //mostra anche gli altri tipi di visita del volontario
+             
             for (Volontario v : volontari) {
                 if (!v.getTipiDiVisite().isEmpty()) {
                     consoleIO.mostraMessaggio("   Altri tipi di visita assegnati:");
@@ -301,16 +301,16 @@ public class ViewUtilita {
         try {
             maxDb = ApplicationSettingsDAO.getMaxPeoplePerVisit();
         } catch (Throwable t) {
-            // ignore DB error -> fallback file
+             
         }
 
         int value;
         if (maxDb != null) {
             value = maxDb.intValue();
         } else {
-            // fallback legacy: leggi dal file
+             
             Object props = ServizioFile.caricaProperties(NUMERO_PERSONE_FILE);
-            // prova a estrarre un valore numerico da props (Properties o stringa)
+             
             int fallback = 10;
             try {
                 if (props instanceof java.util.Properties) {
@@ -324,7 +324,7 @@ public class ViewUtilita {
                     fallback = Integer.parseInt(s);
                 }
             } catch (Exception e) {
-                // keep default
+                 
             }
             value = fallback;
         }
