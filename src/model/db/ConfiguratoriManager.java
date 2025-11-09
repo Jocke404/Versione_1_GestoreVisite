@@ -24,7 +24,6 @@ public class ConfiguratoriManager extends DatabaseManager {
     }
     
      
-     
     protected void caricaConfiguratori() {
         String sql = "SELECT nome, cognome, email, password FROM configuratori";
         try (Connection conn = DatabaseConnection.connect();
